@@ -1,0 +1,50 @@
+<!-- templates/quiz.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="../static/styles.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Flask Web App</title>
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico"
+            sizes="64x64">
+        <script>
+            // If reload flag is set, reload the page after 3 seconds
+            function reloadAfterDelay() {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000); // Wait for 3 seconds
+            }
+        </script>
+    </head>
+    <body>
+        <div class="topbar">
+            <!-- Courtesy of phoneticallySAARTHaK on Reddit: https://pokemon-fonts-generator.netlify.app/ -->
+            <img src="/static/dexquiz.png" alt="DexQuiz" width="1715" height="168">
+        </div>
+        <div class="topnav">
+            <a href="/quiz">zum Quiz</a>
+            <a href="#">Highscores</a>
+            <a href="#">Login</a>
+        </div>
+        <div class="content">
+            <h1>This is the pokemon guessing game!</h1>
+            <p>Hello, {{ user_name }}! This is a dynamic message.</p>
+
+            <!-- Form for user input -->
+            <form method="POST">
+                <input type="text" name="guess" required>
+                <button type="submit">Submit</button>
+            </form>
+
+            {% if message %}
+            <p>{{ message }}</p>
+            {% endif %}
+
+            {% if reload %}
+            <script>reloadAfterDelay();</script>
+            {% endif %}
+        </div>
+
+    </body>
+</html>
