@@ -1,0 +1,20 @@
+services:
+    db:
+        container_name: mydb
+        image: mysql:9.2.0
+        ports:
+            - "32001:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    app:
+        container_name: myapp
+        build:
+            context: .
+            dockerfile: dockerfile
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db

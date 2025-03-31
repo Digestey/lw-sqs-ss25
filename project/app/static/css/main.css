@@ -1,0 +1,239 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* Ensure body takes full viewport height */
+}
+
+main {
+  flex: 1;
+  /* Pushes the footer to the bottom */
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Style of the Title bar */
+.topbar {
+  background-color: #DE1537;
+  border-radius: 5px;
+  border-style: groove;
+  border-color: orange;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.p {
+  height: fit-content;
+}
+
+.dexquiz-home-nav {
+  display: flex;
+  text-align: center;
+}
+
+/* Style the top navigation bar */
+.topnav {
+  overflow: hidden;
+  background-color: #8F0C25;
+}
+
+/* Style the topnav links */
+.topnav a {
+  float: left;
+  display: flex;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Change color on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+  transition: background-color 100ms linear;
+}
+
+/* Style the content */
+.content {
+  background-color: #ddd;
+  padding: 25px;
+  align-content: center;
+  display: flex;
+  justify-content: center;
+  flex-flow: column;
+  align-items: center;
+}
+
+/* Ensure footer is always at the bottom */
+.footer {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: gray;
+  color: white;
+  padding: 10px;
+  margin-top: auto;
+  /* Pushes footer to the bottom */
+}
+
+form {
+  padding-bottom: 20px;
+}
+
+.pokedex-container {
+  position: relative;
+  width: 765px;
+  /* Adjust to match your template */
+  height: 567px;
+  /* Adjust to match your template */
+}
+
+.pokedex-screen {
+  width: 100%;
+  height: auto;
+  display: flex;
+}
+
+.hint {
+  position: center;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.hint-height {
+  height: auto;  /* or a specific pixel value */
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-weight {
+  top: 80px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-species {
+  top: 110px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-primary-type {
+  top: 140px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-secondary-type {
+  top: 170px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-pokedex-entry {
+  top: 200px;
+  left: 50px;
+  width: 400px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+/* Base stats positioning */
+.base-stats-container {
+  position: relative;
+}
+
+.hint-base-hp {
+  height: 10px;
+  top: 250px;
+  left: 100px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-base-attack {
+  top: 280px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-base-defense {
+  top: 310px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-base-special-attack {
+  top: 340px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-base-special-defense {
+  top: 370px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-base-speed {
+  top: 400px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+
+.hint-ability {
+  top: 430px;
+  left: 100px;
+  height: 10px;
+  visibility: hidden; /* Hide initially */
+  transition: visibility 0.3s, height 0.3s ease;
+}
+

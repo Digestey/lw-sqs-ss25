@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="{{ url_for('static', path='/css/main.css') }}" rel="stylesheet">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}DEXQUIZ{% endblock %}</title>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('images', path='favicon.ico') }}" sizes="64x64">
+    </head>
+    <body>
+        <div class="topbar">
+            <a title="DexQuiz" href="/" class="dexquiz-home-nav">
+                <img src="{{ url_for('images', path='dexquiz.png') }}" alt="DexQuiz" width="1715" height="168">
+            </a>
+        </div>
+        <div class="topnav">
+            <a href="/quiz">Zum Quiz</a>
+            <a href="#">Highscores</a>
+            <a href="#">Login</a>
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+
+        {% block scripts %}{% endblock %}
+        <footer class="footer">
+            <div class="footer.content">
+                
+            </div>
+        </footer>
+    </body>
+    
+</html>

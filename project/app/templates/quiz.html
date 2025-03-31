@@ -1,50 +1,70 @@
-<!-- templates/quiz.html -->
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <link rel="stylesheet" href="../static/styles.css">
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Flask Web App</title>
-        <link rel="icon" type="image/x-icon" href="../images/favicon.ico"
-            sizes="64x64">
-        <script>
-            // If reload flag is set, reload the page after 3 seconds
-            function reloadAfterDelay() {
-                setTimeout(() => {
-                    window.location.reload();
-                }, 3000); // Wait for 3 seconds
-            }
+{% extends "base.html" %}
+
+{% block title %}Quiz - DEXQUIZ{% endblock %}
+
+{% block content %}
+<section>
+    <h1>This is the Pokémon Guessing Game!</h1>
+    <p>The way it works is simple: you guess the name of a random Pokémon.</p>
+    <p>If you guess correctly, you win the game; if you guess incorrectly, some
+        information about the Pokémon will be revealed.</p>
+    <p>Depending on how quickly you guess, you'll earn points (points system to
+        be implemented). Try to score as many points as you can!</p>
+    <p>To join the leaderboard or view it, please log in.</p>
+</section>
+
+<!-- Form for user input -->
+<form method="POST">
+    <input type="text" name="guess" required>
+    <button type="submit">Submit</button>
+</form>
+<div>
+    <h3>Guess the Pokémon!</h3>
+    <p><strong>Type:</strong> {{ pokemon.types[0] }}</p>
+    {% if pokemon.types|length > 1 %}
+    <p><strong>Secondary Type:</strong> {{ pokemon.types[1] }}</p>
+    {% endif %}
+    <p><strong>Height:</strong> {{ pokemon.height }}</p>
+    <p><strong>Weight:</strong> {{ pokemon.weight }}</p>
+    <p><strong>Dex Entry:</strong> {{ pokemon.dex_entry }}</p>
+
+    <h4>Stats:</h4>
+    <ul>
+        {% for stat, value in pokemon.stats.items() %}
+        <li>{{ stat }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="pokedex-container">
+    <img src="images/hints.png" alt="Hints-Overlay" width="1530" height="567">
+    <div class="hint-height" {% if hint_to_show == 'height' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-weight" {% if hint_to_show == 'weight' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-species" {% if hint_to_show == 'species' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-primary-type" {% if hint_to_show == 'types' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-secondary-type" {% if hint_to_show == 'secondary_type' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-pokedex-entry" {% if hint_to_show == 'dex_entry' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-base-hp" {% if hint_to_show == 'base_hp' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-base-attack" {% if hint_to_show == 'base_attack' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-base-defense" {% if hint_to_show == 'base_defense' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-base-special-attack" {% if hint_to_show == 'base_special_attack' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-base-special-defense" {% if hint_to_show == 'base_special_defense' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-base-speed" {% if hint_to_show == 'base_speed' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-ability" {% if hint_to_show == 'abilities' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+</div>
+
+<script src="/static/script.js"></script>
+
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if reload %}
+<script>
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         </script>
-    </head>
-    <body>
-        <div class="topbar">
-            <!-- Courtesy of phoneticallySAARTHaK on Reddit: https://pokemon-fonts-generator.netlify.app/ -->
-            <img src="/static/dexquiz.png" alt="DexQuiz" width="1715" height="168">
-        </div>
-        <div class="topnav">
-            <a href="/quiz">zum Quiz</a>
-            <a href="#">Highscores</a>
-            <a href="#">Login</a>
-        </div>
-        <div class="content">
-            <h1>This is the pokemon guessing game!</h1>
-            <p>Hello, {{ user_name }}! This is a dynamic message.</p>
-
-            <!-- Form for user input -->
-            <form method="POST">
-                <input type="text" name="guess" required>
-                <button type="submit">Submit</button>
-            </form>
-
-            {% if message %}
-            <p>{{ message }}</p>
-            {% endif %}
-
-            {% if reload %}
-            <script>reloadAfterDelay();</script>
-            {% endif %}
-        </div>
-
-    </body>
-</html>
+{% endif %}
+{% endblock %}

@@ -1,34 +1,9 @@
-<!-- templates/index.html -->
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <link rel="stylesheet" href="../static/styles.css">
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Flask Web App</title>
-        <link rel="icon" type="image/x-icon" href="../static/favicon.ico" sizes="64x64">
-    </head>
-    <body>
-        <div class="topbar">
-            <!-- Courtesy of phoneticallySAARTHaK on Reddit: https://pokemon-fonts-generator.netlify.app/ -->
-            <img src="/static/dexquiz.png" alt="DexQuiz" width="1715" height="168">
-        </div>
-        <div class="topnav">
-            <a href="/quiz">Zum Quiz</a>
-            <a href="#">Link</a>
-            <a href="#">Link</a>
-        </div>
-        <div class="content">
-            <h1>Welcome to My Flask Web App!</h1>
-            <p>Hello, {{ user_name }}! This is a dynamic message.</p>
+{% extends "base.html" %}
 
-            <!-- Form for user input -->
-            <form action="/submit" method="POST">
-                <label for="name">Enter your name:</label>
-                <input type="text" id="name" name="name">
-                <button type="submit">Submit</button>
-            </form>
-        </div>
+{% block title %}Home - DEXQUIZ{% endblock %}
 
-    </body>
-</html>
+{% block content %}
+    <h1>Welcome to the DexQuiz!</h1>
+    <p>Test your knowledge on the 1025 different Pokémon.</p>
+    <a href="/quiz">Start Quiz</a>
+{% endblock %}
