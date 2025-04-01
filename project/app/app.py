@@ -18,6 +18,10 @@ sessions = {}
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+pb.cache.set_cache(os.getenv("POKEMON_CACHE"))
+
+print(f"{dir(pb.cache.API_CACHE)}")
+
 # Mount the required directories for the webpage
 
 app.mount(
@@ -163,6 +167,13 @@ async def post_quiz(request: Request, guess: str = Form(...)):
         "hint_to_show": hint_to_show
     })
 
+@app.get("/login")
+async def login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/highscores")
+async def highscores(request: Request):
+    return templates.TemplateResponse("highscores.html", {"request": request})
 
 def get_hint(wrong_guesses):
     """Determine the hints that are to be displayed

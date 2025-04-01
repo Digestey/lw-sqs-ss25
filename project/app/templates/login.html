@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Login - DEXQUIZ{% endblock %}
+
+{% block content %}
+    <h1>Please log in.</h1>
+
+    <p>In order to be featured on the leaderboard and store</p>
+    <p>your past performances automatically, you need to be logged in.</p>
+    
+    <form method="POST">
+        <input type="text" name="username" required>
+        <input type="text" name="password" required>
+        <button type="log_in">Log in</button>
+        <button type="cr_account">Create account</button>
+    </form>
+{% endblock %}

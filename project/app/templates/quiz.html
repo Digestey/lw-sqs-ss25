@@ -37,19 +37,21 @@
 </div>
 <div class="pokedex-container">
     <img src="images/hints.png" alt="Hints-Overlay" width="1530" height="567">
-    <div class="hint-height" {% if hint_to_show == 'height' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-weight" {% if hint_to_show == 'weight' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-species" {% if hint_to_show == 'species' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-primary-type" {% if hint_to_show == 'types' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-secondary-type" {% if hint_to_show == 'secondary_type' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-pokedex-entry" {% if hint_to_show == 'dex_entry' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-base-hp" {% if hint_to_show == 'base_hp' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-base-attack" {% if hint_to_show == 'base_attack' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-base-defense" {% if hint_to_show == 'base_defense' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-base-special-attack" {% if hint_to_show == 'base_special_attack' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-base-special-defense" {% if hint_to_show == 'base_special_defense' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-base-speed" {% if hint_to_show == 'base_speed' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
-    <div class="hint-ability" {% if hint_to_show == 'abilities' %}style="display:block;"{% else %}style="display:none;"{% endif %}></div>
+    <div class="hint-height" {% if hint_to_show == 'height' %}style="display:block;"{% else %}style="display:block;"{% endif %}>{{pokemon.weight}}</div>
+    <div class="hint-weight" {% if hint_to_show == 'weight' %}style="display:block;"{% else %}style="display:block;"{% endif %}> {{ pokemon.weight }}</div>
+    <div class="hint-species" {% if hint_to_show == 'species' %}style="display:block;"{% else %}style="display:block;"{% endif %}> {{pokemon.name}}</div>
+    <div class="hint-primary-type" {% if hint_to_show == 'types' %}style="display:block;"{% else %}style="display:block;"{% endif %}>{{ pokemon.types[0] }}</div>
+    {% if pokemon.types|length > 1 %}
+    <div class="hint-secondary-type" {% if hint_to_show == 'secondary_type' %}style="display:block;"{% else %}style="display:block;"{% endif %}>{{ pokemon.types[1] }}</div>
+    {% endif %}
+    <div class="hint-pokedex-entry" {% if hint_to_show == 'dex_entry' %}style="display:block;"{% else %}style="display:flex;"{% endif %}></div>
+    <div class="hint-base-hp" {% if hint_to_show == 'base_hp' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
+    <div class="hint-base-attack" {% if hint_to_show == 'base_attack' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
+    <div class="hint-base-defense" {% if hint_to_show == 'base_defense' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
+    <div class="hint-base-special-attack" {% if hint_to_show == 'base_special_attack' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
+    <div class="hint-base-special-defense" {% if hint_to_show == 'base_special_defense' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
+    <div class="hint-base-speed" {% if hint_to_show == 'base_speed' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
+    <div class="hint-ability" {% if hint_to_show == 'abilities' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
 </div>
 
 <script src="/static/script.js"></script>
