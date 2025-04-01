@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 from pathlib import Path
 import pokebase as pb
 from dotenv import load_dotenv
+from fastapi.responses import JSONResponse
 
 
 # Initialization of the application
@@ -129,51 +130,24 @@ async def get_quiz(request: Request):
 
 @app.post("/quiz")
 async def post_quiz(request: Request, guess: str = Form(...)):
-    # Store Pokémon in a temporary storage
-    # If this is the first time, fetch a new pokemon
     session_id = request.client.host
     if session_id not in sessions:
         sessions[session_id] = fetch_pokemon()
 
-    pokemon = sessions[session_id]  # Get the Pokémon data from the session
-    correct_answer = pokemon['name']  # Access the name from the dictionary
+    correct_answer = sessions[session_id]["name"].lower()
     guess = guess.strip().lower()
 
-    # Check if the guess is correct
     if guess == correct_answer:
-        message = "Correct! Reloading..."
         del sessions[session_id]  # Reset session on correct guess
-        return templates.TemplateResponse(
-            "quiz.html",
-            {"request": request, "message": message, "reload": True, "pokemon": pokemon}
-        )
+        return JSONResponse(content={"correct": True, "message": "Ding Ding Ding! We have a winner!"})
 
-    # If incorrect, track how many wrong guesses there have been
-    if 'wrong_guesses' not in pokemon:
-        pokemon['wrong_guesses'] = 0
+    # Reveal a new hint for incorrect guesses
+    hint_index = sessions[session_id].get("hint_index", 0)
+    hints = sessions[session_id].get("hints", [])  # List of hints to reveal
+    hint_index = min(hint_index + 1, len(hints))  # Increment hint index but don't exceed max hints
+    sessions[session_id]["hint_index"] = hint_index
 
-    pokemon['wrong_guesses'] += 1
-    wrong_guesses = pokemon['wrong_guesses']
-
-    # Determine which hint to show
-    hint_to_show = get_hint(wrong_guesses)
-
-    message = "Wrong guess. Try again!"
-    return templates.TemplateResponse("quiz.html", {
-        "request": request,
-        "message": message,
-        "reload": False,
-        "pokemon": pokemon,
-        "hint_to_show": hint_to_show
-    })
-
-@app.get("/login")
-async def login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-@app.get("/highscores")
-async def highscores(request: Request):
-    return templates.TemplateResponse("highscores.html", {"request": request})
+    return JSONResponse(content={"correct": False, "message": "That is incorrect. Another hint has been added to the entry", "hint": hints[:hint_index]})
 
 def get_hint(wrong_guesses):
     """Determine the hints that are to be displayed

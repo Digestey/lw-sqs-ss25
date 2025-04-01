@@ -107,17 +107,32 @@ form {
 }
 
 .pokedex-container {
+  display: flex;
+  align-items: center;
   position: relative;
   width: 765px;
   /* Adjust to match your template */
   height: 567px;
   /* Adjust to match your template */
+  position: relative;
+  width: 100%; /* Ensures it takes the full width */
+  max-width: 1530px; /* Ensures it does not get too large */
+  margin: 0 auto; /* Centers it horizontally */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .pokedex-screen {
   width: 100%;
   height: auto;
   display: flex;
+  align-items: center;
+}
+
+.pokedex-image {
+  display: flex;
+  align-self: center;
 }
 
 .hint {

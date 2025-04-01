@@ -36,7 +36,7 @@
     </ul>
 </div>
 <div class="pokedex-container">
-    <img src="images/hints.png" alt="Hints-Overlay" width="1530" height="567">
+    <img class="pokedex-image" src="images/hints.png" alt="Hints-Overlay" width="1530" height="567">
     <div class="hint-height" {% if hint_to_show == 'height' %}style="display:block;"{% else %}style="display:block;"{% endif %}>{{pokemon.weight}}</div>
     <div class="hint-weight" {% if hint_to_show == 'weight' %}style="display:block;"{% else %}style="display:block;"{% endif %}> {{ pokemon.weight }}</div>
     <div class="hint-species" {% if hint_to_show == 'species' %}style="display:block;"{% else %}style="display:block;"{% endif %}> {{pokemon.name}}</div>
@@ -67,6 +67,6 @@
             setTimeout(() => {
                 window.location.reload();
             }, 3000);
-        </script>
+ </script>
 {% endif %}
 {% endblock %}

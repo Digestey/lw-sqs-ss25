@@ -9,6 +9,8 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        volumes:
+            - mysql_data:/var/lib/mysql
     app:
         container_name: myapp
         build:
@@ -18,3 +20,6 @@ services:
             - "8000:8000"
         depends_on:
             - db
+
+volumes:
+    mysql_data: /var/lib/mysql

@@ -70,3 +70,4 @@ venv
 __pycache__
 cache
 ./cache
+.pytest_cache
