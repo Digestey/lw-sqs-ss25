@@ -1,6 +1,6 @@
 services:
-    db:
-        container_name: mydb
+    pokedb:
+        container_name: pokedb
         image: mysql:9.2.0
         ports:
             - "32001:3306"
@@ -11,15 +11,28 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
             - mysql_data:/var/lib/mysql
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
+
     app:
-        container_name: myapp
+        container_name: dexquiz
         build:
             context: .
             dockerfile: dockerfile
         ports:
             - "8000:8000"
         depends_on:
-            - db
+            - pokedb
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
 volumes:
-    mysql_data: /var/lib/mysql
+  mysql_data:  # define only the named volume here
