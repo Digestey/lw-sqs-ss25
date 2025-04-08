@@ -21,7 +21,7 @@ templates = Jinja2Templates(directory="templates")
 
 pb.cache.set_cache(os.getenv("POKEMON_CACHE"))
 
-print(f"{dir(pb.cache.API_CACHE)}")
+# print(f"{dir(pb.cache.API_CACHE)}")
 
 # Mount the required directories for the webpage
 

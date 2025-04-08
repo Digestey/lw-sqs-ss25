@@ -35,4 +35,4 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
 volumes:
-  mysql_data:  # define only the named volume here
+    mysql_data:  # define only the named volume here
