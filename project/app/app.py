@@ -9,6 +9,7 @@ from pathlib import Path
 import pokebase as pb
 from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
+import re
 
 
 # Initialization of the application
@@ -42,8 +43,9 @@ def english_dex_entry(pokemon):
 
     # If there are English entries, return a random one
     if english_entries:
-        random_entry = random.choice(english_entries)
-        return random_entry.flavor_text
+        random_entry = random.choice(english_entries).flavor_text
+        result = re.sub(re.escape(pokemon.name), "The Pokemon", random_entry, flags=re.IGNORECASE)
+        return result
     else:
         return "No English entry found."
 
