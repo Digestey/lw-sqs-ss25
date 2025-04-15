@@ -65,6 +65,6 @@ See [`doc/arc42`](doc/arc42) for arc42-based architectural documentation.
 
 ## ⚖️ License
 
-This project uses the MIT License (see [`LICENSE`](LICENSE)).
+This project uses the GNU GPLv3 License (see [`COPYING`](COPYING)).
 
 Make sure to review licenses of dependencies used in this project (e.g., by using `pip-licenses`).
