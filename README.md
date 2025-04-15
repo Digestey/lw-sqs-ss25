@@ -22,13 +22,7 @@ DexQuiz is a full-stack quiz app built with FastAPI and MySQL. It presents users
 
 ### 📦 Installation
 
-```bash
-git clone https://github.com/your-username/dexquiz.git
-cd dexquiz
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
-```
+tbd
 
 ### 🏃 Running DexQuiz
 
