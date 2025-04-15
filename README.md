@@ -1,3 +1,24 @@
-# SQS-Projekt Lukas Waller (ss25)
+# Dexquiz
 
-Hier entsteht das Git-Repository zum Projekt im Rahmen des Kurses 'Software-Qualitätssicherung' an der TH-Rosenheim
+Challenge your knowledge in the realm of Pokémon. How well do you know
+your Pocket Monsters? Do you recognize them from their stats and PokéDex
+entries? This web-based application will help you find out.
+
+## Description
+
+DexQuiz is a web-based application that provides a quiz on Pokémon Names
+by their stats and PokeDex entries.
+
+## Getting Started
+
+### Dependencies
+
+### Installation
+
+### Running DexQuiz
+
+## Additional Documentation
+
+### Architecture desicions
+
+See [doc/adr](doc/adr) for architectural decision records (ADR).
