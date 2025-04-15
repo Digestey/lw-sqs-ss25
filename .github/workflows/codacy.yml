@@ -1,0 +1,32 @@
+name: Codacy Analysis
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  codacy-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Codacy Coverage Tool
+        run: |
+          pip install codacy-coverage
+
+      - name: Run tests and upload coverage
+        run: |
+          pytest --cov=your_project tests/
+          codacy-coverage -r coverage.xml

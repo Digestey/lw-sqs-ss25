@@ -22,17 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             messageBox.textContent = data.message;
             messageBox.style.color = "red";
-
-            // Show the next hint
-            if (data.hint && data.hint.length > 0) {
-                const hintContainers = document.querySelectorAll(".pokedex-container div");
-                for(container in hintContainers) {
-                    console.log(container)
-                }
-                if (data.hint.length <= hintContainers.length) {
-                    hintContainers[data.hint.length - 1].style.visibility = "visible";
-                }
-            }
         }
     });
 });

@@ -17,6 +17,16 @@ MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 
 
 def connect_to_db():
+    """This function is used to check whether the database is reachable. It will retry to reach the
+       Database 5 Times in 5 Second intervals. If the database is still not reachable, it should
+       quit the application.
+
+    Raises:
+        e: Database could not be reached. Is the pokedb container up? Are the credentials correct?
+
+    Returns:
+        _type_: database connection
+    """
     retries = 5  # Number of retry attempts
     delay = 5  # Delay between retries in seconds
 
@@ -44,6 +54,11 @@ def connect_to_db():
 
 
 def get_connection():
+    """Returns a connection to access the database in order to perform SQL queries.
+
+    Returns:
+        PooledMYSQLConnection: Connection needed in order to perform SQL queries.
+    """
     return mysql.connector.connect(
         host=MYSQL_URL,
         user=MYSQL_USERNAME,

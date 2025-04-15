@@ -1,0 +1,8 @@
+version: 2
+analysis:
+  language: python
+  tools:
+    - pylint
+    - flake8
+    - pyflakes
+    - black
