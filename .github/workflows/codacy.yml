@@ -18,8 +18,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           cd ../tests
-          coverage run -m pytest
-          coverage xml
+          pytest --cov=app --cov-report=xml --cov-report=term
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
         with:
