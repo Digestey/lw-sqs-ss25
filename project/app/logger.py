@@ -1,7 +1,6 @@
 """Module Logger: extends logger class"""
 import logging
 
-
 class Logger(logging.Logger):
     """Extends python logger class to allow for extra information.
 
@@ -72,4 +71,5 @@ def get_logger(name: str, level=logging.INFO, debug=False, extra_info=None):
 
     if extra_info:
         logger.set_extra_info(extra_info)
+        
     return logger
