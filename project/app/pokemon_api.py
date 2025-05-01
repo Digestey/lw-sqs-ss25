@@ -4,8 +4,12 @@ import random
 import pokebase as pb
 from dotenv import load_dotenv
 
+from logger import Logger
+from models import QuizInfo
+
 load_dotenv()
 pb.cache.set_cache(os.getenv("POKEMON_CACHE"))
+
 
 def english_dex_entry(pokemon):
     english_entries = [
@@ -19,49 +23,42 @@ def english_dex_entry(pokemon):
         return "No English entry found."
 
 
-def fetch_pokemon():
+def fetch_pokemon(logger: Logger):
     pokemonid = random.randrange(1, 1025, 1)
     current_pokemon = pb.pokemon(pokemonid)  # Fetch Pokémon data
 
-    # Here be debug print
-    print("===================GENERATED POKEMON INFORMATION=============================================================================================================================================================================")
-    print(f"Name\t\t\t\t: {current_pokemon.name}")  # Debugging info
-    print(f"Id\t\t\t\t\t: {current_pokemon.id}")
-    print(f"Height\t\t\t\t: {current_pokemon.height}")
-    print(f"Weight\t\t\t\t: {current_pokemon.weight}")
-    # Debugging info
-    print(
-        f"{current_pokemon.stats[0].stat}\t\t\t\t: {current_pokemon.stats[0].base_stat}")
-    # Debugging info
-    print(
-        f"{current_pokemon.stats[1].stat}\t\t\t\t: {current_pokemon.stats[1].base_stat}")
-    # Debugging info
-    print(
-        f"{current_pokemon.stats[2].stat}\t\t\t\t: {current_pokemon.stats[2].base_stat}")
-    # Debugging info
-    print(
-        f"{current_pokemon.stats[3].stat}\t\t\t: {current_pokemon.stats[3].base_stat}")
-    # Debugging info
-    print(
-        f"{current_pokemon.stats[4].stat}\t\t\t: {current_pokemon.stats[4].base_stat}")
-    # Debugging info
-    print(
-        f"{current_pokemon.stats[5].stat}\t\t\t\t: {current_pokemon.stats[5].base_stat}")
-    print(f"Type:\t\t\t\t: {current_pokemon.types[0].type}")  # Debugging info
+    # Debug output for generated Pokémon
+    logger.debug("===================GENERATED POKEMON      INFORMATION=============================================================================================================================================================================")
+    logger.debug(f"Name\t\t\t\t: {current_pokemon.name}")
+    logger.debug(f"Id\t\t\t\t\t: {current_pokemon.id}")
+    logger.debug(f"Height\t\t\t\t: {current_pokemon.height}")
+    logger.debug(f"Weight\t\t\t\t: {current_pokemon.weight}")
+    logger.debug(
+    f"{current_pokemon.stats[0].stat}\t\t\t\t: {current_pokemon.stats[0].base_stat}")
+    logger.debug(
+    f"{current_pokemon.stats[1].stat}\t\t\t\t: {current_pokemon.stats[1].base_stat}")
+    logger.debug(
+    f"{current_pokemon.stats[2].stat}\t\t\t\t: {current_pokemon.stats[2].base_stat}")
+    logger.debug(
+    f"{current_pokemon.stats[3].stat}\t\t\t: {current_pokemon.stats[3].base_stat}")
+    logger.debug(
+    f"{current_pokemon.stats[4].stat}\t\t\t: {current_pokemon.stats[4].base_stat}")
+    logger.debug(
+    f"{current_pokemon.stats[5].stat}\t\t\t\t: {current_pokemon.stats[5].base_stat}")
+    logger.debug(f"Type:\t\t\t\t: {current_pokemon.types[0].type}")
+
     if len(current_pokemon.types) != 1:
         # Debugging info
-        print(f"Secondary Type:\t\t\t: {current_pokemon.types[1].type}")
+        logger.debug(f"Secondary Type:\t\t\t: {current_pokemon.types[1].type}")
+    
     entry = english_dex_entry(current_pokemon)
     print(f"Dex-Entry:\t\t\t: {entry}")  # Debugging info
     # Collecting Pokémon Information
-    pokemon_info = {
-        "name": current_pokemon.name,
-        "id": current_pokemon.id,
-        "height": current_pokemon.height,
-        "weight": current_pokemon.weight,
-        "stats": {stat.stat.name.capitalize(): stat.base_stat for stat in current_pokemon.stats},
-        "types": [type.type.name.capitalize() for type in current_pokemon.types],
-        "dex_entry": english_dex_entry(current_pokemon)
-    }
+    stats = {stat.stat.name.capitalize(
+    ): stat.base_stat for stat in current_pokemon.stats}
+    types = [type.type.name.capitalize() for type in current_pokemon.types]
+    entry = english_dex_entry(current_pokemon)
+    quizmon = QuizInfo(current_pokemon.name, current_pokemon.id,
+                       current_pokemon.height, current_pokemon.weight, stats, types, entry)
 
-    return pokemon_info
+    return quizmon

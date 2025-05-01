@@ -9,10 +9,13 @@ from fastapi.responses import JSONResponse
 import pokebase as pb
 from dotenv import load_dotenv
 from pokemon_api import fetch_pokemon
-
+from logger import get_logger
+import logging
 # Initialization of the application
 
 load_dotenv()
+logging.basicConfig()
+logger = get_logger(name="DexQuiz", debug=True, level=logging.DEBUG)
 
 sessions = {}
 app = FastAPI()
@@ -55,7 +58,7 @@ async def submit(request: Request, name: str = Form(...)):
 async def get_quiz(request: Request):
     session_id = request.client.host  # Use client IP as a simple session identifier
     if session_id not in sessions:
-        sessions[session_id] = fetch_pokemon()
+        sessions[session_id] = fetch_pokemon(logger)
 
     pokemon_info = sessions[session_id]
 
@@ -76,7 +79,7 @@ async def post_quiz(request: Request, guess: str = Form(...)):
     if session_id not in sessions:
         sessions[session_id] = fetch_pokemon()
 
-    correct_answer = sessions[session_id]["name"].lower()
+    correct_answer = sessions[session_id].name.lower()
     guess = guess.strip().lower()
 
     if guess == correct_answer:
