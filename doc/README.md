@@ -15,7 +15,10 @@ Contains architecture documentation following the **arc42** template.
 
 - **Purpose**: To capture the system’s architecture and design choices.
 - **Sections**: Covers everything from system context to detailed components and quality requirements.
+- **Format**: Markdown files.
 
+### `userstories`
+Contains user stories to define use cases for DexQuiz
 
 ## Purpose
 

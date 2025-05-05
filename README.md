@@ -59,6 +59,6 @@ See [`doc/arc42`](doc/arc42) for arc42-based architectural documentation.
 
 ## ⚖️ License
 
-This project is not licensed. Please contact the author for permissions.
+This project is licensed under the GNU General License, for further information, see the included LICENSE file.
 
 Make sure to review licenses of dependencies used in this project (e.g., by using `pip-licenses`).
