@@ -1,7 +1,7 @@
 import pytest
 import logging
 
-from app.logger import get_logger
+from app.util.logger import get_logger
 
 
 @pytest.fixture
