@@ -11,7 +11,7 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
             - mysql_data:/var/lib/mysql
-            - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+            - ./db_init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
             interval: 10s
@@ -24,6 +24,8 @@ services:
         build:
             context: .
             dockerfile: dockerfile
+        expose:
+            - "8000"
         ports:
             - "8000:8000"
         depends_on:

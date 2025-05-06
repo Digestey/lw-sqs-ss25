@@ -4,17 +4,22 @@ from mysql.connector import Error
 from dotenv import load_dotenv
 import os
 import bcrypt
+from pydantic import BaseModel
 
 # --- ENVIRONMENT VARIABLES ---
 
 load_dotenv()
 
 MYSQL_URL = os.getenv("MYSQL_URL")
-MYSQL_USERNAME = os.getenv("MYSQL_USERNAME")
+MYSQL_USERNAME = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 
 # --- META ---
 
+class Highscore(BaseModel):
+    username: str
+    score: int
 
 def connect_to_db():
     """This function is used to check whether the database is reachable. It will retry to reach the
@@ -22,7 +27,7 @@ def connect_to_db():
        quit the application.
 
     Raises:
-        e: Database could not be reached. Is the pokedb container up? Are the credentials correct?
+        e: Database could not be reached. Is the pokedb container up? Are the credentials correct? yeah
 
     Returns:
         _type_: database connection
@@ -37,7 +42,8 @@ def connect_to_db():
             connector = mysql.connector.connect(
                 host=MYSQL_URL,
                 user=MYSQL_USERNAME,
-                password=MYSQL_PASSWORD
+                password=MYSQL_PASSWORD,
+                database=MYSQL_DATABASE
             )
 
             if connector.is_connected():
@@ -62,7 +68,8 @@ def get_connection():
     return mysql.connector.connect(
         host=MYSQL_URL,
         user=MYSQL_USERNAME,
-        password=MYSQL_PASSWORD
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DATABASE
     )
 
 # --- USERS ---
@@ -136,10 +143,10 @@ def add_highscore(username, score):
 
 def get_highscores():
     cnn = get_connection()
-    cursor = cnn.cursor()
+    cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
-            "SELECT * FROM highscores",
+            "SELECT u.username, h.score FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
         )
         highscores = cursor.fetchall()
         cursor.close()

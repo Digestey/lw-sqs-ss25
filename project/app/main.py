@@ -9,8 +9,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 import pokebase as pb
 from dotenv import load_dotenv
-from routes import frontend
-from services.pokemon_service import fetch_pokemon
+from routes import frontend, highscores, users
 from util.logger import get_logger
 
 # Initialization of the application
@@ -40,8 +39,9 @@ app.mount(
 )
 
 app.include_router(frontend.router)
+app.include_router(highscores.router)
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
