@@ -5,7 +5,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from services.database_service import get_top_highscores
 from services.auth_service import (
     authenticate_user,
     create_access_token,

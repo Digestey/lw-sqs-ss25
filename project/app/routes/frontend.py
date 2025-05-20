@@ -1,8 +1,10 @@
 # app/routes/frontend.py
 
-from fastapi import APIRouter, Request, Form
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import APIRouter, HTTPException, Request, Form, Depends
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.security import OAuth2PasswordBearer
+from services.auth_service import get_user_from_token, oauth2_scheme
 
 from services.pokemon_service import fetch_pokemon
 from util.logger import get_logger
@@ -14,17 +16,27 @@ logger = get_logger("Frontend")
 # In-memory session store (basic)
 sessions = {}
 
+
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
+
 @router.get("/register", response_class=HTMLResponse)
 async def login_form(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
+
+
+@router.get("/highscores", response_class=HTMLResponse)
+async def highscore_page(request: Request):
+    return templates.TemplateResponse("highscores.html", {
+        "request": request
+    })
 
 @router.get("/quiz", response_class=HTMLResponse)
 async def get_quiz(request: Request):

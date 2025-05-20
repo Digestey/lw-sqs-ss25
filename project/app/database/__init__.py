@@ -8,5 +8,5 @@ from ..services.database_service import (
     add_highscore,
     get_highscores,
     get_user_highscores,
-    get_top_highscores
+    get_top_highscores_api
 )

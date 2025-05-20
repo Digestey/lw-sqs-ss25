@@ -1,7 +1,7 @@
 # app/routes/highscores.py
 
 from typing import List
-from fastapi import APIRouter, HTTPException, Request, Form
+from fastapi import APIRouter, HTTPException, Request, Form, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import mysql
@@ -9,7 +9,7 @@ import datetime
 from pydantic import BaseModel
 
 from services.database_service import get_highscores, add_highscore, get_top_highscores
-from services.pokemon_service import fetch_pokemon
+from services.auth_service import oauth2_scheme
 from util.logger import get_logger
 
 router = APIRouter()
@@ -30,34 +30,29 @@ class HighscoreRequest(BaseModel):
 @router.get("/api/highscores", response_model=List[HighscoreResponse])
 async def get_all_highscores():
     try:    
-        highscores = get_highscores() 
+        highscores = get_highscores()
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+        raise HTTPException(status_code=500, detail=str(e)) from e
     return highscores
 
 @router.get("/api/highscore/{top}", response_model=List[HighscoreResponse])
-async def get_highscore_by_id(top: int):
+async def get_top_highscores_api(top: int, token: str = Depends(oauth2_scheme)):
     try:
-        highscore = get_top_highscores(top)
+        highscores = get_top_highscores(top)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-    return highscore
+        raise HTTPException(status_code=500, detail=str(e)) from e
+    return highscores
+
 
 @router.post("/api/highscore", response_model=List[HighscoreResponse])
 async def post_highscore(request: Request):
     obj = await request.json()
     try:
         highscore_data = add_highscore(obj['username'], obj['score'])
-        
-        # Here, `highscore_data` should include the `achieved_at` value
-        # from the result returned by the `add_highscore` function.
-        
-        # Example: HighscoreResponse(username=..., score=..., achieved_at=...)
-        # Or you can return it directly if the function is set to return that model.
         
         return highscore_data  # Ensure that the `add_highscore` returns data with `achieved_at`
     except ValueError as ve:

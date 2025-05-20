@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("token", data.access_token);
 
       alert("Login successful!");
-      window.location.href = "/quiz"; // Optional redirect after login
+      window.location.href = "/"; // Optional redirect after login
     } catch (error) {
       alert(error.message);
     }

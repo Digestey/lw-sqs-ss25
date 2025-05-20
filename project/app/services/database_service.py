@@ -168,7 +168,7 @@ def get_highscores():
     cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
-            "SELECT u.username, h.score, h.achived_at FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
+            "SELECT u.username, h.score, h.achieved_at FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
         )
         highscores = cursor.fetchall()
         cursor.close()
@@ -185,7 +185,7 @@ def get_user_highscores(username):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT h.score, h.timestamp FROM highscores h
+        SELECT h.score, h.achieved_at FROM highscores h
         JOIN users u ON h.user_id = u.id
         WHERE u.username = %s
         ORDER BY h.score DESC
@@ -199,7 +199,7 @@ def get_top_highscores(limit=10):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT u.username, h.score, h.timestamp FROM highscores h
+        SELECT u.username, h.score, h.achieved_at FROM highscores h
         JOIN users u ON h.user_id = u.id
         ORDER BY h.score DESC
         LIMIT %s
