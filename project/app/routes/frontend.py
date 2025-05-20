@@ -16,13 +16,15 @@ sessions = {}
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "user_name": "John Doe"})
+    return templates.TemplateResponse("index.html", {"request": request})
 
+@router.get("/login", response_class=HTMLResponse)
+async def login_form(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
-@router.post("/submit", response_class=HTMLResponse)
-async def submit(request: Request, name: str = Form(...)):
-    return templates.TemplateResponse("index.html", {"request": request, "user_name": name})
-
+@router.get("/register", response_class=HTMLResponse)
+async def login_form(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 @router.get("/quiz", response_class=HTMLResponse)
 async def get_quiz(request: Request):

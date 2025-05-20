@@ -75,17 +75,24 @@ def get_connection():
 # --- USERS ---
 
 
-def add_user(username, password):
+def add_user(username, hashed_password):
+    """_summary_
+
+    Args:
+        username (str): Username to be added to Database
+        hashed_password (str): Password to be added, hashed for security
+
+    Raises:
+        ValueError: Raised, when <username> already exists
+    """    
     cnn = get_connection()
-    cursor = cnn.cursor()
+    cursor = cnn.cursor(dictionary=True)
     try:
-        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         cursor.execute(
-            "INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, hashed))
+            "INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, hashed_password))
         cnn.commit()
-        print("User added")
     except mysql.connector.IntegrityError:
-        print("Username already exists.")
+        raise ValueError("Username already exists.")
     finally:
         cursor.close()
         cnn.close()
@@ -93,15 +100,16 @@ def add_user(username, password):
 
 def delete_user(username):
     cnn = get_connection()
-    cursor = cnn.cursor()
+    cursor = cnn.cursor(dictionary=True)
     cursor.execute("DELETE FROM users WHERE username=(%s)", (username,))
+    cnn.commit()
     cursor.close()
     cnn.close()
 
 
 def get_user(username):
     cnn = get_connection()
-    cursor = cnn.cursor()
+    cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
             "SELECT * FROM users WHERE username = %s", (username,)
@@ -116,13 +124,6 @@ def get_user(username):
         cursor.close()
         cnn.close()
 
-
-def verify_user(username, password):
-    user = get_user(username)
-    if user and bcrypt.checkpw(password.encode('utf-8'), user["password hash"].encode('utf-8')):
-        return True
-    return False
-
 # --- HIGHSCORES ---
 
 
@@ -130,12 +131,33 @@ def add_highscore(username, score):
     cnn = get_connection()
     cursor = cnn.cursor()
     try:
+        # Find user_id from username
+        cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+        result = cursor.fetchone()
+        if result is None:
+            raise ValueError("User not found")
+
+        user_id = result[0]
+
+        # Insert highscore using user_id
         cursor.execute(
-            "INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, score))
+            "INSERT INTO highscores (user_id, score) VALUES (%s, %s)", (user_id, score)
+        )
+        
+        highscore_id = cursor.lastrowid
+
+        # Fetch the inserted row
+        cursor.execute(
+            "SELECT h.id, u.username, h.score, h.achieved_at FROM highscores h JOIN users u ON h.user_id = u.id WHERE h.id = %s",
+            (highscore_id,)
+        )
+        result = cursor.fetchone()
         cnn.commit()
-        print("Highscore added")
-    except mysql.connector.IntegrityError:
-        print("Highscore already exists.")
+        return result
+    except Exception as e:
+        cnn.rollback()
+        raise e
+        
     finally:
         cursor.close()
         cnn.close()
@@ -146,14 +168,15 @@ def get_highscores():
     cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
-            "SELECT u.username, h.score FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
+            "SELECT u.username, h.score, h.achived_at FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
         )
         highscores = cursor.fetchall()
         cursor.close()
         cnn.close()
         return highscores
-    except mysql.connector.IntegrityError:
-        print("Username not found.")
+    except Exception as e:
+        cnn.rollback()
+        raise e
     finally:
         cursor.close()
         cnn.close()

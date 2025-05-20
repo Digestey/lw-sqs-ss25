@@ -1,4 +1,4 @@
-from .database import (
+from ..services.database_service import (
     connect_to_db,
     get_connection,
     add_user,

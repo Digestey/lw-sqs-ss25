@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Login - DEXQUIZ{% endblock %}
+
+{% block content %}
+    <h1>Please log in.</h1>
+
+    <p>Here you can register a new user</p>
+    
+    <form method="POST" id="register-form">
+        <p>Username:</p>
+        <input type="text" name="username" required>
+        <p>Passord:</p>
+        <input type="text" name="password" required>
+        <input type="text" name="repeat_password" required>
+        <button type="register_now">Register Now!</button>
+    </form>
+
+    <script src="/static/register.js"></script>
+{% endblock %}

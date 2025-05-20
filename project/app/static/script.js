@@ -4,6 +4,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const messageBox = document.createElement("p");  // Create message box
     form.appendChild(messageBox);
 
+    const logoutButton = document.getElementById("logout-button");
+
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+            localStorage.removeItem("token"); // Clear the JWT
+            window.location.href = "/"; // Redirect to home or login page
+        });
+    }
+
     form.addEventListener("submit", async function (event) {
         event.preventDefault(); // Prevent page reload
 

@@ -40,6 +40,7 @@ app.mount(
 
 app.include_router(frontend.router)
 app.include_router(highscores.router)
+app.include_router(users.router)
 
 
 if __name__ == "__main__":
