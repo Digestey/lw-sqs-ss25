@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formData = new FormData(form);
 
+    if (formData.get("password").length < 1 || formData.get("username") < 1) {
+      throw new Error("Those fields are empty, m'lardy")
+    }
+
     try {
       const response = await fetch("/api/token", {
         method: "POST",

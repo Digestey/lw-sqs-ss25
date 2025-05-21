@@ -1,3 +1,22 @@
+const MIN_PW_LENGTH = 8;
+const MIN_USERNAME_LENGTH = 5;
+const MAX_STRING_LENGTH = 100;
+
+function username_check(username) {
+  if (username.length < MIN_USERNAME_LENGTH || username.length > MAX_STRING_LENGTH) {
+    return false;
+  }
+  return true
+}
+
+function password_check(password) {
+  if (password.length < MIN_PW_LENGTH || password.length > MAX_STRING_LENGTH) {
+    return false;
+  }
+  return true;
+
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("register-form");
 
@@ -5,11 +24,18 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     const formData = new FormData(form);
+
     const password = formData.get("password");
+
+    if (!(username_check(formData.get("username")) || password_check(password))) {
+      alert("Login failed: Username and Password requirements are not met. Username must be longer than 5 characters and password must be longer than 8 characters. Neither can exceed 100 characters.")
+      return;
+    }
+
     const repeatPassword = formData.get("repeat_password");
 
-    console.log(password)
-    console.log(repeatPassword)
+    // console.log(password)
+    // console.log(repeatPassword)
 
     if (password !== repeatPassword) {
       alert("Passwords do not match.");
