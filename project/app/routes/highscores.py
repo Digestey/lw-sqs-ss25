@@ -1,15 +1,14 @@
 # app/routes/highscores.py
-
+import datetime
 from typing import List
 from fastapi import APIRouter, HTTPException, Request, Form, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import mysql
-import datetime
 from pydantic import BaseModel
 
 from services.database_service import get_highscores, add_highscore, get_top_highscores
-from services.auth_service import oauth2_scheme
+from services.auth_service import get_user_from_token, oauth2_scheme
 from util.logger import get_logger
 
 router = APIRouter()
@@ -48,13 +47,13 @@ async def get_top_highscores_api(top: int, token: str = Depends(oauth2_scheme)):
     return highscores
 
 
-@router.post("/api/highscore", response_model=List[HighscoreResponse])
-async def post_highscore(request: Request):
+@router.post("/api/highscore")
+async def post_highscore(request: Request, token: str = Depends(oauth2_scheme)):
     obj = await request.json()
     try:
-        highscore_data = add_highscore(obj['username'], obj['score'])
-        
-        return highscore_data  # Ensure that the `add_highscore` returns data with `achieved_at`
+        username = get_user_from_token(token)
+        highscore_data = add_highscore(username, obj['score'])
+        return highscore_data
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:

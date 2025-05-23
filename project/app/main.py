@@ -20,8 +20,9 @@ logger = get_logger(name="DexQuiz", debug=True, level=logging.DEBUG)
 
 sessions = {}
 app = FastAPI()
+cache_dir = os.getenv("POKEMON_CACHE", default="./cache")
 
-pb.cache.set_cache(os.getenv("POKEMON_CACHE"))
+pb.cache.set_cache()
 
 # print(f"{dir(pb.cache.API_CACHE)}")
 

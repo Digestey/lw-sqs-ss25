@@ -34,23 +34,23 @@ def fetch_pokemon(logger: Logger):
     logger.debug(f"Height\t\t\t\t: {current_pokemon.height}")
     logger.debug(f"Weight\t\t\t\t: {current_pokemon.weight}")
     logger.debug(
-    f"{current_pokemon.stats[0].stat}\t\t\t\t: {current_pokemon.stats[0].base_stat}")
+        f"{current_pokemon.stats[0].stat}\t\t\t\t: {current_pokemon.stats[0].base_stat}")
     logger.debug(
-    f"{current_pokemon.stats[1].stat}\t\t\t\t: {current_pokemon.stats[1].base_stat}")
+        f"{current_pokemon.stats[1].stat}\t\t\t\t: {current_pokemon.stats[1].base_stat}")
     logger.debug(
-    f"{current_pokemon.stats[2].stat}\t\t\t\t: {current_pokemon.stats[2].base_stat}")
+        f"{current_pokemon.stats[2].stat}\t\t\t\t: {current_pokemon.stats[2].base_stat}")
     logger.debug(
-    f"{current_pokemon.stats[3].stat}\t\t\t: {current_pokemon.stats[3].base_stat}")
+        f"{current_pokemon.stats[3].stat}\t\t\t: {current_pokemon.stats[3].base_stat}")
     logger.debug(
-    f"{current_pokemon.stats[4].stat}\t\t\t: {current_pokemon.stats[4].base_stat}")
+        f"{current_pokemon.stats[4].stat}\t\t\t: {current_pokemon.stats[4].base_stat}")
     logger.debug(
-    f"{current_pokemon.stats[5].stat}\t\t\t\t: {current_pokemon.stats[5].base_stat}")
+        f"{current_pokemon.stats[5].stat}\t\t\t\t: {current_pokemon.stats[5].base_stat}")
     logger.debug(f"Type:\t\t\t\t: {current_pokemon.types[0].type}")
 
     if len(current_pokemon.types) != 1:
         # Debugging info
         logger.debug(f"Secondary Type:\t\t\t: {current_pokemon.types[1].type}")
-    
+
     entry = english_dex_entry(current_pokemon)
     print(f"Dex-Entry:\t\t\t: {entry}")  # Debugging info
     # Collecting Pokémon Information

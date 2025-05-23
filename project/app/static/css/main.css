@@ -47,6 +47,15 @@ body {
   height: fit-content;
 }
 
+.score_button {
+  height: 200px;
+  width: 400px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  color: #DE1537;
+}
+
 .dexquiz-home-nav {
   display: flex;
   text-align: center;
@@ -107,149 +116,36 @@ form {
 }
 
 .pokedex-container {
-  display: flex;
-  align-items: center;
-  position: relative;
-  width: 765px;
-  /* Adjust to match your template */
-  height: 567px;
-  /* Adjust to match your template */
-  position: relative;
-  width: 100%; /* Ensures it takes the full width */
-  max-width: 1530px; /* Ensures it does not get too large */
-  margin: 0 auto; /* Centers it horizontally */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    position: relative;
+    transform: scale(0.5);         
+    transform-origin: top left;  
+    display: inline-block;
 }
 
-.pokedex-screen {
-  width: 100%;
-  height: auto;
-  display: flex;
-  align-items: center;
+.pokedex-background {
+    width: 100%;
+    height: auto;
 }
 
-.pokedex-image {
-  display: flex;
-  align-self: center;
+.overlay {
+    position: absolute;
+    color: black;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 1rem;
 }
 
-.hint {
-  position: center;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 5px;
-  border-radius: 5px;
-}
+/* Adjust these manually based on pixel positions on the image */
+.type1 { top: 50px; left: 320px; }
+.type2 { top: 80px; left: 320px; }
+.height { top: 110px; left: 330px; }
+.weight { top: 130px; left: 330px; }
+.dex-entry { top: 220px; left: 50px; width: 400px; }
 
-.hint-height {
-  height: auto;  /* or a specific pixel value */
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-weight {
-  top: 80px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-species {
-  top: 110px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-primary-type {
-  top: 140px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-secondary-type {
-  top: 170px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-pokedex-entry {
-  top: 200px;
-  left: 50px;
-  width: 400px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-/* Base stats positioning */
-.base-stats-container {
-  position: relative;
-}
-
-.hint-base-hp {
-  height: 10px;
-  top: 250px;
-  left: 100px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-base-attack {
-  top: 280px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-base-defense {
-  top: 310px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-base-special-attack {
-  top: 340px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-base-special-defense {
-  top: 370px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-base-speed {
-  top: 400px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
-.hint-ability {
-  top: 430px;
-  left: 100px;
-  height: 10px;
-  visibility: hidden; /* Hide initially */
-  transition: visibility 0.3s, height 0.3s ease;
-}
-
+.stat-hp { top: 50px; left: 160px; }
+.stat-attack { top: 90px; left: 160px; }
+.stat-defense { top: 120px; left: 160px; }
+.stat-sp-atk { top: 150px; left: 160px; }
+.stat-sp-def { top: 180px; left: 160px; }
+.stat-speed { top: 210px; left: 160px; }
+.ability { top: 240px; left: 160px; }
