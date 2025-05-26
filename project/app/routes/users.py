@@ -1,5 +1,8 @@
-# app/routes/users.py
+"""
+Module users:
 
+Contains all api routes concerning user management.
+"""
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.templating import Jinja2Templates
 from fastapi.security import OAuth2PasswordRequestForm
@@ -21,12 +24,25 @@ logger = get_logger("Users")
 
 
 class RegisterRequest(BaseModel):
+    """Model for User
+    """    
     username: str
     password: str
 
 
 @router.post("/api/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """Logs user in.
+
+    Args:
+        form_data (OAuth2PasswordRequestForm, optional): form data. Defaults to Depends().
+
+    Raises:
+        HTTPException: If anything goes wrong, access is denied by default.
+
+    Returns:
+        str: Identification token (JWT).
+    """    
     try:
         user = authenticate_user(form_data.username, form_data.password)
         token = create_access_token(data={"sub": user.username})
@@ -37,7 +53,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.post("/api/register", status_code=status.HTTP_201_CREATED)
 async def register(request: RegisterRequest):
+    """Registers a new user.
+    Args:
+        request (RegisterRequest): Request
+
+    Raises:
+        HTTPException: _description_
+    """
     try:
-        user = register_user(request.username, request.password)
+        register_user(request.username, request.password)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e

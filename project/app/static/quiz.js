@@ -1,3 +1,5 @@
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form");
     const messageBox = document.getElementById("quiz-message");

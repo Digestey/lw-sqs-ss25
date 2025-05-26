@@ -1,12 +1,11 @@
-# app.py
+"""
+Main entry point for the DexQuiz Application
+"""
 import os
 import logging
 from pathlib import Path
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
 import pokebase as pb
 from dotenv import load_dotenv
 from routes import frontend, highscores, users

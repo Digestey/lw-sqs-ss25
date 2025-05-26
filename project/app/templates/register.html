@@ -3,16 +3,17 @@
 {% block title %}Login - DEXQUIZ{% endblock %}
 
 {% block content %}
-    <h1>Please log in.</h1>
+    <h1>Come join the DexQuiz 'community'!</h1>
 
-    <p>Here you can register a new user</p>
+    <p>Considering registering? Good.</p>
+    <p>Registration is required in order to access the scoreboard.</p>
     
     <form method="POST" id="register-form">
-        <p>Username:</p>
+        <label>Username:</label>
         <input type="text" name="username" required>
-        <p>Password:</p>
+        <label>Password:</label>
         <input type="password" name="password" required>
-        <p>Repeat password:</p>
+        <label>Repeat password:</label>
         <input type="password" name="repeat_password" required>
         <button type="register_now">Register Now!</button>
     </form>

@@ -13,7 +13,15 @@ project = 'DexQuiz'
 copyright = '2025, Lukas Waller'
 author = 'Lukas Waller'
 
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+]
+
+
 sys.path.insert(0, os.path.abspath('../project/app'))
+sys.path.insert(0, os.path.abspath('../doc/adr'))
+sys.path.insert(0, os.path.abspath('../doc/arc42'))
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

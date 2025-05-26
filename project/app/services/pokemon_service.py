@@ -1,4 +1,8 @@
-# pokemon_api.py
+"""
+Module pokemon_service:
+
+Connects to PokeAPI via PokeBase Wrapper.
+"""
 import os
 import random
 import pokebase as pb
@@ -12,6 +16,14 @@ pb.cache.set_cache(os.getenv("POKEMON_CACHE"))
 
 
 def english_dex_entry(pokemon):
+    """Extracts English Pokedex entry from pokemon object returned by the API
+
+    Args:
+        pokemon (pokemon): Pokemon
+
+    Returns:
+        str: Random English PokeDex Entry.
+    """
     english_entries = [
         entry for entry in pokemon.species.flavor_text_entries if entry.language.name == "en"]
 
@@ -24,12 +36,19 @@ def english_dex_entry(pokemon):
 
 
 def fetch_pokemon(logger: Logger):
+    """Fetches a random Pokemon from the PokeAPI.
+
+    Args:
+        logger (Logger): Logger
+
+    Returns:
+        pokemon: A random Pokemon object.
+    """
     pokemonid = random.randrange(1, 1025, 1)
     current_pokemon = pb.pokemon(pokemonid)  # Fetch Pokémon data
 
-    # Debug output for generated Pokémon
-    logger.debug("===================GENERATED POKEMON      INFORMATION=============================================================================================================================================================================")
-    logger.debug(f"Name\t\t\t\t: {current_pokemon.name}")
+    # in production, this would be hidden. but me being an idiot, i keep it here
+    print(f"Name\t\t\t\t: {current_pokemon.name}")
     logger.debug(f"Id\t\t\t\t\t: {current_pokemon.id}")
     logger.debug(f"Height\t\t\t\t: {current_pokemon.height}")
     logger.debug(f"Weight\t\t\t\t: {current_pokemon.weight}")
@@ -52,7 +71,7 @@ def fetch_pokemon(logger: Logger):
         logger.debug(f"Secondary Type:\t\t\t: {current_pokemon.types[1].type}")
 
     entry = english_dex_entry(current_pokemon)
-    print(f"Dex-Entry:\t\t\t: {entry}")  # Debugging info
+    logger.debug(f"Dex-Entry:\t\t\t: {entry}")  # Debugging info
     # Collecting Pokémon Information
     stats = {stat.stat.name.capitalize(
     ): stat.base_stat for stat in current_pokemon.stats}

@@ -1,10 +1,10 @@
-# app/routes/frontend.py
+"""
+Module frontend: Defines all routes that are part of frontend handling
+"""
 
-from fastapi import APIRouter, HTTPException, Request, Form, Depends
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi import APIRouter, Request, Form
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.security import OAuth2PasswordBearer
-from services.auth_service import get_user_from_token, oauth2_scheme
 
 from services.pokemon_service import fetch_pokemon
 from util.logger import get_logger
@@ -19,27 +19,67 @@ sessions = {}
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    """_summary_
+
+    Args:
+        request (Request): _description_
+
+    Returns:
+        _type_: _description_
+    """    
     return templates.TemplateResponse("index.html", {"request": request})
 
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
+    """_summary_
+
+    Args:
+        request (Request): _description_
+
+    Returns:
+        _type_: _description_
+    """    
     return templates.TemplateResponse("login.html", {"request": request})
 
 
 @router.get("/register", response_class=HTMLResponse)
 async def login_form(request: Request):
+    """_summary_
+
+    Args:
+        request (Request): _description_
+
+    Returns:
+        _type_: _description_
+    """    
     return templates.TemplateResponse("register.html", {"request": request})
 
 
 @router.get("/highscores", response_class=HTMLResponse)
 async def highscore_page(request: Request):
+    """Highscores Page. Can only be accessed if the user is logged in.
+       That is handled in the js code however.
+
+    Args:
+        request (Request): _description_
+
+    Returns:
+        HTMLResponse: Highscores Page.
+    """    
     return templates.TemplateResponse("highscores.html", {
         "request": request
     })
 
 @router.get("/quiz", response_class=HTMLResponse)
 async def get_quiz(request: Request):
+    """Quiz frontend route. Fetches first pokemon
+    Args:
+        request (Request): 
+
+    Returns:
+        HTMLResponse: Quiz page.
+    """    
     session_id = request.client.host
     if session_id not in sessions:
         sessions[session_id] = fetch_pokemon(logger)
@@ -59,6 +99,15 @@ async def get_quiz(request: Request):
 
 @router.post("/quiz", response_class=JSONResponse)
 async def post_quiz(request: Request, guess: str = Form(...)):
+    """Fetches a new Quiz question, and validates existing ones.
+
+    Args:
+        request (Request): request (form data from the ui form)
+        guess (str, optional): String. Defaults to Form(...).
+
+    Returns:
+        JSONResponse: Evaluated response if the guess was correct (and the message to be displayed)
+    """
     session_id = request.client.host
     if session_id not in sessions:
         sessions[session_id] = fetch_pokemon(logger)
@@ -69,7 +118,10 @@ async def post_quiz(request: Request, guess: str = Form(...)):
 
     if guess == correct_answer:
         del sessions[session_id]
-        return JSONResponse(content={"correct": True, "message": "Ding Ding Ding! We have a winner!"})
+        return JSONResponse(content={
+            "correct": True,
+            "message": "Ding Ding Ding! We have a winner!"
+        })
 
     return JSONResponse(content={
         "correct": False,

@@ -23,11 +23,21 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
 
 class Token(BaseModel):
+    """_summary_
+
+    Args:
+        BaseModel (_type_): _description_
+    """    
     access_token: str
     token_type: str
 
 
 class UserInDb(BaseModel):
+    """_summary_
+
+    Args:
+        BaseModel (_type_): _description_
+    """    
     id: int
     username: str
     password_hash: str
