@@ -1,4 +1,4 @@
-const MIN_USERNAME_LENGTH = 4;
+const MIN_USERNAME_LENGTH = 5;
 const MIN_PW_LENGTH = 8;
 const MAX_STRING_LENGTH = 100;
 
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       throw new Error("Those fields are empty, m'lardy")
     }
 
-    if (!(username_check(formData.get("username")) || password_check(password))) {
+    if (!(username_check(formData.get("username")) && password_check(formData.get("password")))) {
       alert("Login failed: Username and Password requirements are not met. Username must be longer than 5 characters and password must be longer than 8 characters. Neither can exceed 100 characters.")
       return;
     }
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        throw new Error(response.detail || "Login failed");
       }
 
       const data = await response.json();

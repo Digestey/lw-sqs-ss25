@@ -3,7 +3,8 @@ Module database_service
 
 Contains the database connection functions.
 """
-import time ,os
+import time
+import os
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
@@ -21,11 +22,13 @@ MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 
 # --- META ---
 
+
 class Highscore(BaseModel):
     """Object to represent highscore
-    """    
+    """
     username: str
     score: int
+
 
 def connect_to_db():
     """This function is used to check whether the database is reachable. It will retry to reach the
@@ -90,7 +93,7 @@ def add_user(username, hashed_password):
 
     Raises:
         ValueError: Raised, when <username> already exists
-    """    
+    """
     cnn = get_connection()
     cursor = cnn.cursor(dictionary=True)
     try:
@@ -109,7 +112,7 @@ def delete_user(username):
 
     Args:
         username (str): Username to be deleted
-    """    
+    """
     cnn = get_connection()
     cursor = cnn.cursor(dictionary=True)
     cursor.execute("DELETE FROM users WHERE username=(%s)", (username,))
@@ -126,12 +129,13 @@ def get_user(username):
 
     Returns:
         user: returns user entry from database
-    """    
+    """
     cnn = get_connection()
     cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
-            "SELECT username FROM users WHERE username = %s", (username,)
+            "SELECT id, username, password_hash, created_at FROM users WHERE username = %s", (
+                username,)
         )
         user = cursor.fetchone()
         cursor.close()
@@ -159,7 +163,7 @@ def add_highscore(username, score):
 
     Returns:
         result: The inserted highscore
-    """    
+    """
     cnn = get_connection()
     cursor = cnn.cursor()
     try:
@@ -175,7 +179,7 @@ def add_highscore(username, score):
         cursor.execute(
             "INSERT INTO highscores (user_id, score) VALUES (%s, %s)", (user_id, score)
         )
-        
+
         highscore_id = cursor.lastrowid
 
         # Fetch the inserted row
@@ -189,7 +193,7 @@ def add_highscore(username, score):
     except Exception as e:
         cnn.rollback()
         raise e
-        
+
     finally:
         cursor.close()
         cnn.close()
@@ -203,7 +207,7 @@ def get_highscores():
 
     Returns:
         highscores: List of highscores
-    """    
+    """
     cnn = get_connection()
     cursor = cnn.cursor(dictionary=True)
     try:
@@ -221,6 +225,7 @@ def get_highscores():
         cursor.close()
         cnn.close()
 
+
 def get_user_highscores(username):
     """Get the highscores from a certain user.
 
@@ -229,7 +234,7 @@ def get_user_highscores(username):
 
     Returns:
         scores: A list of all highscores archieved by the user.
-    """    
+    """
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
@@ -243,6 +248,7 @@ def get_user_highscores(username):
     conn.close()
     return scores
 
+
 def get_top_highscores(limit=10):
     """Returns the top highscores
 
@@ -251,7 +257,7 @@ def get_top_highscores(limit=10):
 
     Returns:
         scores: List of highscores
-    """    
+    """
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
@@ -264,6 +270,7 @@ def get_top_highscores(limit=10):
     cursor.close()
     conn.close()
     return scores
+
 
 if __name__ == "__main__":
     connection = connect_to_db()

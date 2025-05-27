@@ -8,14 +8,14 @@ from fastapi.templating import Jinja2Templates
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from services.auth_service import (
+from app.services.auth_service import (
     authenticate_user,
     create_access_token,
     Token,
     register_user
 )
-from services.database_service import get_user, add_user
-from util.logger import get_logger
+from app.services.database_service import get_user, add_user
+from app.util.logger import get_logger
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -45,8 +45,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         str: Identification token (JWT).
     """
     try:
-        user = get_user(form_data.username)
-        authenticate_user(user, form_data.password)
+        db_user = get_user(form_data.username)
+        if db_user is None:
+            raise HTTPException(
+                status_code=401, detail="Invalid username or password")
+        user = authenticate_user(db_user, form_data.password)
         token = create_access_token(data={"sub": user.username})
     except Exception as e:
         raise HTTPException(status_code=403, detail=str(e)) from e

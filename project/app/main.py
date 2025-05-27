@@ -8,8 +8,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import pokebase as pb
 from dotenv import load_dotenv
-from routes import frontend, highscores, users
-from util.logger import get_logger
+from app.routes import frontend, highscores, users
+from app.util.logger import get_logger
 
 # Initialization of the application
 
@@ -27,15 +27,17 @@ pb.cache.set_cache()
 
 # Mount the required directories for the webpage
 
+BASE_DIR = Path(__file__).resolve().parent
+
 app.mount(
     "/static",
-    StaticFiles(directory=Path("static/")),
+    StaticFiles(directory=BASE_DIR / "static"),
     name="static",
 )
 app.mount(
     "/images",
-    StaticFiles(directory=Path("images/")),
-    name="images"
+    StaticFiles(directory=BASE_DIR / "images"),
+    name="images",
 )
 
 app.include_router(frontend.router)

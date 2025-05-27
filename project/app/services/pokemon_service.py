@@ -8,8 +8,8 @@ import random
 import pokebase as pb
 from dotenv import load_dotenv
 
-from util.logger import Logger
-from QuizInfo import QuizInfo
+from app.util.logger import Logger
+from app.QuizInfo import QuizInfo
 
 load_dotenv()
 pb.cache.set_cache(os.getenv("POKEMON_CACHE"))

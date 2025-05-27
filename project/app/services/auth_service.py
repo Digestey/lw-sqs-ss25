@@ -63,16 +63,20 @@ def authenticate_user(db_user, plain_pw):
     if len(username) < 1 or len(password_hash) < 1:
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
-    if not bcrypt.checkpw(plain_pw.encode('utf-8'), password_hash):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if isinstance(password_hash, str):
+        password_hash = password_hash.encode('utf-8')
 
+    if not bcrypt.checkpw(plain_pw.encode('utf-8'), password_hash):
+        print("credentials invalid")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    print("authenticate user complete")
     return UserInDb(
         id=db_user["id"],
         username=username,
-        password_hash=password_hash.decode() if isinstance(password_hash, bytes) else password_hash,
+        password_hash=password_hash.decode() if isinstance(
+            password_hash, bytes) else password_hash,
         created_at=db_user["created_at"]
     )
-
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
