@@ -14,6 +14,7 @@ from services.auth_service import (
     Token,
     register_user
 )
+from services.database_service import get_user, add_user
 from util.logger import get_logger
 
 router = APIRouter()
@@ -25,7 +26,7 @@ logger = get_logger("Users")
 
 class RegisterRequest(BaseModel):
     """Model for User
-    """    
+    """
     username: str
     password: str
 
@@ -42,9 +43,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     Returns:
         str: Identification token (JWT).
-    """    
+    """
     try:
-        user = authenticate_user(form_data.username, form_data.password)
+        user = get_user(form_data.username)
+        authenticate_user(user, form_data.password)
         token = create_access_token(data={"sub": user.username})
     except Exception as e:
         raise HTTPException(status_code=403, detail=str(e)) from e
@@ -61,6 +63,7 @@ async def register(request: RegisterRequest):
         HTTPException: _description_
     """
     try:
-        register_user(request.username, request.password)
+        add_user(request.username, register_user(
+            request.username, request.password))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e

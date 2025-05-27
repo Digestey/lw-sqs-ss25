@@ -1,3 +1,7 @@
+const MIN_USERNAME_LENGTH = 4;
+const MIN_PW_LENGTH = 8;
+const MAX_STRING_LENGTH = 100;
+
 function username_check(username) {
   return !(username.length < MIN_USERNAME_LENGTH || username.length > MAX_STRING_LENGTH);
 }

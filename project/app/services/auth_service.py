@@ -1,3 +1,9 @@
+"""
+Module auth_service: Authentication Service
+
+Handles everything authentication- and token-related.
+However does NOT connect to the database.
+"""
 from datetime import datetime, timedelta
 import os
 import bcrypt
@@ -6,9 +12,6 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
-
-
-from services.database_service import add_user, get_user
 
 load_dotenv()
 
@@ -27,7 +30,7 @@ class Token(BaseModel):
 
     Args:
         BaseModel (_type_): _description_
-    """    
+    """
     access_token: str
     token_type: str
 
@@ -37,7 +40,7 @@ class UserInDb(BaseModel):
 
     Args:
         BaseModel (_type_): _description_
-    """    
+    """
     id: int
     username: str
     password_hash: str
@@ -49,26 +52,27 @@ def register_user(username, password):
     if not check_credentials(username, password):
         raise HTTPException(status_code=400, detail="Registration failed")
     hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    try:
-        add_user(username, hashed)
-    except Exception as e:
-        raise HTTPException(
-            status_code=400, detail=f"Registration failed: {str(e)}") from e
+    return hashed
 
 
-def authenticate_user(username, password):
+def authenticate_user(db_user, plain_pw):
     """Verifies user credentials and returns the UserInDb model if valid."""
-    if (len(username) < 1 or  len(password) < 1):
+    username = db_user["username"]
+    password_hash = db_user["password_hash"]
+
+    if len(username) < 1 or len(password_hash) < 1:
         raise HTTPException(status_code=400, detail="Invalid credentials")
-    user = get_user(username)
-    if not user or not bcrypt.checkpw(password.encode('utf-8'), user["password_hash"].encode('utf-8')):
+
+    if not bcrypt.checkpw(plain_pw.encode('utf-8'), password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
     return UserInDb(
-        id=user["id"],
-        username=user["username"],
-        password_hash=user["password_hash"],
-        created_at=user["created_at"]
+        id=db_user["id"],
+        username=username,
+        password_hash=password_hash.decode() if isinstance(password_hash, bytes) else password_hash,
+        created_at=db_user["created_at"]
     )
+
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -95,7 +99,8 @@ def get_user_from_token(token: str):
         return username
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid token") from e
-    
+
+
 def check_credentials(username: str, password: str):
     """Checks whether the credentials provided are according to the password requirements
 
@@ -104,14 +109,15 @@ def check_credentials(username: str, password: str):
         password (str): password to be checked
 
     Returns:
-        (bool): Return True if both username and password are according to their respective requirements. False otherwise.
+        (bool): Return True if both username and password are according to
+        their respective requirements. False otherwise.
     """
     username_length = len(username)
     password_length = len(password)
-    
+
     if username_length < MIN_USERNAME_LENGTH or username_length > MAX_STRING_LENGTH:
         return False
-    
+
     if password_length < MIN_PASSWORD_LENGTH or password_length > MAX_STRING_LENGTH:
         return False
     return True
