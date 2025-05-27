@@ -49,22 +49,22 @@ def fetch_pokemon(logger: Logger):
 
     # in production, this would be hidden. but me being an idiot, i keep it here
     print(f"Name\t\t\t\t: {current_pokemon.name}")
-    logger.debug(f"Id\t\t\t\t\t: {current_pokemon.id}")
-    logger.debug(f"Height\t\t\t\t: {current_pokemon.height}")
-    logger.debug(f"Weight\t\t\t\t: {current_pokemon.weight}")
-    logger.debug(
+    print(f"Id\t\t\t\t\t: {current_pokemon.id}")
+    print(f"Height\t\t\t\t: {current_pokemon.height}")
+    print(f"Weight\t\t\t\t: {current_pokemon.weight}")
+    print(
         f"{current_pokemon.stats[0].stat}\t\t\t\t: {current_pokemon.stats[0].base_stat}")
-    logger.debug(
+    print(
         f"{current_pokemon.stats[1].stat}\t\t\t\t: {current_pokemon.stats[1].base_stat}")
-    logger.debug(
+    print(
         f"{current_pokemon.stats[2].stat}\t\t\t\t: {current_pokemon.stats[2].base_stat}")
-    logger.debug(
+    print(
         f"{current_pokemon.stats[3].stat}\t\t\t: {current_pokemon.stats[3].base_stat}")
-    logger.debug(
+    print(
         f"{current_pokemon.stats[4].stat}\t\t\t: {current_pokemon.stats[4].base_stat}")
-    logger.debug(
+    print(
         f"{current_pokemon.stats[5].stat}\t\t\t\t: {current_pokemon.stats[5].base_stat}")
-    logger.debug(f"Type:\t\t\t\t: {current_pokemon.types[0].type}")
+    print(f"Type:\t\t\t\t: {current_pokemon.types[0].type}")
 
     if len(current_pokemon.types) != 1:
         # Debugging info
@@ -79,5 +79,6 @@ def fetch_pokemon(logger: Logger):
     entry = english_dex_entry(current_pokemon)
     quizmon = QuizInfo(current_pokemon.name, current_pokemon.id,
                        current_pokemon.height, current_pokemon.weight, stats, types, entry)
-
+    print(vars(quizmon))
+    print(quizmon.__dict__)
     return quizmon

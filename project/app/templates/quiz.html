@@ -28,26 +28,80 @@
 <button id="submit-score-button" style="display: none;">Submit score</button>
 
 <div class="pokedex-container">
-    <img src="images/pokedex_bg.png" class="pokedex-background" alt="Hints-Overlay">
 
-    <!-- Type and Basic Info -->
-    <div class="overlay type1">{{ pokemon.types[0] }}</div>
-    {% if pokemon.types|length > 1 %}
-    <div class="overlay type2">{{ pokemon.types[1] }}</div>
-    {% endif %}
-    <div class="overlay height">{{ pokemon.height }}</div>
-    <div class="overlay weight">{{ pokemon.weight }}</div>
-    <div class="overlay dex-entry">{{ pokemon.dex_entry }}</div>
-    <img src="images/skills_bg.png" class="pokedex-background" alt="Pokedex Stats">
-    <div class="overlay stat-hp">{{ pokemon.stats["Hp"] }}</div>
-    <div class="overlay stat-attack">{{ pokemon.stats["Attack"] }}</div>
-    <div class="overlay stat-defense">{{ pokemon.stats["Defense"] }}</div>
-    <div class="overlay stat-sp-atk">{{ pokemon.stats["Sp. atk"] }}</div>
-    <div class="overlay stat-sp-def">{{ pokemon.stats["Sp. def"] }}</div>
-    <div class="overlay stat-speed">{{ pokemon.stats["Speed"] }}</div>
-    <div class="overlay ability">{{ pokemon.ability }}</div>
-</div>
+    <!-- Info Box: types, height, weight, dex entry, ability -->
+    <div class="info-box">
+        <img
+            src="{{ url_for('images', path='type_icons/' + pokemon.types[0].lower() + '.png') }}"
+            alt="{{ pokemon.types[0] }}"
+            class="type-icon"
+            onerror="this.onerror=null;this.src='{{ url_for('images', path='type_icons/default.png') }}';">
+        {% if pokemon.types|length > 1 %}
+        <img
+            src="{{ url_for('images', path='type_icons/' + pokemon.types[1].lower() + '.png') }}"
+            alt="{{ pokemon.types[1] }}"
+            class="type-icon"
+            onerror="this.onerror=null;this.src='{{ url_for('images', path='type_icons/default.png') }}';">
+        {% endif %}
+        <p class="height">Height: {{ pokemon.height }}</p>
+        <p class="weight">Weight: {{ pokemon.weight }}</p>
+        <p class="dex-entry">{{ pokemon.entry }}</p>
+    </div>
 
+    <!-- Stats progress bars box -->
+    <div class="stats-box">
+        <div class="stat-row">
+            <span class="stat-label">HP:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Hp', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Hp', 0) }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Attack:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Attack', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Attack', 0) }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Defense:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Defense', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Defense', 0)
+                }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Special Attack:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Special-attack', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Special-attack', 0)
+                }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Special Defense:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Special-defense', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Special-defense', 0)
+                }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Speed:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Speed', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Speed', 0) }}</span>
+        </div>
+    </div>
 </div>
 
 <script src="/static/quiz.js"></script>
