@@ -46,6 +46,18 @@ async def login_form(request: Request):
     """
     return templates.TemplateResponse("login.html", {"request": request})
 
+@router.get("/register", response_class=HTMLResponse)
+async def login_form(request: Request):
+    """_summary_
+
+    Args:
+        request (Request): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    return templates.TemplateResponse("register.html", {"request": request})
+
 
 @router.get("/highscores", response_class=HTMLResponse)
 async def highscore_page(request: Request):

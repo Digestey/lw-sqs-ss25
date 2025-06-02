@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         logoutButton.addEventListener("click", (e) => {
             e.preventDefault(); // Prevent form-like behavior if ever used that way
             localStorage.removeItem("token");
-            window.location.href = "/login";
+            window.location.assign("/login");
         });
     }
 

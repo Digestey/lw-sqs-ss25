@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!token) {
         console.error("No token found");
-        window.location.href = "/login";
+        window.location.assign("/login");
         return;
     }
 

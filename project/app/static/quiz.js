@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         logoutButton.addEventListener("click", () => {
             localStorage.removeItem("token");
             localStorage.removeItem("currentScore");
-            window.location.href = "/";
+            window.location.assign("/");
         });
     }
 

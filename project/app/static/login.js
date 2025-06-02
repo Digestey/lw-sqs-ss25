@@ -11,7 +11,7 @@ function password_check(password) {
 }
 
 document.addEventListener("cr_account", function () {
-    window.location.href = "/register"
+    window.location.assign("/register");
 })
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("token", data.access_token);
 
       alert("Login successful!");
-      window.location.href = "/"; // redirect to main Page after login
+      window.location.assign("/");
     } catch (error) {
       alert(error.message);
     }

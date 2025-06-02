@@ -1,3 +1,16 @@
+-- Ensure consistent SQL mode
+SET SQL_MODE = 'STRICT_ALL_TABLES,NO_ENGINE_SUBSTITUTION';
+
+-- Abort on errors in scripts
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, AUTOCOMMIT = 0;
+START TRANSACTION;
+
+-- Set default character set to UTF-8 (utf8mb4 supports emojis and full Unicode)
+SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
+
+-- Set safe timezone (important if datetime data is involved)
+SET TIME_ZONE = '+00:00';
+
 -- Users table: stores login info
 CREATE DATABASE IF NOT EXISTS pokedb;
 USE pokedb;
