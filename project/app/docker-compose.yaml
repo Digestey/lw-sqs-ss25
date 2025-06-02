@@ -11,7 +11,7 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
             - mysql_data:/var/lib/mysql
-            - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+            - ./db_init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
             interval: 10s
@@ -24,6 +24,8 @@ services:
         build:
             context: .
             dockerfile: dockerfile
+        expose:
+            - "8000"
         ports:
             - "8000:8000"
         depends_on:
@@ -33,6 +35,23 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            HOST_IP: ${HOST_IP}
+            PYTHONPATH: /app
+    
+#    test:
+#        build:
+#          context: .
+#          dockerfile: dockerfile
+#        depends_on:
+#          - app
+#          - pokedb
+#        environment:
+#          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#          MYSQL_DATABASE: ${MYSQL_DATABASE}
+#          MYSQL_USER: ${MYSQL_USER}
+#          MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#          PYTHONPATH: /app
+#        command: ["pytest", "-v", "--maxfail=1", "tests/"]
 
 volumes:
     mysql_data:  # define only the named volume here

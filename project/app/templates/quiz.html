@@ -15,46 +15,96 @@
 
 <!-- Form for user input -->
 <form method="POST">
+    <label>Your Guess:</label>
     <input type="text" name="guess" required>
     <button type="submit">Submit</button>
 </form>
-<div>
-    <h3>Guess the Pokémon!</h3>
-    <p><strong>Type:</strong> {{ pokemon.types[0] }}</p>
-    {% if pokemon.types|length > 1 %}
-    <p><strong>Secondary Type:</strong> {{ pokemon.types[1] }}</p>
-    {% endif %}
-    <p><strong>Height:</strong> {{ pokemon.height }}</p>
-    <p><strong>Weight:</strong> {{ pokemon.weight }}</p>
-    <p><strong>Dex Entry:</strong> {{ pokemon.dex_entry }}</p>
 
-    <h4>Stats:</h4>
-    <ul>
-        {% for stat, value in pokemon.stats.items() %}
-        <li>{{ stat }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
-</div>
+<p id="quiz-message"></p>
+
+<p id="score-display" style="display: none;">
+    Your current Score: <span id="score-value">0</span>
+</p>
+<button id="submit-score-button" style="display: none;">Submit score</button>
+
 <div class="pokedex-container">
-    <img class="pokedex-image" src="images/hints.png" alt="Hints-Overlay" width="1530" height="567">
-    <div class="hint-height" {% if hint_to_show == 'height' %}style="display:block;"{% else %}style="display:block;"{% endif %}>{{pokemon.weight}}</div>
-    <div class="hint-weight" {% if hint_to_show == 'weight' %}style="display:block;"{% else %}style="display:block;"{% endif %}> {{ pokemon.weight }}</div>
-    <div class="hint-species" {% if hint_to_show == 'species' %}style="display:block;"{% else %}style="display:block;"{% endif %}> {{pokemon.name}}</div>
-    <div class="hint-primary-type" {% if hint_to_show == 'types' %}style="display:block;"{% else %}style="display:block;"{% endif %}>{{ pokemon.types[0] }}</div>
-    {% if pokemon.types|length > 1 %}
-    <div class="hint-secondary-type" {% if hint_to_show == 'secondary_type' %}style="display:block;"{% else %}style="display:block;"{% endif %}>{{ pokemon.types[1] }}</div>
-    {% endif %}
-    <div class="hint-pokedex-entry" {% if hint_to_show == 'dex_entry' %}style="display:block;"{% else %}style="display:flex;"{% endif %}></div>
-    <div class="hint-base-hp" {% if hint_to_show == 'base_hp' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
-    <div class="hint-base-attack" {% if hint_to_show == 'base_attack' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
-    <div class="hint-base-defense" {% if hint_to_show == 'base_defense' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
-    <div class="hint-base-special-attack" {% if hint_to_show == 'base_special_attack' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
-    <div class="hint-base-special-defense" {% if hint_to_show == 'base_special_defense' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
-    <div class="hint-base-speed" {% if hint_to_show == 'base_speed' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
-    <div class="hint-ability" {% if hint_to_show == 'abilities' %}style="display:block;"{% else %}style="display:block;"{% endif %}></div>
+
+    <!-- Info Box: types, height, weight, dex entry, ability -->
+    <div class="info-box">
+        <img
+            src="{{ url_for('images', path='type_icons/' + pokemon.types[0].lower() + '.png') }}"
+            alt="{{ pokemon.types[0] }}"
+            class="type-icon"
+            onerror="this.onerror=null;this.src='{{ url_for('images', path='type_icons/default.png') }}';">
+        {% if pokemon.types|length > 1 %}
+        <img
+            src="{{ url_for('images', path='type_icons/' + pokemon.types[1].lower() + '.png') }}"
+            alt="{{ pokemon.types[1] }}"
+            class="type-icon"
+            onerror="this.onerror=null;this.src='{{ url_for('images', path='type_icons/default.png') }}';">
+        {% endif %}
+        <p class="height">Height: {{ pokemon.height }}</p>
+        <p class="weight">Weight: {{ pokemon.weight }}</p>
+        <p class="dex-entry">{{ pokemon.entry }}</p>
+    </div>
+
+    <!-- Stats progress bars box -->
+    <div class="stats-box">
+        <div class="stat-row">
+            <span class="stat-label">HP:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Hp', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Hp', 0) }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Attack:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Attack', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Attack', 0) }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Defense:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Defense', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Defense', 0)
+                }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Special Attack:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Special-attack', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Special-attack', 0)
+                }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Special Defense:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Special-defense', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Special-defense', 0)
+                }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Speed:</span>
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    style="width: {{ (pokemon.stats.get('Speed', 0) / 255 * 100) | round(1) }}%;"></div>
+            </div>
+            <span class="stat-value">{{ pokemon.stats.get('Speed', 0) }}</span>
+        </div>
+    </div>
 </div>
 
-<script src="/static/script.js"></script>
+<script src="/static/quiz.js"></script>
 
 {% if message %}
 <p>{{ message }}</p>
@@ -62,11 +112,4 @@
 {% endblock %}
 
 {% block scripts %}
-{% if reload %}
-<script>
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
- </script>
-{% endif %}
 {% endblock %}

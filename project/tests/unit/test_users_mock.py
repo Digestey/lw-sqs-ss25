@@ -2,10 +2,10 @@ from unittest.mock import patch, MagicMock
 import bcrypt
 import pytest
 
-from app.database.database import add_user, delete_user, get_user, verify_user
+from app.services.database_service import add_user, delete_user, get_user
 
 
-@patch("app.database.database.get_connection")
+@patch("app.services.database_service.get_connection")
 def test_add_user_success(mock_get_connection):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -20,7 +20,7 @@ def test_add_user_success(mock_get_connection):
     mock_conn.close.assert_called()
 
 
-@patch("app.database.database.get_connection")
+@patch("app.services.database_service.get_connection")
 def test_delete_user(mock_get_connection):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -35,7 +35,7 @@ def test_delete_user(mock_get_connection):
     mock_conn.close.assert_called()
 
 
-@patch("app.database.database.get_connection")
+@patch("app.services.database_service.get_connection")
 def test_get_user(mock_get_connection):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -46,19 +46,3 @@ def test_get_user(mock_get_connection):
     user = get_user("testuser")
     assert user["username"] == "testuser"
     mock_cursor.execute.assert_called_once()
-
-
-@patch("app.database.database.get_user")
-def test_verify_user_correct(mock_get_user):
-    hashed = bcrypt.hashpw(b"testpassword", bcrypt.gensalt()).decode("utf-8")
-    mock_get_user.return_value = {"username": "testuser", "password hash": hashed}
-
-    assert verify_user("testuser", "testpassword") is True
-
-
-@patch("app.database.database.get_user")
-def test_verify_user_wrong_password(mock_get_user):
-    hashed = bcrypt.hashpw(b"somethingelse", bcrypt.gensalt()).decode("utf-8")
-    mock_get_user.return_value = {"username": "testuser", "password hash": hashed}
-
-    assert verify_user("testuser", "testpassword") is False

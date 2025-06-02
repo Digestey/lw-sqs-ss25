@@ -1,17 +1,15 @@
-# app.py
+"""
+Main entry point for the DexQuiz Application
+"""
 import os
 import logging
 from pathlib import Path
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
 import pokebase as pb
 from dotenv import load_dotenv
-from routes import frontend
-from services.pokemon_service import fetch_pokemon
-from util.logger import get_logger
+from app.routes import frontend, highscores, users
+from app.util.logger import get_logger
 
 # Initialization of the application
 
@@ -21,27 +19,33 @@ logger = get_logger(name="DexQuiz", debug=True, level=logging.DEBUG)
 
 sessions = {}
 app = FastAPI()
+cache_dir = os.getenv("POKEMON_CACHE", default="./cache")
+host_ip = os.getenv("HOST_IP", "127.0.0.1")
 
-pb.cache.set_cache(os.getenv("POKEMON_CACHE"))
+pb.cache.set_cache()
 
 # print(f"{dir(pb.cache.API_CACHE)}")
 
 # Mount the required directories for the webpage
 
+BASE_DIR = Path(__file__).resolve().parent
+
 app.mount(
     "/static",
-    StaticFiles(directory=Path("static/")),
+    StaticFiles(directory=BASE_DIR / "static"),
     name="static",
 )
 app.mount(
     "/images",
-    StaticFiles(directory=Path("images/")),
-    name="images"
+    StaticFiles(directory=BASE_DIR / "images"),
+    name="images",
 )
 
 app.include_router(frontend.router)
+app.include_router(highscores.router)
+app.include_router(users.router)
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host=host_ip, port=8000)
