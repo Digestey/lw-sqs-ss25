@@ -8,3 +8,12 @@ def test_homepage():
     assert response.status_code == 200
     assert "DexQuiz" in response.text
     
+def test_login_frontend():
+    response = client.get("/login")
+    assert response.status_code == 200
+    assert "login" in response.text
+    
+def test_register_frontend():
+    response = client.get("/login")
+    assert response.status_code == 200
+    assert "register" in response.text

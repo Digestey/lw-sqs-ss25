@@ -30,29 +30,19 @@ class Highscore(BaseModel):
     score: int
 
 
-def connect_to_db():
-    """This function is used to check whether the database is reachable. It will retry to reach the
-       Database 5 Times in 5 Second intervals. If the database is still not reachable, it should
-       quit the application.
-
-    Raises:
-        e: Database could not be reached. Is the pokedb container up? Are the credentials correct? yeah
-
-    Returns:
-        _type_: database connection
-    """
-    retries = 5  # Number of retry attempts
-    delay = 5  # Delay between retries in seconds
+def connect_to_db(host, user, password, database, port=3306):
+    retries = 5
+    delay = 5
 
     for attempt in range(retries):
         try:
-            print(
-                f"Attempting to connect to MySQL (Attempt {attempt + 1}/{retries})...")
+            print(f"Attempting to connect to MySQL (Attempt {attempt + 1}/{retries})...")
             connector = mysql.connector.connect(
-                host=MYSQL_URL,
-                user=MYSQL_USERNAME,
-                password=MYSQL_PASSWORD,
-                database=MYSQL_DATABASE
+                host=host,
+                user=user,
+                password=password,
+                database=database,
+                port=port
             )
 
             if connector.is_connected():
@@ -65,7 +55,7 @@ def connect_to_db():
                 time.sleep(delay)
             else:
                 print("Max retries reached. Unable to connect to MySQL.")
-                raise e  # Raise the last exception after retrying
+                raise e
 
 
 def get_connection():
@@ -75,10 +65,13 @@ def get_connection():
         PooledMYSQLConnection: Connection needed in order to perform SQL queries.
     """
     return mysql.connector.connect(
-        host=MYSQL_URL,
-        user=MYSQL_USERNAME,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DATABASE
+        host=os.getenv("MYSQL_URL", "127.0.0.1"),
+        port=int("3306"),
+        user=os.getenv("MYSQL_USER", "root"),
+        password=os.getenv("MYSQL_PASSWORD", ""),
+        database=os.getenv("MYSQL_DATABASE", "testdb"),
+        use_pure=True,
+        unix_socket=None 
     )
 
 # --- USERS ---

@@ -36,6 +36,21 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
             PYTHONPATH: /app
+    
+#    test:
+#        build:
+#          context: .
+#          dockerfile: dockerfile
+#        depends_on:
+#          - app
+#          - pokedb
+#        environment:
+#          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#          MYSQL_DATABASE: ${MYSQL_DATABASE}
+#          MYSQL_USER: ${MYSQL_USER}
+#          MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#          PYTHONPATH: /app
+#        command: ["pytest", "-v", "--maxfail=1", "tests/"]
 
 volumes:
     mysql_data:  # define only the named volume here
