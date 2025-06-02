@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 const MIN_PW_LENGTH = 8;
 const MIN_USERNAME_LENGTH = 5;
 const MAX_STRING_LENGTH = 100;
@@ -8,6 +10,15 @@ function username_check(username) {
 
 function password_check(password) {
   return !(password.length < MIN_PW_LENGTH || password.length > MAX_STRING_LENGTH);
+}
+
+function constantTimeEquals(a, b) {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -35,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // console.log(password)
     // console.log(repeatPassword)
 
-    if (password !== repeatPassword) {
+    if (!constantTimeEquals(password, repeatPassword)) {
       alert("Passwords do not match.");
       return;
     }

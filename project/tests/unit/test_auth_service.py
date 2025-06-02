@@ -33,15 +33,15 @@ def test_register_user_invalid():
 
 
 def test_authenticate_user_valid():
-    password = "validpass123"
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    test_password = "validpass123"
+    hashed = bcrypt.hashpw(test_password.encode(), bcrypt.gensalt())
     db_user = {
         "id": 1,
         "username": "user",
         "password_hash": hashed,  # ⬅️ don't decode
         "created_at": datetime.now()
     }
-    user = auth.authenticate_user(db_user, password)
+    user = auth.authenticate_user(db_user, test_password)
     assert user.username == "user"
 
 
@@ -72,8 +72,8 @@ def test_authenticate_user_missing_fields():
 
 def test_create_access_token_and_get_user(monkeypatch):
     test_username = "testuser"
-    secret = "testsecret"
-    monkeypatch.setattr(auth, "SECRET_KEY", secret)
+    test_secret = "testsecret"
+    monkeypatch.setattr(auth, "SECRET_KEY", test_secret)
 
     data = {"sub": test_username}
     token_obj = auth.create_access_token(data, timedelta(minutes=5))

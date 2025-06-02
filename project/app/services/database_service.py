@@ -263,7 +263,3 @@ def get_top_highscores(limit=10):
     cursor.close()
     conn.close()
     return scores
-
-
-if __name__ == "__main__":
-    connection = connect_to_db()

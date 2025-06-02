@@ -47,7 +47,7 @@ async def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 @router.get("/register", response_class=HTMLResponse)
-async def login_form(request: Request):
+async def register_form(request: Request):
     """_summary_
 
     Args:

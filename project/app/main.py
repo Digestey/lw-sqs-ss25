@@ -20,6 +20,7 @@ logger = get_logger(name="DexQuiz", debug=True, level=logging.DEBUG)
 sessions = {}
 app = FastAPI()
 cache_dir = os.getenv("POKEMON_CACHE", default="./cache")
+host_ip = os.getenv("HOST_IP", "127.0.0.1")
 
 pb.cache.set_cache()
 
@@ -47,4 +48,4 @@ app.include_router(users.router)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=host_ip, port=8000)
