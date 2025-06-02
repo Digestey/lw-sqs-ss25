@@ -9,7 +9,7 @@ import pokebase as pb
 from dotenv import load_dotenv
 
 from app.util.logger import Logger
-from app.QuizInfo import QuizInfo
+from app.models.quiz_info import QuizInfo
 
 load_dotenv()
 pb.cache.set_cache(os.getenv("POKEMON_CACHE"))

@@ -1,42 +1,20 @@
 """
 Module highscores: Contains all backend routes that are highscore-related.
 """
-import datetime
 from typing import List
 from fastapi import APIRouter, HTTPException, Request, Depends
 import mysql
-from pydantic import BaseModel
 
 from app.services.database_service import get_highscores, add_highscore, get_top_highscores
 from app.services.auth_service import get_user_from_token, oauth2_scheme
 from app.util.logger import get_logger
+from app.models.highscore_response import HighscoreResponse
 
 router = APIRouter()
 logger = get_logger("Highscore")
 
 # In-memory session store (basic)
 sessions = {}
-
-
-class HighscoreResponse(BaseModel):
-    """_summary_
-
-    Args:
-        BaseModel (_type_): _description_
-    """
-    username: str
-    score: int
-    achieved_at: datetime.datetime
-
-
-class HighscoreRequest(BaseModel):
-    """_summary_
-
-    Args:
-        BaseModel (_type_): _description_
-    """
-    username: str
-    score: int
 
 
 @router.get("/api/highscores", response_model=List[HighscoreResponse])
