@@ -9,8 +9,6 @@ import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
 
-from pydantic import BaseModel
-
 # --- ENVIRONMENT VARIABLES ---
 
 load_dotenv()
@@ -23,14 +21,22 @@ MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 # --- META ---
 
 
-class Highscore(BaseModel):
-    """Object to represent highscore
-    """
-    username: str
-    score: int
-
-
 def connect_to_db(host, user, password, database, port=3306):
+    """_summary_
+
+    Args:
+        host (_type_): _description_
+        user (_type_): _description_
+        password (_type_): _description_
+        database (_type_): _description_
+        port (int, optional): _description_. Defaults to 3306.
+
+    Raises:
+        e: _description_
+
+    Returns:
+        _type_: _description_
+    """    
     retries = 5
     delay = 5
 

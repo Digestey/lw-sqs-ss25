@@ -11,7 +11,9 @@ from jose import jwt
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
+
+from app.models.user_in_db import UserInDb
+from app.models.token import Token
 
 load_dotenv()
 
@@ -24,27 +26,6 @@ MAX_STRING_LENGTH = 100
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
-
-class Token(BaseModel):
-    """_summary_
-
-    Args:
-        BaseModel (_type_): _description_
-    """
-    access_token: str
-    token_type: str
-
-
-class UserInDb(BaseModel):
-    """_summary_
-
-    Args:
-        BaseModel (_type_): _description_
-    """
-    id: int
-    username: str
-    password_hash: str
-    created_at: datetime
 
 
 def register_user(username, password):
