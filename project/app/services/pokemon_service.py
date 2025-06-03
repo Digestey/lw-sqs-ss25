@@ -1,13 +1,13 @@
 """
-Module pokemon_service:
+pokemon_service.py
 
-Connects to PokeAPI via PokeBase Wrapper.
+Provides functionality to fetch and format Pokémon data using PokeBase.
 """
+
 import os
 import random
 import pokebase as pb
 from dotenv import load_dotenv
-
 from app.util.logger import Logger
 from app.QuizInfo import QuizInfo
 
@@ -15,70 +15,59 @@ load_dotenv()
 pb.cache.set_cache(os.getenv("POKEMON_CACHE"))
 
 
-def english_dex_entry(pokemon):
-    """Extracts English Pokedex entry from pokemon object returned by the API
+def get_random_pokemon_id(min_id=1, max_id=1025):
+    return random.randint(min_id, max_id)
 
-    Args:
-        pokemon (pokemon): Pokemon
 
-    Returns:
-        str: Random English PokeDex Entry.
-    """
+def get_english_dex_entry(species):
+    """Returns a random English Pokédex entry."""
     english_entries = [
-        entry for entry in pokemon.species.flavor_text_entries if entry.language.name == "en"]
-
-    # If there are English entries, return a random one
-    if english_entries:
-        random_entry = random.choice(english_entries)
-        return random_entry.flavor_text
-    else:
-        return "No English entry found."
+        entry.flavor_text for entry in species.flavor_text_entries
+        if entry.language.name == "en"
+    ]
+    return random.choice(english_entries) if english_entries else "No English entry found."
 
 
-def fetch_pokemon(logger: Logger):
-    """Fetches a random Pokemon from the PokeAPI.
+def extract_stats(stats_data):
+    """Transforms raw stats into a readable dict."""
+    return {
+        stat.stat.name.capitalize(): stat.base_stat
+        for stat in stats_data
+    }
 
-    Args:
-        logger (Logger): Logger
 
-    Returns:
-        pokemon: A random Pokemon object.
-    """
-    pokemonid = random.randrange(1, 1025, 1)
-    current_pokemon = pb.pokemon(pokemonid)  # Fetch Pokémon data
+def extract_types(types_data):
+    """Extracts and formats type names."""
+    return [t.type.name.capitalize() for t in types_data]
 
-    # in production, this would be hidden. but me being an idiot, i keep it here
-    print(f"Name\t\t\t\t: {current_pokemon.name}")
-    print(f"Id\t\t\t\t\t: {current_pokemon.id}")
-    print(f"Height\t\t\t\t: {current_pokemon.height}")
-    print(f"Weight\t\t\t\t: {current_pokemon.weight}")
-    print(
-        f"{current_pokemon.stats[0].stat}\t\t\t\t: {current_pokemon.stats[0].base_stat}")
-    print(
-        f"{current_pokemon.stats[1].stat}\t\t\t\t: {current_pokemon.stats[1].base_stat}")
-    print(
-        f"{current_pokemon.stats[2].stat}\t\t\t\t: {current_pokemon.stats[2].base_stat}")
-    print(
-        f"{current_pokemon.stats[3].stat}\t\t\t: {current_pokemon.stats[3].base_stat}")
-    print(
-        f"{current_pokemon.stats[4].stat}\t\t\t: {current_pokemon.stats[4].base_stat}")
-    print(
-        f"{current_pokemon.stats[5].stat}\t\t\t\t: {current_pokemon.stats[5].base_stat}")
-    print(f"Type:\t\t\t\t: {current_pokemon.types[0].type}")
 
-    if len(current_pokemon.types) != 1:
-        # Debugging info
-        logger.debug(f"Secondary Type:\t\t\t: {current_pokemon.types[1].type}")
+def log_pokemon_details(logger: Logger, pokemon):
+    logger.log(f"Name: {pokemon.name}")
+    logger.debug(f"Id: {pokemon.id}")
+    logger.debug(f"Height: {pokemon.height}")
+    logger.debug(f"Weight: {pokemon.weight}")
+    for stat in pokemon.stats:
+        logger.debug(f"{stat.stat.name.capitalize()}: {stat.base_stat}")
+    logger.debug("Types: " + ", ".join(t.type.name for t in pokemon.types))
 
-    entry = english_dex_entry(current_pokemon)
-    logger.debug(f"Dex-Entry:\t\t\t: {entry}")  # Debugging info
-    # Collecting Pokémon Information
-    stats = {stat.stat.name.capitalize(
-    ): stat.base_stat for stat in current_pokemon.stats}
-    types = [type.type.name.capitalize() for type in current_pokemon.types]
-    entry = english_dex_entry(current_pokemon)
-    quizmon = QuizInfo(current_pokemon.name, current_pokemon.id,
-                       current_pokemon.height, current_pokemon.weight, stats, types, entry)
-    print(vars(quizmon))
-    print(quizmon.__dict__)
-    return quizmon
+
+def fetch_pokemon(logger: Logger) -> QuizInfo:
+    """Fetches a random Pokémon and returns a QuizInfo object."""
+    pokemon_id = get_random_pokemon_id()
+    pokemon = pb.pokemon(pokemon_id)
+
+    log_pokemon_details(logger, pokemon)
+
+    stats = extract_stats(pokemon.stats)
+    types = extract_types(pokemon.types)
+    entry = get_english_dex_entry(pokemon.species)
+
+    return QuizInfo(
+        name=pokemon.name,
+        id=pokemon.id,
+        height=pokemon.height,
+        weight=pokemon.weight,
+        stats=stats,
+        types=types,
+        dex_entry=entry
+    )
