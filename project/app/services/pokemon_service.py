@@ -42,7 +42,7 @@ def extract_types(types_data):
 
 
 def log_pokemon_details(logger: Logger, pokemon):
-    logger.log(msg=f"Name: {pokemon.name}")
+    logger.log(msg=f"Name: {pokemon.name}", level=0)
     logger.debug(f"Id: {pokemon.id}")
     logger.debug(f"Height: {pokemon.height}")
     logger.debug(f"Weight: {pokemon.weight}")
@@ -64,10 +64,10 @@ def fetch_pokemon(logger: Logger) -> QuizInfo:
 
     return QuizInfo(
         name=pokemon.name,
-        id=pokemon.id,
+        pokemon_id=pokemon.id,
         height=pokemon.height,
         weight=pokemon.weight,
         stats=stats,
         types=types,
-        dex_entry=entry
+        entry=entry
     )
