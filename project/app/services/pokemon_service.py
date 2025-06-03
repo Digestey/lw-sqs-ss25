@@ -42,7 +42,7 @@ def extract_types(types_data):
 
 
 def log_pokemon_details(logger: Logger, pokemon):
-    logger.log(f"Name: {pokemon.name}")
+    logger.log(msg=f"Name: {pokemon.name}")
     logger.debug(f"Id: {pokemon.id}")
     logger.debug(f"Height: {pokemon.height}")
     logger.debug(f"Weight: {pokemon.weight}")
