@@ -5,7 +5,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Request, Depends
 import mysql
 
-from app.services.database_service import get_highscores, add_highscore, get_top_highscores
+from app.services.database_service import get_highscores, add_highscore, get_top_highscores, get_connection
 from app.services.auth_service import get_user_from_token, oauth2_scheme
 from app.util.logger import get_logger
 from app.models.highscore_response import HighscoreResponse
@@ -29,11 +29,14 @@ async def get_all_highscores():
         _type_: _description_
     """
     try:
-        highscores = get_highscores()
+        db_conn = get_connection()
+        highscores = get_highscores(db_conn)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+    finally:
+        db_conn.close()
     return highscores
 
 
@@ -53,11 +56,14 @@ async def get_top_highscores_api(top: int, token: str = Depends(oauth2_scheme)):
         _type_: _description_
     """
     try:
-        highscores = get_top_highscores(top)
+        db_conn = get_connection()
+        highscores = get_top_highscores(db_conn, top)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+    finally:
+        db_conn.close()
     return highscores
 
 
@@ -79,10 +85,13 @@ async def post_highscore(request: Request, token: str = Depends(oauth2_scheme)):
     obj = await request.json()
     try:
         username = get_user_from_token(token)
-        highscore_data = add_highscore(username, obj['score'])
+        db_conn = get_connection()
+        highscore_data = add_highscore(db_conn, username, obj['score'])
         return highscore_data
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:
         raise HTTPException(
             status_code=500, detail="Internal server error") from e
+    finally:
+        db_conn.close()

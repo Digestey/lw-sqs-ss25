@@ -13,12 +13,11 @@ def test_add_user_success(mock_get_connection):
     mock_get_connection.return_value = mock_conn
     mock_conn.cursor.return_value = mock_cursor
 
-    add_user("testuser", "testpassword")
+    add_user(mock_conn, "testuser", "testpassword")
 
     assert mock_cursor.execute.called
     mock_conn.commit.assert_called_once()
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
 
 
 @patch("app.services.database_service.get_connection")
@@ -30,10 +29,9 @@ def test_add_user_integrity_error(mock_get_connection):
     mock_conn.cursor.return_value = mock_cursor
 
     with pytest.raises(ValueError, match="Username already exists."):
-        add_user("existing_user", "password")
+        add_user(mock_conn, "existing_user", "password")
 
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
 
 
 @patch("app.services.database_service.get_connection")
@@ -43,15 +41,13 @@ def test_delete_user(mock_get_connection):
     mock_get_connection.return_value = mock_conn
     mock_conn.cursor.return_value = mock_cursor
 
-    delete_user("testuser")
+    delete_user(mock_conn, "testuser")
 
     mock_cursor.execute.assert_called_with(
         "DELETE FROM users WHERE username=(%s)", ("testuser",)
     )
     mock_conn.commit.assert_called_once()
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
-
 
 @patch("app.services.database_service.get_connection")
 def test_get_user_found(mock_get_connection):
@@ -63,7 +59,7 @@ def test_get_user_found(mock_get_connection):
     mock_conn.cursor.return_value = mock_cursor
     mock_get_connection.return_value = mock_conn
 
-    user = get_user("testuser")
+    user = get_user(mock_conn, "testuser")
 
     assert user["username"] == "testuser"
     mock_cursor.execute.assert_called_once()
@@ -77,7 +73,6 @@ def test_get_user_not_found(mock_get_connection):
     mock_conn.cursor.return_value = mock_cursor
     mock_get_connection.return_value = mock_conn
 
-    result = get_user("nonexistent")
+    result = get_user(mock_conn, "nonexistent")
     assert result is None
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()

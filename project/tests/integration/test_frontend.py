@@ -14,6 +14,6 @@ def test_login_frontend():
     assert "login" in response.text
     
 def test_register_frontend():
-    response = client.get("/login")
+    response = client.get("/register")
     assert response.status_code == 200
     assert "register" in response.text

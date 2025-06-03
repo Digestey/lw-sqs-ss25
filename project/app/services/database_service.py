@@ -48,7 +48,8 @@ def connect_to_db(host, user, password, database, port=3306):
                 user=user,
                 password=password,
                 database=database,
-                port=port
+                port=port,
+                use_pure=True
             )
 
             if connector.is_connected():
@@ -77,23 +78,23 @@ def get_connection():
         password=os.getenv("MYSQL_PASSWORD", ""),
         database=os.getenv("MYSQL_DATABASE", "testdb"),
         use_pure=True,
-        unix_socket=None 
+        unix_socket=None
     )
 
 # --- USERS ---
 
 
-def add_user(username, hashed_password):
+def add_user(cnn, username, hashed_password):
     """Adds a user to the database.
 
     Args:
+        cnn (connector): Database connector
         username (str): Username to be added to Database.
         hashed_password (str): Password to be added, hashed for security.
 
     Raises:
         ValueError: Raised, when <username> already exists
     """
-    cnn = get_connection()
     cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
@@ -103,24 +104,20 @@ def add_user(username, hashed_password):
         raise ValueError("Username already exists.") from exc
     finally:
         cursor.close()
-        cnn.close()
 
 
-def delete_user(username):
+def delete_user(cnn, username):
     """Deletes a user
 
     Args:
         username (str): Username to be deleted
     """
-    cnn = get_connection()
     cursor = cnn.cursor(dictionary=True)
     cursor.execute("DELETE FROM users WHERE username=(%s)", (username,))
     cnn.commit()
     cursor.close()
-    cnn.close()
 
-
-def get_user(username):
+def get_user(cnn, username):
     """Fetches a user from the database by username
 
     Args:
@@ -129,7 +126,6 @@ def get_user(username):
     Returns:
         user: returns user entry from database
     """
-    cnn = get_connection()
     cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
@@ -138,18 +134,14 @@ def get_user(username):
         )
         user = cursor.fetchone()
         cursor.close()
-        cnn.close()
         return user
     except mysql.connector.IntegrityError:
         print("Username not found.")
-    finally:
-        cursor.close()
-        cnn.close()
 
 # --- HIGHSCORES ---
 
 
-def add_highscore(username, score):
+def add_highscore(cnn, username, score):
     """Posts a new highscore
 
     Args:
@@ -163,7 +155,7 @@ def add_highscore(username, score):
     Returns:
         result: The inserted highscore
     """
-    cnn = get_connection()
+
     cursor = cnn.cursor()
     try:
         # Find user_id from username
@@ -195,10 +187,9 @@ def add_highscore(username, score):
 
     finally:
         cursor.close()
-        cnn.close()
 
 
-def get_highscores():
+def get_highscores(cnn):
     """Get all stored highscores.
 
     Raises:
@@ -207,25 +198,22 @@ def get_highscores():
     Returns:
         highscores: List of highscores
     """
-    cnn = get_connection()
+
     cursor = cnn.cursor(dictionary=True)
     try:
         cursor.execute(
             "SELECT u.username, h.score, h.achieved_at FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
         )
         highscores = cursor.fetchall()
-        cursor.close()
-        cnn.close()
         return highscores
     except Exception as e:
         cnn.rollback()
         raise e
     finally:
         cursor.close()
-        cnn.close()
 
 
-def get_user_highscores(username):
+def get_user_highscores(cnn, username):
     """Get the highscores from a certain user.
 
     Args:
@@ -234,8 +222,7 @@ def get_user_highscores(username):
     Returns:
         scores: A list of all highscores archieved by the user.
     """
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = cnn.cursor(dictionary=True)
     cursor.execute("""
         SELECT h.score, u.username, h.achieved_at FROM highscores h
         JOIN users u ON h.user_id = u.id
@@ -244,11 +231,10 @@ def get_user_highscores(username):
     """, (username,))
     scores = cursor.fetchall()
     cursor.close()
-    conn.close()
     return scores
 
 
-def get_top_highscores(limit=10):
+def get_top_highscores(cnn, limit=10):
     """Returns the top highscores
 
     Args:
@@ -257,8 +243,8 @@ def get_top_highscores(limit=10):
     Returns:
         scores: List of highscores
     """
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+
+    cursor = cnn.cursor(dictionary=True)
     cursor.execute("""
         SELECT u.username, h.score, h.achieved_at FROM highscores h
         JOIN users u ON h.user_id = u.id
@@ -267,5 +253,4 @@ def get_top_highscores(limit=10):
     """, (limit,))
     scores = cursor.fetchall()
     cursor.close()
-    conn.close()
     return scores

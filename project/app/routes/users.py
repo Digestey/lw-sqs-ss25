@@ -14,7 +14,7 @@ from app.services.auth_service import (
     Token,
     register_user
 )
-from app.services.database_service import get_user, add_user
+from app.services.database_service import get_user, add_user, get_connection
 from app.util.logger import get_logger
 
 router = APIRouter()
@@ -45,7 +45,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         str: Identification token (JWT).
     """
     try:
-        db_user = get_user(form_data.username)
+        db_conn = get_connection()
+        db_user = get_user(db_conn, form_data.username)
         if db_user is None:
             raise HTTPException(
                 status_code=401, detail="Invalid username or password")
@@ -53,6 +54,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         token = create_access_token(data={"sub": user.username})
     except Exception as e:
         raise HTTPException(status_code=403, detail=str(e)) from e
+    finally:
+        db_conn.close()
     return token
 
 
@@ -66,7 +69,10 @@ async def register(request: RegisterRequest):
         HTTPException: _description_
     """
     try:
-        add_user(request.username, register_user(
+        db_conn = get_connection()
+        add_user(db_conn, request.username, register_user(
             request.username, request.password))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+    finally:
+        db_conn.close()

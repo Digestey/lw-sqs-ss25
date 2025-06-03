@@ -24,7 +24,7 @@ def test_add_highscore_success(mock_get_connection):
 
     mock_cursor.lastrowid = 42
 
-    result = add_highscore("testuser", 100)
+    result = add_highscore(mock_conn, "testuser", 100)
 
     assert result["score"] == 100
     mock_cursor.execute.assert_any_call("SELECT id FROM users WHERE username = %s", ("testuser",))
@@ -33,7 +33,6 @@ def test_add_highscore_success(mock_get_connection):
     )
     mock_conn.commit.assert_called_once()
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
 
 
 @patch("app.services.database_service.get_connection")
@@ -46,11 +45,10 @@ def test_add_highscore_user_not_found(mock_get_connection):
     mock_cursor.fetchone.return_value = None  # Simulate user not found
 
     with pytest.raises(ValueError, match="User not found"):
-        add_highscore("ghostuser", 100)
+        add_highscore(mock_conn, "ghostuser", 100)
 
     mock_conn.rollback.assert_called_once()
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
 
 
 @patch("app.services.database_service.get_connection")
@@ -65,12 +63,11 @@ def test_get_highscores(mock_get_connection):
         {"username": "user2", "score": 150, "achieved_at": "2025-06-01"},
     ]
 
-    result = get_highscores()
+    result = get_highscores(mock_conn)
     assert len(result) == 2
     assert result[0]["score"] == 200
     mock_cursor.execute.assert_called_once()
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
 
 
 @patch("app.services.database_service.get_connection")
@@ -85,12 +82,12 @@ def test_get_user_highscores(mock_get_connection):
         {"username": "user1", "score": 80, "achieved_at": "2025-05-30"},
     ]
 
-    result = get_user_highscores("user1")
+    result = get_user_highscores(mock_conn, "user1")
     assert len(result) == 2
     assert all(score["username"] == "user1" for score in result)
     mock_cursor.execute.assert_called_once()
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
+
 
 
 @patch("app.services.database_service.get_connection")
@@ -105,7 +102,7 @@ def test_get_top_highscores(mock_get_connection):
         {"username": "user2", "score": 250, "achieved_at": "2025-06-01"},
     ]
 
-    result = get_top_highscores(limit=2)
+    result = get_top_highscores(mock_conn, limit=2)
     assert len(result) == 2
     assert result[0]["score"] == 300
     mock_cursor.execute.assert_called_once_with(
@@ -116,4 +113,3 @@ def test_get_top_highscores(mock_get_connection):
         LIMIT %s
     """, (2,))
     mock_cursor.close.assert_called()
-    mock_conn.close.assert_called()
