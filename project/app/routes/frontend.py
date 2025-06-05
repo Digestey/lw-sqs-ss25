@@ -1,5 +1,5 @@
 """
-Module frontend: Defines all routes that are part of frontend handling
+Module frontend: Defines all routes that are part of this applications frontend.
 """
 
 import os
@@ -23,38 +23,39 @@ sessions = {}
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """_summary_
+    """Home site.
 
     Args:
         request (Request): _description_
 
     Returns:
-        _type_: _description_
+        TemplateResponse: Returns the HTML Template to be displayed in the clients browser.
     """
     return templates.TemplateResponse("index.html", {"request": request})
 
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
-    """_summary_
+    """Route for the login-frontend
 
     Args:
-        request (Request): _description_
+        request (Request): request
 
     Returns:
-        _type_: _description_
+        TemplateResponse: HTML to be displayed in the browser
     """
     return templates.TemplateResponse("login.html", {"request": request})
 
 @router.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
-    """_summary_
-
+    """Register Route. Provides the frontend to give users the opportunity to sell their
+       soul to this website.
+    
     Args:
-        request (Request): _description_
+        request (Request): Request
 
     Returns:
-        _type_: _description_
+        TemplateResponse: The HTML Template to be displayed
     """
     return templates.TemplateResponse("register.html", {"request": request})
 
@@ -68,7 +69,7 @@ async def highscore_page(request: Request):
         request (Request): _description_
 
     Returns:
-        HTMLResponse: Highscores Page.
+        HTMLResponse: Highscores Page to be displayed in the browser.
     """
     return templates.TemplateResponse("highscores.html", {
         "request": request
@@ -82,7 +83,7 @@ async def get_quiz(request: Request):
         request (Request): 
 
     Returns:
-        HTMLResponse: Quiz page.
+        HTMLResponse: Quiz page to be displayed in the browser.
     """
     session_id = request.client.host
     if session_id not in sessions:

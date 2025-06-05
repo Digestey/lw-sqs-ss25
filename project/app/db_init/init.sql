@@ -35,11 +35,11 @@ CREATE TABLE IF NOT EXISTS highscores (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Insert a dummy user (only if not exists)
+-- Insert a dummy user (to test the highscore functionality)
 INSERT IGNORE INTO users (id, username, password_hash)
-VALUES (1, 'testuser', 'dummyhash');
+VALUES (1, 'Tester', 'canttouchthis');
 
--- Insert 10 dummy highscore entries for the test user
+-- Insert 10 dummy highscore entries for the test user so something is displayed
 INSERT INTO highscores (user_id, score)
 VALUES 
 (1, 10),
@@ -53,5 +53,5 @@ VALUES
 (1, 22),
 (1, 17);
 
--- Print a message after tables are created
+-- Print a message after tables are created to signal it has finished successfully
 SELECT 'Tables created successfully!' AS message;
