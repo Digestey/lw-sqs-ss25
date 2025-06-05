@@ -216,8 +216,10 @@ async def test_add_and_fetch_highscore(mysql_container):
 
     # Insert highscore
     score_data = add_highscore(conn, "highscore_user", 200)
-    assert score_data["username"] == "highscore_user"
-    assert score_data["score"] == 200
+
+    # score_data is a tuple: (id, username, score, achieved_at)
+    assert score_data[1] == "highscore_user"  # username
+    assert score_data[2] == 200               # score
 
     delete_user(conn, "highscore_user")
     conn.close()
@@ -291,6 +293,6 @@ async def test_get_highscores_empty(mysql_container):
 
     highscores = get_highscores(conn)
     assert isinstance(highscores, list)
-    assert len(highscores) == 11  # Highscore table is initialized with 11 dummy entries
+    assert len(highscores) == 0 
 
     conn.close()

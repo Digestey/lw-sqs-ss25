@@ -28,6 +28,7 @@ async def get_all_highscores():
     Returns:
         _type_: _description_
     """
+    db_conn = None
     try:
         db_conn = get_connection()
         highscores = get_highscores(db_conn)
@@ -36,7 +37,8 @@ async def get_all_highscores():
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
     finally:
-        db_conn.close()
+        if db_conn:
+            db_conn.close()
     return highscores
 
 
@@ -55,6 +57,7 @@ async def get_top_highscores_api(top: int, token: str = Depends(oauth2_scheme)):
     Returns:
         _type_: _description_
     """
+    db_conn = None
     try:
         db_conn = get_connection()
         highscores = get_top_highscores(db_conn, top)
@@ -63,7 +66,8 @@ async def get_top_highscores_api(top: int, token: str = Depends(oauth2_scheme)):
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
     finally:
-        db_conn.close()
+        if db_conn:
+            db_conn.close()
     return highscores
 
 
@@ -82,6 +86,7 @@ async def post_highscore(request: Request, token: str = Depends(oauth2_scheme)):
     Returns:
         _type_: _description_
     """
+    db_conn = None
     obj = await request.json()
     try:
         username = get_user_from_token(token)
@@ -94,4 +99,5 @@ async def post_highscore(request: Request, token: str = Depends(oauth2_scheme)):
         raise HTTPException(
             status_code=500, detail="Internal server error") from e
     finally:
-        db_conn.close()
+        if db_conn:
+            db_conn.close()

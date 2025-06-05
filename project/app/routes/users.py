@@ -44,6 +44,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     Returns:
         str: Identification token (JWT).
     """
+    db_conn = None
     try:
         db_conn = get_connection()
         db_user = get_user(db_conn, form_data.username)
@@ -51,11 +52,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             raise HTTPException(
                 status_code=401, detail="Invalid username or password")
         user = authenticate_user(db_user, form_data.password)
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
         token = create_access_token(data={"sub": user.username})
+    except HTTPException as e:
+        raise e
     except Exception as e:
-        raise HTTPException(status_code=403, detail=str(e)) from e
+        # print("Exception: PRINT THE DAMN EXCEPTION HERE" + str(e))
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
     finally:
-        db_conn.close()
+        if db_conn:
+            db_conn.close()
     return token
 
 
@@ -68,6 +75,7 @@ async def register(request: RegisterRequest):
     Raises:
         HTTPException: _description_
     """
+    db_conn = None
     try:
         db_conn = get_connection()
         add_user(db_conn, request.username, register_user(
@@ -75,4 +83,5 @@ async def register(request: RegisterRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     finally:
-        db_conn.close()
+        if db_conn:
+            db_conn.close()

@@ -13,11 +13,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MYSQL_URL = os.getenv("MYSQL_URL")
-MYSQL_USERNAME = os.getenv("MYSQL_USER")
-MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
-MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
-
 # --- META ---
 
 
@@ -66,14 +61,10 @@ def connect_to_db(host, user, password, database, port=3306):
 
 
 def get_connection():
-    """Returns a connection to access the database in order to perform SQL queries.
-
-    Returns:
-        PooledMYSQLConnection: Connection needed in order to perform SQL queries.
-    """
+    """Returns a connection to access the database in order to perform SQL queries."""
     return mysql.connector.connect(
         host=os.getenv("MYSQL_URL", "127.0.0.1"),
-        port=int("3306"),
+        port=int(os.getenv("MYSQL_PORT", "3306")),
         user=os.getenv("MYSQL_USER", "root"),
         password=os.getenv("MYSQL_PASSWORD", ""),
         database=os.getenv("MYSQL_DATABASE", "testdb"),
