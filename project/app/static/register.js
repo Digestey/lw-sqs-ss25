@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 const MIN_PW_LENGTH = 8;
 const MIN_USERNAME_LENGTH = 5;
 const MAX_STRING_LENGTH = 100;
@@ -24,6 +22,8 @@ function constantTimeEquals(a, b) {
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("register-form");
 
+  console.log("Register.js loaded")
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -43,8 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const repeatPassword = formData.get("repeat_password");
 
-    // console.log(password)
-    // console.log(repeatPassword)
+    console.log(password)
+    console.log(repeatPassword)
 
     if (!constantTimeEquals(password, repeatPassword)) {
       alert("Passwords do not match.");
