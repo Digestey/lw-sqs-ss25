@@ -6,7 +6,7 @@ from app.services.database_service import *
 from app.services.auth_service import *
 import os
 
-SQL_FILE_PATH = os.path.abspath("app/db_init/init.sql")
+SQL_FILE_PATH = os.path.abspath("init.sql")
 
 def run_sql_file(conn, filepath):
     """Initializes schema in test DB."""
