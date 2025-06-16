@@ -4,7 +4,7 @@
 
 ## Status
 
-Pending
+Accepted
 
 ## Context
 
@@ -12,28 +12,18 @@ For my first Proof of Concept (PoC), I used a single database connection to inte
 
 ## Decision
 
-- **Use connection pooling** (as provided by `mysql.connector` or another pooling library) for managing database connections in the production environment. Pooling allows for efficient reuse of connections, which is critical for performance when the application scales. 
-- For the development and testing phases, we will use a **Singleton pattern** to manage a single connection instance. This will simplify testing and reduce overhead in environments where the database load is expected to be light.
+**Use connection pooling** (as provided by `mysql.connector` or another pooling library) for managing database connections in the production environment. Pooling allows for efficient reuse of connections, which is critical for performance when the application scales.
 
 ## Alternatives Considered
 
-1. **Pooling (via `mysql.connector` or another pooling library)**:
-   - Pooling creates a pool of reusable database connections. It reduces the overhead of establishing new connections for every database operation, improving performance, particularly in high-load or multi-threaded environments. It's the preferred approach for production environments.
-   - **Pros**:
-     - Reduces the overhead of creating and destroying connections.
-     - Allows for better resource management in high-load scenarios.
-   - **Cons**:
-     - Slightly more complex to configure compared to using a single connection.
-     - Might require additional testing and tuning to optimize the pool size.
-
-2. **Singleton (one connection instance for all operations)**:
-   - A singleton pattern ensures that only one database connection is used throughout the entire application, which simplifies connection management in environments with low database traffic.
-   - **Pros**:
-     - Simple to implement.
-     - Works well in low-traffic, single-user scenarios.
-   - **Cons**:
-     - Not scalable for multi-user or high-load environments.
-     - Tightly couples the database connection to the rest of the application, making it less flexible and harder to maintain in the long run.
+- **Singleton (one connection instance for all operations)**:
+A singleton pattern ensures that only one database connection is used throughout the entire application, which simplifies connection management in environments with low database traffic.
+  - **Pros**:
+   - Simple to implement.  
+   - Works well in low-traffic, single-user scenarios.
+  - **Cons**:
+   - Not scalable for multi-user or high-load environments.
+   - Tightly couples the database connection to the rest of the application, making it less flexible and harder to maintain in the long run.
 
 ## Consequences
 
@@ -42,7 +32,3 @@ For my first Proof of Concept (PoC), I used a single database connection to inte
   - **Maintainability**: The connection pool abstraction encapsulates the connection management logic, allowing future updates or replacements of the database without affecting the business logic.
   - **Scalability**: Pooling makes the application more scalable, as it can handle a higher volume of concurrent database operations without needing to establish new connections for every query.
 
-- **Using Singleton**:
-  - **Simplicity**: The Singleton approach simplifies the architecture for small applications or during the testing phase.
-  - **Resource Management**: A single connection might not be sufficient for handling high traffic or concurrent operations, which could lead to resource bottlenecks.
-  - **Testing**: For testing purposes, using a singleton is simpler and avoids the complexity of managing a pool of connections. It’s a good compromise for unit tests or small-scale applications.

@@ -5,6 +5,8 @@ from jose import jwt
 import bcrypt
 
 import app.services.auth_service as auth
+import app.services.database_service as db
+from app.models.token import Token
 
 
 def test_check_credentials_valid():
@@ -70,22 +72,41 @@ def test_authenticate_user_missing_fields():
     assert "Invalid credentials" in str(excinfo.value)
 
 
+from datetime import datetime
+
 def test_create_access_token_and_get_user(monkeypatch):
     test_username = "testuser"
     test_secret = "testsecret"
+
     monkeypatch.setattr(auth, "SECRET_KEY", test_secret)
 
-    data = {"sub": test_username}
-    token_obj = auth.create_access_token(data, timedelta(minutes=5))
+    # Provide all required fields that UserInDb expects
+    dummy_user = {
+        "id": 1,
+        "username": test_username,
+        "password_hash": "fakehash",
+        "created_at": datetime.now(),
+    }
 
-    assert isinstance(token_obj, auth.Token)
-    decoded_user = auth.get_user_from_token(token_obj.access_token)
-    assert decoded_user == test_username
+    monkeypatch.setattr(auth, "get_user", lambda cnn, username: dummy_user)
+
+    token_obj = auth.create_access_token({"sub": test_username}, timedelta(minutes=5))
+    assert isinstance(token_obj, Token)
+
+    decoded_user = auth.get_user_from_token(token_obj.access_token, db_conn=None)
+    assert decoded_user.username == test_username
+
 
 
 def test_get_user_from_token_invalid(monkeypatch):
-    monkeypatch.setattr(auth, "SECRET_KEY", "wrong")
+    monkeypatch.setattr(auth, "SECRET_KEY", "correctkey")
+
     invalid_token = jwt.encode({"sub": "user"}, "wrongkey", algorithm="HS256")
+
+    # Mock get_user to avoid needing a real DB call
+    monkeypatch.setattr(db, "get_user", lambda cnn, username: {"username": username})
+
     with pytest.raises(Exception) as excinfo:
-        auth.get_user_from_token(invalid_token)
+        auth.get_user_from_token(invalid_token, db_conn=None)
+
     assert "Invalid token" in str(excinfo.value)

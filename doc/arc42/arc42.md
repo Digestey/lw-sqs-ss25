@@ -39,18 +39,19 @@ The quality of this project is assured using codacy.
 The quality goals are set as follows:
 
 - Minimum test coverage: **80%**, achieved by implementing the following types of tests:
-    - Unit tests
-    - Integration tests
-    - API tests
-    - e2e tests
-    - load tests
+  - Unit tests
+  - Integration tests
+  - API tests
+  - e2e tests
+  - load tests
 - Maximum code duplication: **10%** (measures in SLoC, only code blocks are considered)
 - Low code complexity
 - Maximum **5 issues** (code smells) per 1000 SLoC
 
 ## Stakeholder
 
-Theres only me who wants to pass this course and my professor who sets the requirements for this course.
+Theres only me who wants to pass this course and my professor who sets the requirements for this course. But for the sake of this project, theres also the user who wants to
+play the quiz (differentiating between the 'regular user' and the 'logged in user' who want to play the quiz and compete on the highscore leaderboard respectively)
 
 # Architecture Constraints
 
@@ -67,6 +68,8 @@ DexQuiz shall be:
 ## Business Context
 
 **\<Diagram or Table>**
+
+.. image:: images/context_diagram.png
 
 **\<optionally: Explanation of external domain interfaces>**
 

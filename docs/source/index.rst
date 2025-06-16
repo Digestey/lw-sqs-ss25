@@ -5,14 +5,19 @@ Welcome to DEXQUIZ's Documentation
 ===================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
-   adr/index
-   arc42/index
-   api
-
    modules
+
+   adr/index
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Architecture Documentation:
+
+   arc42/index
+
 
 Indices and tables
 ==================

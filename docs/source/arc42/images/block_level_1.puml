@@ -1,0 +1,32 @@
+@startuml
+title Level 1 - Container View: DexQuiz Architecture
+
+actor User as "Player"
+
+interface PokeAPI
+
+package "DexQuiz System (FastAPI App)" {
+    
+    [Frontend (HTML + JS)] as Frontend
+    [API Router] as Router
+    [auth_service] as Auth
+    [pokemon_service] as Quiz
+    [database_service] as DBService
+
+    Router --> Auth : /api/register\n/api/token
+    Router --> Quiz : /api/quiz\n/api/highscore
+    Router --> DBService : For DB-backed routes
+
+    Frontend --> Router : HTTP requests\nvia fetch (JS)
+    Auth --> DBService : Check user\nCreate user
+    Quiz --> PokeAPI : Fetch Pokemon
+}
+
+database "MySQL Database" as MySQL
+
+DBService --> MySQL : Query & insert user/\nhighscore data
+
+User --> Frontend : Uses browser\n(HTML, JS)
+
+@enduml
+

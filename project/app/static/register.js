@@ -43,9 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const repeatPassword = formData.get("repeat_password");
 
-    console.log(password)
-    console.log(repeatPassword)
-
     if (!constantTimeEquals(password, repeatPassword)) {
       alert("Passwords do not match.");
       return;

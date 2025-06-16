@@ -1,13 +1,15 @@
+"""Highscore Data Object from the database"""
 import datetime
 
 from pydantic import BaseModel
 
 
 class HighscoreResponse(BaseModel):
-    """_summary_
-
-    Args:
-        BaseModel (_type_): _description_
+    """Highscore Data Object from the database.
+    
+    username (str): extracted Username
+    score (int): archived score
+    achieved_at: timestamp of when the entry was last modified/created
     """
     username: str
     score: int

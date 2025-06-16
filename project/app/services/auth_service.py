@@ -14,6 +14,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.models.user_in_db import UserInDb
 from app.models.token import Token
+from app.services.database_service import get_user
 
 load_dotenv()
 
@@ -74,15 +75,20 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     )
 
 
-def get_user_from_token(token: str):
+def get_user_from_token(token: str, db_conn) -> UserInDb:
     """Retrieves the user information from the JWT token."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        username = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        return username
-    except Exception as e:
+        
+        # Query the DB for this user
+        user = get_user(db_conn, username)  # From database_service
+        if user is None:
+            raise HTTPException(status_code=401, detail="User not found")
+        return UserInDb(**user)
+    except jwt.JWTError as e:
         raise HTTPException(status_code=401, detail="Invalid token") from e
 
 

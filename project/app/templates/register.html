@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Login - DEXQUIZ{% endblock %}
+{% block title %}Register - DEXQUIZ{% endblock %}
 
 {% block content %}
     <h1>Come join the DexQuiz 'community'!</h1>
@@ -15,8 +15,8 @@
         <input type="password" name="password" required>
         <label>Repeat password:</label>
         <input type="password" name="repeat_password" required>
-        <button>Register Now!</button>
+        <button type="submit">Register Now!</button>
     </form>
 
-    <script src="/static/register.js"></script>
+    <script type="module" src="/static/register.js"></script>
 {% endblock %}

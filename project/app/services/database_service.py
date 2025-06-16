@@ -3,11 +3,13 @@ Module database_service
 
 Contains the database connection functions.
 """
+from http.client import HTTPException
 import time
 import os
 import mysql.connector
-from mysql.connector import Error
+from mysql.connector import Error, pooling
 from dotenv import load_dotenv
+from app.util import logger
 
 # --- ENVIRONMENT VARIABLES ---
 
@@ -15,23 +17,39 @@ load_dotenv()
 
 # --- META ---
 
+CONN_POOL = None
+logger = logger.get_logger(name="db_conn")
+
+def get_pool(port=3306):
+    global CONN_POOL
+    if CONN_POOL is None:
+        CONN_POOL = pooling.MySQLConnectionPool(
+            pool_name="pokedb_pool",
+            pool_size=10,
+            host=os.getenv("MYSQL_URL", "127.0.0.1"),
+            port=port,
+            user=os.getenv("MYSQL_USER", "trainer"),
+            password=os.getenv("MYSQL_PASSWORD", "pokeballs"),
+            database=os.getenv("MYSQL_DATABASE", "testdb")
+        )
+    return CONN_POOL
 
 def connect_to_db(host, user, password, database, port=3306):
-    """_summary_
+    """Legacy function to connect to a custom database
 
     Args:
-        host (_type_): _description_
-        user (_type_): _description_
-        password (_type_): _description_
-        database (_type_): _description_
-        port (int, optional): _description_. Defaults to 3306.
+        host (str): hostname of the database
+        user (str): database username
+        password (str): database password
+        database (str): database name
+        port (int, optional): Database Port. Defaults to 3306.
 
     Raises:
-        e: _description_
+        e: Error if the connection fails
 
     Returns:
-        _type_: _description_
-    """    
+        connection: Database connection
+    """
     retries = 5
     delay = 5
 
@@ -60,17 +78,21 @@ def connect_to_db(host, user, password, database, port=3306):
                 raise e
 
 
-def get_connection():
-    """Returns a connection to access the database in order to perform SQL queries."""
-    return mysql.connector.connect(
-        host=os.getenv("MYSQL_URL", "127.0.0.1"),
-        port=int(os.getenv("MYSQL_PORT", "3306")),
-        user=os.getenv("MYSQL_USER", "root"),
-        password=os.getenv("MYSQL_PASSWORD", ""),
-        database=os.getenv("MYSQL_DATABASE", "testdb"),
-        use_pure=True,
-        unix_socket=None
-    )
+def get_connection(port=None):
+    """Returns a connection to access the database in order to perform SQL queries.
+    
+    args:
+        port (int): port the db is at 
+        (defaults to None, if port is None, 3306 will be the default used port)
+    
+    """
+    try:
+        port = int(port) if port else int(os.getenv("MYSQL_PORT", "3306"))
+        conn = get_pool(port).get_connection()
+        return conn
+    except Exception as e:
+        logger.error("Unexpected error: %s", str(e), exc_info=True)
+        raise e
 
 # --- USERS ---
 
@@ -126,8 +148,10 @@ def get_user(cnn, username):
         user = cursor.fetchone()
         cursor.close()
         return user
-    except mysql.connector.IntegrityError:
-        print("Username not found.")
+    except mysql.connector.Error as e:
+        raise HTTPException(status_code=500, detail="Database error.") from e
+    finally:
+        cursor.close()
 
 # --- HIGHSCORES ---
 

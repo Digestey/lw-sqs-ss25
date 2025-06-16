@@ -1,0 +1,35 @@
+@startuml
+actor User
+participant "DexQuiz Frontend" as FE
+participant "DexQuiz" as API
+participant "auth_service" as Auth
+participant "database_service" as DB
+participant "MySQL Database" as SQL
+
+== Registration Flow ==
+User -> FE : Fill registration form\n(username, password)
+FE -> API : POST /api/register\nJSON(username, password)
+API -> Auth : check_credentials(username, password)
+Auth --> API : valid / raise 400
+API -> Auth : hashpw(password)
+Auth --> API : hashed_password
+API -> DB : add_user(username, hashed_password)
+DB -> SQL : INSERT INTO users (username, password_hash) VALUES (?, ?)
+SQL --> DB : OK
+DB --> API : success
+API --> FE : 201 Created
+
+== Login Flow ==
+
+User -> FE : Submit login form
+FE -> API : POST /api/token\nForm(username, password)
+API -> DB : get_user(username)
+DB -> SQL : SELECT * FROM users WHERE username = ?
+SQL --> DB : user_row
+DB --> API : user_row
+API -> Auth : authenticate_user(user_row, password)
+Auth --> API : UserInDb / raise 403
+API -> Auth : create_access_token({sub: username})
+Auth --> API : JWT access_token
+API --> FE : 200 OK\n{access_token, token_type}
+@enduml

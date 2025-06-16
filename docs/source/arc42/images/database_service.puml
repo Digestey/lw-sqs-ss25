@@ -1,0 +1,38 @@
+@startuml
+package "Database Service" {
+  class DatabaseService {
+    +get_pool()
+    +connect_to_db(host, user, pw, db, port)
+    +get_connection(port)
+
+    +add_user(cnn, username, hashed_pw)
+    +delete_user(cnn, username)
+    +get_user(cnn, username)
+
+    +add_highscore(cnn, username, score)
+    +get_highscores(cnn)
+    +get_user_highscores(cnn, username)
+    +get_top_highscores(cnn, limit)
+  }
+
+  class MySQLConnectionPool
+  class Cursor
+
+  DatabaseService --> MySQLConnectionPool : uses
+  DatabaseService --> Cursor : executes SQL
+  DatabaseService --> ".env file" : reads DB config
+  DatabaseService --> Logger : logs errors
+}
+
+note right of DatabaseService::get_connection
+  Uses pool to return active DB connection
+end note
+
+note right of DatabaseService::add_user
+  Raises ValueError if user exists
+end note
+
+note right of DatabaseService::add_highscore
+  Inserts row, fetches via JOIN
+end note
+@enduml

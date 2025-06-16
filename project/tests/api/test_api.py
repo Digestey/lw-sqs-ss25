@@ -6,59 +6,6 @@ from app.services.database_service import *
 from app.services.auth_service import *
 import os
 
-SQL_FILE_PATH = os.path.abspath("app/db_init/init.sql")
-
-def run_sql_file(conn, filepath):
-    """Initializes schema in test DB."""
-    with open(filepath, "r", encoding="utf-8") as f:
-        statements = f.read().split(";")
-        cursor = conn.cursor()
-        for stmt in statements:
-            stmt = stmt.strip()
-            if stmt:
-                cursor.execute(stmt)
-                if cursor.with_rows:
-                    cursor.fetchall()
-        conn.commit()
-        cursor.close()
-
-
-@pytest.fixture(scope="session")
-def mysql_container():
-    container = MySqlContainer("mysql:9.2.0", username="testuser", password="testpass", dbname="pokedb")
-    container.start()
-    port = container.get_exposed_port(3306)
-
-    # Override environment variables for test DB
-    os.environ["MYSQL_URL"] = "127.0.0.1"
-    os.environ["MYSQL_USER"] = "testuser"
-    os.environ["MYSQL_PASSWORD"] = "testpass"
-    os.environ["MYSQL_DATABASE"] = "pokedb"
-
-    conn = connect_to_db(
-        host="127.0.0.1",
-        user="testuser",
-        password="testpass",
-        database="pokedb",
-        port=int(port)
-    )
-    run_sql_file(conn, SQL_FILE_PATH)
-    yield container
-    container.stop()
-
-@pytest.fixture
-def client(mysql_container):
-     # Set env again for safety
-    os.environ["MYSQL_URL"] = "127.0.0.1"
-    os.environ["MYSQL_USER"] = "testuser"
-    os.environ["MYSQL_PASSWORD"] = "testpass"
-    os.environ["MYSQL_DATABASE"] = "pokedb"
-    os.environ["MYSQL_PORT"] = mysql_container.get_exposed_port(3306)
-    os.environ["SECRET_KEY"] = "testsecret"
-
-    from app.main import app  # Import AFTER env vars are in place
-    return TestClient(app)
-
 def test_register_user(client):
     response = client.post("/api/register", json={
         "username": "newuser",
@@ -116,13 +63,7 @@ def create_user_with_token(conn, username, password):
 
 @pytest.mark.asyncio
 async def test_post_and_get_highscore(client, mysql_container):
-    conn = connect_to_db(
-        host="127.0.0.1",
-        user="testuser",
-        password="testpass",
-        database="pokedb",
-        port=int(mysql_container.get_exposed_port(3306))
-    )
+    conn = get_connection(mysql_container.get_exposed_port(3306))
     username = "hsuser"
     password = "secure123"
     token = create_user_with_token(conn, username, password)
@@ -139,7 +80,7 @@ async def test_post_and_get_highscore(client, mysql_container):
     assert result[2] == 999
 
     # Get all highscores
-    response_all = client.get("/api/highscores")
+    response_all = client.get("/api/highscores", headers={"Authorization": f"Bearer {token}"})
     assert response_all.status_code == 200
     scores = response_all.json()
     assert any(s["username"] == username and s["score"] == 999 for s in scores)
@@ -157,9 +98,9 @@ async def test_post_and_get_highscore(client, mysql_container):
 
 @pytest.mark.asyncio
 async def test_get_highscores_unauthorized(client):
-    # /api/highscores is public, should work
+    # /api/highscores is protected
     response = client.get("/api/highscores")
-    assert response.status_code == 200
+    assert response.status_code == 401 # missing or invalid token
 
     # /api/highscore/{top} is protected
     response = client.get("/api/highscore/1")

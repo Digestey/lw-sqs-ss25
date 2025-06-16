@@ -14,19 +14,42 @@ copyright = '2025, Lukas Waller'
 author = 'Lukas Waller'
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
+    "myst_parser",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",  # for Google or NumPy style docstrings
+    "sphinx.ext.viewcode",  # (optional) adds links to source code
+    "sphinxcontrib.redoc",  # for OpenAPI display
+    'sphinxcontrib.plantuml',
 ]
 
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
-sys.path.insert(0, os.path.abspath('../project/app'))
+html_sidebars = {
+    # For all pages, default sidebar
+    '**': ['globaltoc.html', 'relations.html', 'searchbox.html'],
+
+    # For arc42 pages, use minimal sidebar (only local TOC or none)
+    'arc42/**': ['searchbox.html'],
+}
+
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+}
+
+
+sys.path.insert(0, os.path.abspath(os.path.join(__file__, '..', '..', '..', 'project')))
 sys.path.insert(0, os.path.abspath('../doc/adr'))
 sys.path.insert(0, os.path.abspath('../doc/arc42'))
 
+print("Sphinx sys.path:", sys.path)  # debug print to verify path
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
-extensions = []
 
 templates_path = ['_templates']
 exclude_patterns = [

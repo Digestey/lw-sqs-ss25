@@ -18,7 +18,7 @@ sessions = {}
 
 
 @router.get("/api/highscores", response_model=List[HighscoreResponse])
-async def get_all_highscores():
+async def get_all_highscores(token: str = Depends(oauth2_scheme)):
     """_summary_
 
     Raises:
@@ -31,6 +31,9 @@ async def get_all_highscores():
     db_conn = None
     try:
         db_conn = get_connection()
+        username = get_user_from_token(token, db_conn)
+        if username is None:
+            raise HTTPException(status_code=403, detail="Invalid access token")
         highscores = get_highscores(db_conn)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
@@ -89,9 +92,9 @@ async def post_highscore(request: Request, token: str = Depends(oauth2_scheme)):
     db_conn = None
     obj = await request.json()
     try:
-        username = get_user_from_token(token)
         db_conn = get_connection()
-        highscore_data = add_highscore(db_conn, username, obj['score'])
+        user = get_user_from_token(token, db_conn)
+        highscore_data = add_highscore(db_conn, user.username, obj['score'])
         return highscore_data
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve

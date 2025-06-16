@@ -26,7 +26,7 @@ async def home(request: Request):
     """Home site.
 
     Args:
-        request (Request): _description_
+        request (Request): request body
 
     Returns:
         TemplateResponse: Returns the HTML Template to be displayed in the clients browser.
@@ -39,7 +39,7 @@ async def login_form(request: Request):
     """Route for the login-frontend
 
     Args:
-        request (Request): request
+        request (Request): request body
 
     Returns:
         TemplateResponse: HTML to be displayed in the browser
@@ -66,7 +66,7 @@ async def highscore_page(request: Request):
        That is handled in the js code however.
 
     Args:
-        request (Request): _description_
+        request (Request): reqeust body
 
     Returns:
         HTMLResponse: Highscores Page to be displayed in the browser.
@@ -131,5 +131,5 @@ async def post_quiz(request: Request, guess: str = Form(...)):
     return JSONResponse(content={
         "correct": False,
         "message": "That is incorrect. Another hint has been added to the entry.",
-        "hint": ""  # Later you could add stats/types one by one
+        "hint": ""  # remainder of the original plan
     })
