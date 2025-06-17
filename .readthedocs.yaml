@@ -14,7 +14,7 @@ build:
   commands:
     - pip install -r docs/requirements.txt
     - sphinx-apidoc -o docs/source project/app
-    - ls -lisa docs
+    - ls -lisa docs/source
 
 python:
    install:
