@@ -1,0 +1,42 @@
+@startuml
+package "Auth Service" {
+  class AuthService {
+    +register_user(username, password)
+    +authenticate_user(db_user, plain_pw)
+    +create_access_token(data, expires_delta)
+    +get_user_from_token(token)
+    +check_credentials(username, password)
+  }
+
+  class ext.JWT {
+    +encode()
+    +decode()
+  }
+
+  class ext.Bcrypt {
+    +hashpw()
+    +checkpw()
+  }
+
+  class Token {
+    -access_token: str
+    -token_type: str
+  }
+
+  AuthService --> JWT : uses
+  AuthService --> Bcrypt : uses
+  AuthService --> Token : returns
+
+  note right of AuthService::register_user
+    Calls check_credentials and bcrypt.hashpw
+  end note
+
+  note right of AuthService::authenticate_user
+    Compares hashed passwords using bcrypt.checkpw
+  end note
+
+  note right of AuthService::get_user_from_token
+    Decodes JWT and extracts "sub"
+  end note
+}
+@enduml

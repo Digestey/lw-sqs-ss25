@@ -1,0 +1,38 @@
+
+
+name: Codacy Coverage Reporter
+
+on: 
+  push:
+      branches:
+        - main
+        - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  codacy-coverage-reporter:
+    runs-on: ubuntu-latest
+    name: codacy-coverage-reporter
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
+      - name: Install dependencies and run code analysis
+        run: |
+          cd project/app
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          cd ../tests
+          pytest --cov=app --cov-report=xml --cov-report=term
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1.3.0
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          # or
+          # api-token: ${{ secrets.CODACY_API_TOKEN }}
+          coverage-reports: project/tests/coverage.xml
+          # or a comma-separated list for multiple reports
+          # coverage-reports: <PATH_TO_REPORT>, <PATH_TO_REPORT>

@@ -67,3 +67,11 @@ package-lock.json
 .env
 build
 venv
+__pycache__
+cache
+./cache
+.pytest_cache
+*.xml
+.coverage
+.idea
+../.idea

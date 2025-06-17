@@ -1,0 +1,25 @@
+@startuml
+title Level 0 - Context Diagram of DexQuiz
+
+actor "Player/User" as User
+actor "Developer / Maintainer" as Dev
+rectangle "DexQuiz System" as DexQuiz {
+  [Frontend (HTML + JS)]
+  [Backend (FastAPI API)]
+}
+interface PokeAPI as API
+
+database "MySQL Database" as DB
+cloud "Codacy\n(Code Analysis)" as Codacy
+queue "GitHub Actions" as CI
+
+User --> [Frontend (HTML + JS)] : Accesses via browser
+[Frontend (HTML + JS)] --> [Backend (FastAPI API)] : Sends requests (register, login, quiz, scores)
+
+[Backend (FastAPI API)] --> DB : Reads/Writes user data and highscores
+Dev --> CI : Pushes code to GitHub
+CI --> Codacy : Triggers analysis
+CI --> [Backend (FastAPI API)] : Deploys / Tests code
+[Backend (FastAPI API)] --> API : Fetch Pokemon data
+
+@enduml

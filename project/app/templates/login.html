@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Login - DEXQUIZ{% endblock %}
+
+{% block content %}
+    <h1>Please log in.</h1>
+
+    <p>In order to be featured on the leaderboard and store</p>
+    <p>your past performances automatically, you need to be logged in.</p>
+    
+    <form method="POST" id="login-form">
+        <label>Username</label>
+        <input type="text" name="username" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <button type="log_in">Log in</button>
+    </form>
+        <button type="cr_account">Create account</button>
+
+    <script src="/static/login.js"></script>
+{% endblock %}
