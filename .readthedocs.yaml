@@ -12,6 +12,7 @@ build:
   tools:
     python: "3.13"
   commands:
+    - pip install -r docs/requirements.txt
     - sphinx-apidoc -o docs/source project/app
 
 python:

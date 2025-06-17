@@ -1,6 +1,5 @@
 import os
 import sys
-import subprocess
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -9,14 +8,6 @@ import subprocess
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
-def run_apidoc():
-    here = os.path.abspath(os.path.dirname(__file__))
-    output_path = os.path.join(here)
-    module_path = os.path.abspath(os.path.join(here, "../../project/app"))
-    subprocess.call(["sphinx-apidoc", "-o", output_path, module_path])
-
-run_apidoc()
 
 project = 'DexQuiz'
 copyright = '2025, Lukas Waller'
