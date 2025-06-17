@@ -1,37 +1,15 @@
-
-
-# Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
-
-# Required
 version: 2
 
-# Set the OS, Python version, and other tools you might need
 build:
   os: ubuntu-24.04
   tools:
     python: "3.13"
-  commands:
-    - pip install -r docs/requirements.txt
-    - sphinx-apidoc -o docs/source project/app
-    - ls -lisa docs
-    - mkdir $READTHEDOCS_OUTPUT
-    - mkdir $READTHEDOCS_OUTPUT./html
-    - cp -a docs/build/html $READTHEDOCS_OUTPUT/html
 
 python:
-   install:
-   - method: pip
-     path: .
-   - requirements: docs/requirements.txt
+  install:
+    - method: pip
+      path: .
+    - requirements: docs/requirements.txt
 
-# Build documentation in the "docs/" directory with Sphinx
 sphinx:
-   configuration: docs/source/conf.py
-
-# Optionally, but recommended,
-# declare the Python requirements required to build your documentation
-# See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-
-        
-
+  configuration: docs/source/conf.py
