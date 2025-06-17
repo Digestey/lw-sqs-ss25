@@ -19,7 +19,6 @@ extensions = [
     "sphinx.ext.napoleon",  # for Google or NumPy style docstrings
     "sphinx.ext.viewcode",  # (optional) adds links to source code
     "sphinxcontrib.redoc",  # for OpenAPI display
-    'sphinxcontrib.plantuml',
 ]
 
 source_suffix = {
