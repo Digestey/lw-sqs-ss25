@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "DexQuiz"
+version = "0.1.0"
+description = "Dexquiz"
+authors = [{ name = "Lukas Waller", email = "lukas.waller@stud.th-rosenheim.de" }]
+dependencies = []
+
+[tool.setuptools]
+packages = ["project"]
