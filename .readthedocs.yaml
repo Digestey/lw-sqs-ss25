@@ -16,7 +16,8 @@ build:
     - pip install -r docs/requirements.txt
     - sphinx-apidoc -o docs/source project/app
     - ls -lisa docs/source
-    - pwd
+    - echo "$READTHEDOCS_OUTPUT/html"
+    - ls -lisa $READTHEDOCS_OUTPUT/html
 
 python:
    install:
