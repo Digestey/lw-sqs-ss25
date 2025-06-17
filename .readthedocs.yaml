@@ -12,7 +12,7 @@ build:
   tools:
     python: "3.13"
   commands:
-    - ls -lisa $READTHEDOCS_OUTPUT
+    - ls -lisa $READTHEDOCS_OUTPUT/..
     - pip install -r docs/requirements.txt
     - sphinx-apidoc -o docs/source project/app
 
