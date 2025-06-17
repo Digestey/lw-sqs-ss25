@@ -6,3 +6,8 @@ analysis:
     - flake8
     - pyflakes
     - black
+
+exclude_paths:
+  docs/
+  project/app/db_init
+  project/tests
