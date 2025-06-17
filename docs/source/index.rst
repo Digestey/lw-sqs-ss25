@@ -17,6 +17,7 @@ Welcome to DEXQUIZ's Documentation
    :caption: Architecture Documentation:
 
    arc42/index
+   api.rst
 
 
 Indices and tables

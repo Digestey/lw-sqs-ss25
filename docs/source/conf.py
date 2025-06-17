@@ -11,15 +11,6 @@ import sys
 
 import subprocess
 
-def run_apidoc():
-    here = os.path.abspath(os.path.dirname(__file__))
-    output_path = here
-    module_path = os.path.abspath(os.path.join(here, "../../project/app"))
-    subprocess.call(["sphinx-apidoc", "-o", output_path, module_path])
-
-run_apidoc()
-
-
 project = 'DexQuiz'
 copyright = '2025, Lukas Waller'
 author = 'Lukas Waller'
@@ -30,12 +21,15 @@ extensions = [
     "sphinx.ext.napoleon",  # for Google or NumPy style docstrings
     "sphinx.ext.viewcode",  # (optional) adds links to source code
     "sphinxcontrib.redoc",  # for OpenAPI display
+    "sphinxcontrib.openapi"
 ]
 
 source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',
 }
+
+html_theme = "furo"
 
 html_sidebars = {
     # For all pages, default sidebar

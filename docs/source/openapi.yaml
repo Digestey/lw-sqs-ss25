@@ -1,0 +1,420 @@
+---
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  "/":
+    get:
+      summary: Home
+      description: |-
+        Home site.
+
+        Args:
+            request (Request): request body
+
+        Returns:
+            TemplateResponse: Returns the HTML Template to be displayed in the clients browser.
+      operationId: home__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+  "/login":
+    get:
+      summary: Login Form
+      description: |-
+        Route for the login-frontend
+
+        Args:
+            request (Request): request body
+
+        Returns:
+            TemplateResponse: HTML to be displayed in the browser
+      operationId: login_form_login_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+  "/register":
+    get:
+      summary: Register Form
+      description: |-
+        Register Route. Provides the frontend to give users the opportunity to sell their
+           soul to this website.
+
+        Args:
+            request (Request): Request
+
+        Returns:
+            TemplateResponse: The HTML Template to be displayed
+      operationId: register_form_register_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+  "/highscores":
+    get:
+      summary: Highscore Page
+      description: |-
+        Highscores Page. Can only be accessed if the user is logged in.
+           That is handled in the js code however.
+
+        Args:
+            request (Request): reqeust body
+
+        Returns:
+            HTMLResponse: Highscores Page to be displayed in the browser.
+      operationId: highscore_page_highscores_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+  "/quiz":
+    get:
+      summary: Get Quiz
+      description: "Quiz frontend route. Fetches first pokemon\nArgs:\n    request
+        (Request): \n\nReturns:\n    HTMLResponse: Quiz page to be displayed in the
+        browser."
+      operationId: get_quiz_quiz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+    post:
+      summary: Post Quiz
+      description: |-
+        Fetches a new Quiz question, and validates existing ones.
+
+        Args:
+            request (Request): request (form data from the ui form)
+            guess (str, optional): String. Defaults to Form(...).
+
+        Returns:
+            JSONResponse: Evaluated response if the guess was correct (and the message to be displayed)
+      operationId: post_quiz_quiz_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              "$ref": "#/components/schemas/Body_post_quiz_quiz_post"
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+  "/api/highscores":
+    get:
+      summary: Get All Highscores
+      description: |-
+        _summary_
+
+        Raises:
+            HTTPException: _description_
+            HTTPException: _description_
+
+        Returns:
+            _type_: _description_
+      operationId: get_all_highscores_api_highscores_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/HighscoreResponse"
+                type: array
+                title: Response Get All Highscores Api Highscores Get
+      security:
+      - OAuth2PasswordBearer: []
+  "/api/highscore/{top}":
+    get:
+      summary: Get Top Highscores Api
+      description: |-
+        _summary_
+
+        Args:
+            top (int): _description_
+            token (str, optional): _description_. Defaults to Depends(oauth2_scheme).
+
+        Raises:
+            HTTPException: _description_
+            HTTPException: _description_
+
+        Returns:
+            _type_: _description_
+      operationId: get_top_highscores_api_api_highscore__top__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: top
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Top
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/HighscoreResponse"
+                title: Response Get Top Highscores Api Api Highscore  Top  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+  "/api/highscore":
+    post:
+      summary: Post Highscore
+      description: |-
+        _summary_
+
+        Args:
+            request (Request): _description_
+            token (str, optional): _description_. Defaults to Depends(oauth2_scheme).
+
+        Raises:
+            HTTPException: _description_
+            HTTPException: _description_
+
+        Returns:
+            _type_: _description_
+      operationId: post_highscore_api_highscore_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  "/api/token":
+    post:
+      summary: Login
+      description: |-
+        Logs user in.
+
+        Args:
+            form_data (OAuth2PasswordRequestForm, optional): form data. Defaults to Depends().
+
+        Raises:
+            HTTPException: If anything goes wrong, access is denied by default.
+
+        Returns:
+            str: Identification token (JWT).
+      operationId: login_api_token_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              "$ref": "#/components/schemas/Body_login_api_token_post"
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Token"
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+  "/api/register":
+    post:
+      summary: Register
+      description: |-
+        Registers a new user.
+        Args:
+            request (RegisterRequest): Request
+
+        Raises:
+            HTTPException: _description_
+      operationId: register_api_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegisterRequest"
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HTTPValidationError"
+components:
+  schemas:
+    Body_login_api_token_post:
+      properties:
+        grant_type:
+          anyOf:
+          - type: string
+            pattern: "^password$"
+          - type: 'null'
+          title: Grant Type
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+        scope:
+          type: string
+          title: Scope
+          default: ''
+        client_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Client Id
+        client_secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Client Secret
+      type: object
+      required:
+      - username
+      - password
+      title: Body_login_api_token_post
+    Body_post_quiz_quiz_post:
+      properties:
+        guess:
+          type: string
+          title: Guess
+      type: object
+      required:
+      - guess
+      title: Body_post_quiz_quiz_post
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            "$ref": "#/components/schemas/ValidationError"
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HighscoreResponse:
+      properties:
+        username:
+          type: string
+          title: Username
+        score:
+          type: integer
+          title: Score
+        achieved_at:
+          type: string
+          format: date-time
+          title: Achieved At
+      type: object
+      required:
+      - username
+      - score
+      - achieved_at
+      title: HighscoreResponse
+      description: |-
+        Highscore Data Object from the database.
+
+        username (str): extracted Username
+        score (int): archived score
+        achieved_at: timestamp of when the entry was last modified/created
+    RegisterRequest:
+      properties:
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - username
+      - password
+      title: RegisterRequest
+      description: "Model for User\n    "
+    Token:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+      type: object
+      required:
+      - access_token
+      - token_type
+      title: Token
+      description: |-
+        _summary_
+
+        Args:
+            BaseModel (_type_): _description_
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: "/api/token"

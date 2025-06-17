@@ -6,4 +6,6 @@ sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
 sphinxcontrib-redoc==1.6.0
+sphinxcontrib-openapi==0.8.4
 myst_parser==4.0.1
+furo==2024.8.6
