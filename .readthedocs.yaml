@@ -14,7 +14,7 @@ build:
   commands:
     - pip install -r docs/requirements.txt
     - sphinx-apidoc -o docs/source project/app
-    - ls -lisa docs/source
+    - ls -lisa docs
     - mkdir $READTHEDOCS_OUTPUT
     - mkdir $READTHEDOCS_OUTPUT./html
     - cp -a docs/build/html $READTHEDOCS_OUTPUT/html
