@@ -1,0 +1,36 @@
+name: UI Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Start app
+      run: |
+        cd project/apps
+        docker-compose up -d --build
+
+    - name: Waiting for application
+      run: |
+        echo "Waiting for FastAPI to be available..."
+        for i in {1..20}; do
+          if curl -sSf http://localhost:8000; then
+            echo "FastAPI is ready!"
+            break
+          fi
+          sleep 3
+        done
+
+    - name: Run Playwright UI tests
+      run: |
+        docker build -t playwright-tests ./project/playwright/
+        docker run --rm --network host playwright-tests

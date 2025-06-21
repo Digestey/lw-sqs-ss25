@@ -162,7 +162,7 @@ Building Block View
 Whitebox Overall System
 -----------------------
 
-.. image:: images/context_diagram.png
+.. image:: images/block_level_0.png
    :alt: DexQuiz architecture diagram
    :width: 1200px
    :align: center
@@ -184,6 +184,17 @@ Important Interfaces
    - Token-based authentication via OAuth2 Bearer scheme
 
 .. _`__name_black_box_1`:
+
+.. _`_white_box_emphasis_building_block_2_emphasis`:
+
+Level 2 (Container View)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: images/block_level_1.png
+   :alt: DexQuiz architecture diagram
+   :width: 700px
+   :align: center
+…
 
 Backend (FastAPI)
 ~~~~~~~~~~~~~~~~~~
@@ -227,27 +238,17 @@ Renders user-facing pages using Jinja2 templates and JavaScript.
 - `app/static/`
 
 White Box Backend
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 *<white box template>*
 
-.. _`_white_box_emphasis_building_block_2_emphasis`:
-
-White Box *<building block 2>*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. image:: images/context_diagram.png
-   :alt: DexQuiz architecture diagram
-   :width: 700px
-   :align: center
-…
 
 .. _`_white_box_emphasis_building_block_m_emphasis`:
 
-Whitebox Overall System
+Whitebox Component View
 -----------------------
 
-.. image:: images/block_level_1.png
+.. image:: images/block_level_2.png
    :alt: Level 1 DexQuiz Architecture Diagram
    :width: 1200px
    :align: center
@@ -361,8 +362,8 @@ MySQL Database
 
    - External dependency defined via Docker/Testcontainers
 
-Level 3
--------
+Level 3 - Services
+------------------
 
 .. _`_white_box_building_block_x_1`:
 
@@ -519,49 +520,43 @@ to store their achieved score to the highscore board.
 Deployment View
 ===============
 
-.. _`_infrastructure_level_1`:
+This section describes how the system is deployed during development and testing.
 
-Infrastructure Level 1
-----------------------
+.. image:: images/deployment_diagram.png
+   :alt: DexQuiz Docker Deployment
+   :width: 800px
+   :align: center
 
-**<Overview Diagram>**
+Execution Environment
+---------------------
 
-Motivation
-   *<explanation in text form>*
+The DexQuiz system runs in Docker containers via `docker-compose`. The following services are defined:
 
-Quality and/or Performance Features
-   *<explanation in text form>*
+- **dexquiz (FastAPI app)**: Handles all frontend and backend logic.
+- **pokedb (MySQL)**: Stores users and highscores.
+- **Named volume `mysql_data`**: Persists database state across runs.
 
-Mapping of Building Blocks to Infrastructure
-   *<description of the mapping>*
+Deployment Nodes and Containers
+-------------------------------
 
-.. _`_infrastructure_level_2`:
+* Docker host: Local machine
+* Two containers:
+  - `dexquiz` exposes port 8000
+  - `pokedb` maps MySQL port 3306 to host port 32001
+* `.env` file controls secrets and DB config.
 
-Infrastructure Level 2
-----------------------
+Communication Paths
+--------------------
 
-.. _`__emphasis_infrastructure_element_1_emphasis`:
+- FastAPI (app) ↔ MySQL (pokedb) via TCP 3306 inside the Docker network.
+- Frontend JS (in app) → API (`/api/...`) via HTTP 8000
 
-*<Infrastructure Element 1>*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Health & Resilience
+-------------------
 
-*<diagram + explanation>*
+- `pokedb` has a healthcheck to ensure it’s accepting connections before dependent containers start.
+- `depends_on` ensures correct startup sequence, though no retry logic is built in for database failures at runtime.
 
-.. _`__emphasis_infrastructure_element_2_emphasis`:
-
-*<Infrastructure Element 2>*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-*<diagram + explanation>*
-
-…
-
-.. _`__emphasis_infrastructure_element_n_emphasis`:
-
-*<Infrastructure Element n>*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-*<diagram + explanation>*
 
 .. _section-concepts:
 
