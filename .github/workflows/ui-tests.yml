@@ -16,7 +16,7 @@ jobs:
 
     - name: Start app
       run: |
-        cd project/apps
+        cd project/app
         docker-compose up -d --build
 
     - name: Waiting for application
