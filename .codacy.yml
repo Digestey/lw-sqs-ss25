@@ -1,4 +1,9 @@
 version: 2
+project_patterns:
+  exclude_paths:
+    - docs/**
+    - project/app/db_init/**
+    - project/tests/**
 analysis:
   language: python
   tools:
@@ -6,8 +11,3 @@ analysis:
     - flake8
     - pyflakes
     - black
----
-exclude_paths:
-  docs/
-  project/app/db_init
-  project/tests

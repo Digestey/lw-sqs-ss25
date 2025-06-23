@@ -1,4 +1,4 @@
-# 1. Use FastAPI for Web Backend
+# ADR 002 - Use FastAPI for Web Backend
 
 Date: 2025-03-28
 

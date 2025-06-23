@@ -1,6 +1,6 @@
-# 9. Frontend-Backend Seperation
+# ADR 009 - Frontend-Backend Seperation
 
-Date: 20.05.2025
+Date: 21.05.2025
 
 ## Status
 
@@ -17,7 +17,7 @@ The frontend uses JavaScript or HTML forms to make requests to a clean API layer
 
 ## Alternatives Considered
 
-- Just keep everything as was in the poc-Phase. Not performed since its not a good look.
+- Just keep everything as was in the poc-Phase. Not performed since its not a good look. (I like monoliths but the people out there dont)
 
 ## Consequences
 

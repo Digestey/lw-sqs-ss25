@@ -12,6 +12,8 @@ from app.routes import frontend, highscores, users
 from app.util.logger import get_logger
 
 # Initialization of the application
+print("Starting DexQuiz application...")
+print(os.getenv("USE_TEST_POKEMON"))
 
 load_dotenv()
 logging.basicConfig()
@@ -23,6 +25,8 @@ cache_dir = os.getenv("POKEMON_CACHE", default="./cache")
 host_ip = os.getenv("HOST_IP", "127.0.0.1")
 
 pb.cache.set_cache()
+
+
 
 # print(f"{dir(pb.cache.API_CACHE)}")
 
@@ -47,5 +51,7 @@ app.include_router(users.router)
 
 
 if __name__ == "__main__":
+    if os.getenv("USE_TEST_POKEMON") == "1":
+        print("Using testing pokemon...")
     import uvicorn
     uvicorn.run(app, host=host_ip, port=8000)
