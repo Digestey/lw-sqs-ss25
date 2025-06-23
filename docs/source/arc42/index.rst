@@ -513,7 +513,7 @@ Deployment View
 
 This section describes how the system is deployed during development and testing.
 
-.. image:: images/deployment_diagram.png
+.. image:: images/deployment_view.png
    :alt: DexQuiz Docker Deployment
    :width: 800px
    :align: center
@@ -553,6 +553,11 @@ Health & Resilience
 
 Cross-cutting Concepts
 ======================
+
+.. image:: images/detailed_class_diagram.png
+   :alt: DexQuiz Docker Deployment
+   :width: 800px
+   :align: center
 
 .. _`__emphasis_security_emphasis`:
 
@@ -635,18 +640,63 @@ Quality Requirements
 Quality Tree
 ------------
 
+The following quality tree outlines the most important non-functional requirements and their subcategories:
+
+::
+
+    Quality
+    ├── Performance
+    │   ├── Fast response times
+    │   └── Efficient DB access via pooling
+    ├── Usability
+    │   ├── Intuitive UI with clear navigation
+    │   └── Simple feedback for success/failure
+    ├── Security
+    │   ├── Encrypted password storage (bcrypt)
+    │   ├── Stateless JWT-based auth
+    │   └── SQL injection protection via parameterization
+    ├── Maintainability
+    │   ├── Modular services (auth, DB, quiz logic)
+    │   └── Readable codebase with logging and comments
+    └── Testability
+        ├── Separation of logic for mocking
+        └── Unit and integration test coverage (pytest, testcontainers)
+
 .. _`_quality_scenarios`:
 
 Quality Scenarios
 -----------------
 
+The table below describes key quality scenarios relevant to DexQuiz:
+
++--------+-------------------+---------------------------------------------------------------+
+| ID     | Quality Attribute | Description                                                   |
++========+===================+===============================================================+
+| QS1    | Performance        | User submits quiz guess → System responds in under 500ms.    |
++--------+-------------------+---------------------------------------------------------------+
+| QS2    | Security           | SQL injection attempt → Input sanitized, query parameterized.|
++--------+-------------------+---------------------------------------------------------------+
+| QS3    | Usability          | User registers and logs in easily without technical barriers.|
++--------+-------------------+---------------------------------------------------------------+
+| QS4    | Reliability        | Database temporarily down → Retry logic prevents crash.      |
++--------+-------------------+---------------------------------------------------------------+
+| QS5    | Maintainability    | Dev replaces Pokémon source → Minimal change required.       |
++--------+-------------------+---------------------------------------------------------------+
+| QS6    | Testability        | Highscore logic tested in isolation using mocks.             |
++--------+-------------------+---------------------------------------------------------------+
+
 .. _section-technical-risks:
 
 Risks and Technical Debts
-=========================
+==========================
 
-- Missing HTTPS means all http requests are unencrypted. For a realistic production environment, HTTPS should be used.
-- Lack of asyncronous db handling means the application may perform poorly and error-ridden under high load.
+- **Missing HTTPS**: Currently, HTTP is used for all traffic. Production deployments must use HTTPS.
+- **Synchronous DB Access**: Blocking I/O via `mysql-connector-python` may degrade under heavy load.
+- **In-memory session handling**: Sessions based on client IP can be unreliable in NAT scenarios.
+- **No persistent session store**: Not scalable. Recommend migration to Redis or similar solution.
+- **External API dependency**: Pokémon data depends on PokeAPI; there is no fallback strategy.
+- **Limited server-side input validation**: Frontend JS handles most checks; backend should enforce rules as well.
+
 
 .. _section-glossary:
 

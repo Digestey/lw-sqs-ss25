@@ -1,0 +1,123 @@
+@startuml
+allowmixing
+skinparam componentStyle rectangle
+skinparam linetype ortho
+title DexQuiz - Detailed class diagram
+
+package "Models" {
+    class UserInDb {
+        +id: int
+        +username: str
+        +password_hash: str
+        +created_at: datetime
+    }
+
+    class QuizInfo {
+        +name: str
+        +pokemon_id: str
+        +height: int
+        +weight: int
+        +stats: int[7]
+        +types: (str, str)
+        +entry: str
+    }
+
+    class Token {
+        +access_token: str
+        +token_type: str
+    }
+
+    class HighscoreResponse {
+        +username: str
+        +score: int
+        +timestamp: datetime
+    }
+}
+
+package "Routes" {
+    class "frontend.py" as Frontend {
+        +home(request)
+        +login_form(request)
+        +register_form(request)
+        +highscore_page(request)
+        +get_quiz(request)
+        +post_quiz(request, guess)
+    }
+
+    class "highscores.py" as HighscoreAPI {
+        +get_all_highscores(token)
+        +get_top_highscores_api(top, token)
+        +post_highscore(request, token)
+    }
+
+    class "user.py" as UserAPI {
+        +login(form_data)
+        +register(request)
+    }
+}
+
+package "Services" {
+    class "auth_service.py" as AuthService {
+        +authenticate_user(user, password)
+        +create_access_token(data)
+        +get_user_from_token(token, db_conn)
+        +register_user(username, password)
+        +check_credentials(username, password)
+    }
+
+    class "database_service.py" as DatabaseService {
+        +get_pool(port=3306)
+        +get_connection(port=None)
+        +add_user(cnn, username, hash)
+        +get_user(cnn, username)
+        +delete_user(cnn, username)
+        +get_highscores(cnn)
+        +get_top_highscores(cnn, top)
+        +add_highscore(cnn, username, score)
+    }
+
+    class "pokemon_service.py" as PokemonService {
+        +fetch_pokemon(logger)
+        +get_random_pokemon_id()
+        +get_english_dex_entry()
+        +extract_stats(pokemon)
+        +extract_types(pokemon)
+        +log_pokemon_details(pokemon)
+    }
+}
+
+package "Util" {
+    class "logger.py" as Logger {
+        +get_logger(name)
+    }
+}
+
+package "External" {
+    component "Jinja2 Templates"
+    component "PokeBase API"
+}
+
+Frontend --> PokemonService
+Frontend --> Logger
+Frontend --> "Jinja2 Templates"
+Frontend --> QuizInfo
+
+UserAPI --> AuthService
+UserAPI --> DatabaseService
+UserAPI --> Logger
+
+HighscoreAPI --> AuthService
+HighscoreAPI --> DatabaseService
+HighscoreAPI --> Logger
+HighscoreAPI --> HighscoreResponse
+
+AuthService --> UserInDb
+AuthService --> Token
+
+DatabaseService --> UserInDb
+DatabaseService --> Logger
+
+PokemonService --> Logger
+PokemonService --> "PokeBase API"
+
+@enduml
