@@ -35,7 +35,7 @@ def register_user(page: Page, username: str, password: str):
     page.locator("input[name='repeat_password']").fill(password)
     page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("button", name="Register Now!").click()
-    page.wait_for_url(f"{BASE_URL}/login", timeout=3000)
+    page.wait_for_url(f"{BASE_URL}/login", timeout=5000)
     assert "/login" in page.url
 
 

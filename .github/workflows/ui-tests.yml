@@ -11,6 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       USE_TEST_POKEMON: "1"
+      MYSQL_ROOT_PASSWORD: pokeballs
+      MYSQL_DATABASE: pokedb
+      MYSQL_USER: trainer
+      MYSQL_PASSWORD: pokeballs
+      MYSQL_URL: pokedb
+      HOST_IP: 0.0.0.0
+      POKEMON_CACHE: "cache/"
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
