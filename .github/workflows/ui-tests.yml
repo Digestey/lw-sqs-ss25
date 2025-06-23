@@ -19,7 +19,7 @@ jobs:
       run: |
         cd project/app
         docker compose version
-        docker compose up -d --build
+        docker compose -f docker-compose.test.yaml up -d --build
 
     - name: Waiting for application
       run: |
