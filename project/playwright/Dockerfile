@@ -6,7 +6,7 @@ RUN pip install playwright pytest pytest-playwright && playwright install
 
 COPY . .
 
-ENV BASE_URL=http://localhost:8000
+ENV BASE_URL=http://0.0.0.0:8000
 ENV USE_TEST_POKEMON=1
 
 CMD ["pytest", "-v"]
