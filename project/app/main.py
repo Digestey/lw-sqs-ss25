@@ -10,6 +10,7 @@ import pokebase as pb
 from dotenv import load_dotenv
 from app.routes import frontend, highscores, users
 from app.util.logger import get_logger
+from app.services.database_service import is_database_healthy
 
 # Initialization of the application
 
@@ -49,6 +50,14 @@ app.include_router(users.router)
 
 
 if __name__ == "__main__":
+    if is_database_healthy(
+        host=host_ip,
+        user=os.getenv("MYSQL_USER", "trainer"),
+        password=os.getenv("MYSQL_PASSWORD", "pokeballs"),
+        database=os.getenv("MYSQL_DATABASE", "pokedb")):
+        logger.info("Database is healthy.")
+    else:
+        logger.warning("Database is NOT reachable.")
     if os.getenv("USE_TEST_POKEMON") == "1":
         logger.info("USING TEST DATA.")
     import uvicorn

@@ -35,48 +35,50 @@ def get_pool(port=3306):
         )
     return CONN_POOL
 
-def connect_to_db(host, user, password, database, port=3306):
-    """Legacy function to connect to a custom database
+
+def is_database_healthy(
+    host, user, password, database, port=3306, timeout=3, retries=5, delay=2
+) -> bool:
+    """
+    Attempts to connect to the database to verify health, with retries.
 
     Args:
-        host (str): hostname of the database
-        user (str): database username
-        password (str): database password
-        database (str): database name
-        port (int, optional): Database Port. Defaults to 3306.
-
-    Raises:
-        e: Error if the connection fails
+        host (str): Database host.
+        user (str): Username.
+        password (str): Password.
+        database (str): Database name.
+        port (int, optional): Port. Defaults to 3306.
+        timeout (int, optional): Timeout in seconds. Defaults to 3.
+        retries (int, optional): Retry attempts. Defaults to 5.
+        delay (int, optional): Delay between retries in seconds. Defaults to 2.
 
     Returns:
-        connection: Database connection
+        bool: True if connection is successful within retries, else False.
     """
-    retries = 5
-    delay = 5
-
     for attempt in range(retries):
         try:
-            print(f"Attempting to connect to MySQL (Attempt {attempt + 1}/{retries})...")
-            connector = mysql.connector.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=database,
+            logger.info(f"[Health Check] Attempt {attempt + 1}/{retries}...")
+            conn = mysql.connector.connect(
+                host=os.getenv("MYSQL_URL", "127.0.0.1"),
                 port=port,
+                user=os.getenv("MYSQL_USER", "trainer"),
+                password=os.getenv("MYSQL_PASSWORD", "pokeballs"),
+                database=os.getenv("MYSQL_DATABASE", "testdb"),
+                connection_timeout=timeout,
                 use_pure=True
             )
-
-            if connector.is_connected():
-                print("Successfully connected to MySQL")
-                return connector
+            if conn.is_connected():
+                conn.close()
+                logger.info("[Health Check] Success")
+                return True
         except Error as e:
-            print(f"Error: {e}")
+            logger.warning(f"[Health Check] Connection failed: {e}")
             if attempt < retries - 1:
-                print(f"Retrying in {delay} seconds...")
+                logger.warning(f"[Health Check] Retrying in {delay} seconds...")
                 time.sleep(delay)
-            else:
-                print("Max retries reached. Unable to connect to MySQL.")
-                raise e
+
+    logger.warning("[Health Check] Max retries reached. Database is unhealthy.")
+    return False
 
 
 def get_connection(port=None):

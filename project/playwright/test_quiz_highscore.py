@@ -3,7 +3,7 @@ import uuid
 import pytest
 from playwright.sync_api import sync_playwright
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+BASE_URL = os.getenv("BASE_URL", "http://dexquiz:8000")
 
 def generate_user():
     return f"testuser_{uuid.uuid4().hex[:8]}"

@@ -3,7 +3,7 @@ import uuid
 import pytest
 from playwright.sync_api import Page, Dialog
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+BASE_URL = os.getenv("BASE_URL", "http://0.0.0.0:8000")
 
 
 def test_docs_page(page: Page):
