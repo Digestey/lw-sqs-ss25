@@ -42,4 +42,4 @@ jobs:
     - name: Run Playwright UI tests
       run: |
         docker build -t playwright-tests ./project/playwright/
-        docker run --rm --network host playwright-tests
+        docker run --rm playwright-tests

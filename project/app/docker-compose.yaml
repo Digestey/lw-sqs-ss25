@@ -29,7 +29,8 @@ services:
         ports:
             - "8000:8000"
         depends_on:
-            - pokedb
+            pokedb:
+                condition: service_healthy
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}

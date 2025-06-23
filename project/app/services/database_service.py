@@ -23,6 +23,7 @@ logger = logger.get_logger(name="db_conn")
 def get_pool(port=3306):
     global CONN_POOL
     if CONN_POOL is None:
+        logger.info(msg="Connection pool created.")
         CONN_POOL = pooling.MySQLConnectionPool(
             pool_name="pokedb_pool",
             pool_size=10,
@@ -86,7 +87,7 @@ def get_connection(port=None):
         (defaults to None, if port is None, 3306 will be the default used port)
     
     """
-    try:
+    try:       
         port = int(port) if port else int(os.getenv("MYSQL_PORT", "3306"))
         conn = get_pool(port).get_connection()
         return conn
@@ -110,10 +111,12 @@ def add_user(cnn, username, hashed_password):
     """
     cursor = cnn.cursor(dictionary=True)
     try:
+        logger.info(msg="Adding user "+username)
         cursor.execute(
             "INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, hashed_password))
         cnn.commit()
     except mysql.connector.IntegrityError as exc:
+        logger.error("Error while inserting into table: %s", exc)
         raise ValueError("Username already exists.") from exc
     finally:
         cursor.close()
@@ -125,6 +128,7 @@ def delete_user(cnn, username):
     Args:
         username (str): Username to be deleted
     """
+    logger.info(msg="Deleting user "+username)
     cursor = cnn.cursor(dictionary=True)
     cursor.execute("DELETE FROM users WHERE username=(%s)", (username,))
     cnn.commit()
@@ -140,6 +144,7 @@ def get_user(cnn, username):
         user: returns user entry from database
     """
     cursor = cnn.cursor(dictionary=True)
+    logger.info(msg="Fetching user "+username)
     try:
         cursor.execute(
             "SELECT id, username, password_hash, created_at FROM users WHERE username = %s", (
@@ -149,6 +154,7 @@ def get_user(cnn, username):
         cursor.close()
         return user
     except mysql.connector.Error as e:
+        logger.error("Error while fetching: %s", e)
         raise HTTPException(status_code=500, detail="Database error.") from e
     finally:
         cursor.close()
@@ -172,6 +178,7 @@ def add_highscore(cnn, username, score):
     """
 
     cursor = cnn.cursor()
+    logger.info(msg="Adding highscore "+username+" with score: "+str(score))
     try:
         # Find user_id from username
         cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
@@ -197,6 +204,7 @@ def add_highscore(cnn, username, score):
         cnn.commit()
         return result
     except Exception as e:
+        logger.error("Error while adding highscore: %s", e)
         cnn.rollback()
         raise e
 
@@ -215,6 +223,7 @@ def get_highscores(cnn):
     """
 
     cursor = cnn.cursor(dictionary=True)
+    logger.info(msg="Fetching all highscores...")
     try:
         cursor.execute(
             "SELECT u.username, h.score, h.achieved_at FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
@@ -222,6 +231,8 @@ def get_highscores(cnn):
         highscores = cursor.fetchall()
         return highscores
     except Exception as e:
+        logger.error("Error while fetching: %s", e)
+
         cnn.rollback()
         raise e
     finally:

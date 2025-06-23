@@ -59,7 +59,7 @@ def get_logger(name: str, level=logging.INFO, debug=False, extra_info=None):
         Logger: A logger to print messages to screen.
     """    
     logger = Logger(name, debug=debug, level=level)
-    logging.basicConfig()
+    # logging.basicConfig()
     logger.setLevel(level)
 
     if not logger.handlers:
