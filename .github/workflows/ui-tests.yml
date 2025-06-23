@@ -16,7 +16,7 @@ jobs:
       MYSQL_USER: trainer
       MYSQL_PASSWORD: pokeballs
       MYSQL_URL: pokedb
-      HOST_IP: 0.0.0.0
+      HOST_IP: localhost
       POKEMON_CACHE: "cache/"
     steps:
     - name: Checkout code
@@ -26,7 +26,7 @@ jobs:
       run: |
         cd project/app
         docker compose version
-        docker compose -f docker-compose.test.yaml up --build
+        docker compose -f docker-compose.test.yaml up -d --build
 
     - name: Waiting for application
       run: |
