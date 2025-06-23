@@ -16,7 +16,7 @@ jobs:
       MYSQL_USER: trainer
       MYSQL_PASSWORD: pokeballs
       MYSQL_URL: pokedb
-      HOST_IP: localhost
+      HOST_IP: 0.0.0.0
       POKEMON_CACHE: "cache/"
     steps:
     - name: Checkout code

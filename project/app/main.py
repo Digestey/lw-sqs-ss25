@@ -51,7 +51,7 @@ app.include_router(users.router)
 
 if __name__ == "__main__":
     if is_database_healthy(
-        host=host_ip,
+        host=os.getenv("MYSQL_URL"),
         user=os.getenv("MYSQL_USER", "trainer"),
         password=os.getenv("MYSQL_PASSWORD", "pokeballs"),
         database=os.getenv("MYSQL_DATABASE", "pokedb")):

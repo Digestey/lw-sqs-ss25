@@ -57,13 +57,13 @@ def is_database_healthy(
     """
     for attempt in range(retries):
         try:
-            logger.info(f"[Health Check] Attempt {attempt + 1}/{retries}...")
+            logger.info(f"[Health Check] Attempt (host {host}) {attempt + 1}/{retries}...")
             conn = mysql.connector.connect(
-                host=os.getenv("MYSQL_URL", "127.0.0.1"),
+                host=host,
                 port=port,
-                user=os.getenv("MYSQL_USER", "trainer"),
-                password=os.getenv("MYSQL_PASSWORD", "pokeballs"),
-                database=os.getenv("MYSQL_DATABASE", "testdb"),
+                user=user,
+                password=password,
+                database=database,
                 connection_timeout=timeout,
                 use_pure=True
             )
