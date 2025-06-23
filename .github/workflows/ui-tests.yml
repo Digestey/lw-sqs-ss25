@@ -43,3 +43,8 @@ jobs:
       run: |
         docker build -t playwright-tests ./project/playwright/
         docker run --rm --network host playwright-tests
+
+    - name: print docker logs
+      run: |
+        docker logs dexquiz -n 50
+        docker logs pokedb -n 50
