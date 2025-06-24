@@ -7,7 +7,7 @@ However does NOT connect to the database.
 from datetime import datetime, timedelta
 import os
 import bcrypt
-from jose import jwt
+from jose import jwt, JWTError
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -26,7 +26,6 @@ MIN_PASSWORD_LENGTH = 8
 MAX_STRING_LENGTH = 100
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
-
 
 
 def register_user(username, password):
@@ -75,6 +74,36 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     )
 
 
+def create_refresh_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    expire = datetime.now() + (expires_delta or timedelta(days=7))
+    to_encode.update({"exp": expire})
+    return Token(
+        access_token=jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM),
+        token_type="bearer"
+    )
+
+
+def refresh_token_pair(refresh_token: str, db_conn) -> tuple[str, str, str]:
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if not username:
+            raise HTTPException(
+                status_code=401, detail="Invalid refresh token")
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=401, detail="Invalid refresh token") from exc
+    db_user = get_user(db_conn, username)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    access_token = create_access_token(data={"sub": username})
+    new_refresh_token = create_refresh_token(data={"sub": username})
+
+    return access_token, new_refresh_token, username
+
+
 def get_user_from_token(token: str, db_conn) -> UserInDb:
     """Retrieves the user information from the JWT token."""
     try:
@@ -82,7 +111,7 @@ def get_user_from_token(token: str, db_conn) -> UserInDb:
         username = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        
+
         # Query the DB for this user
         user = get_user(db_conn, username)  # From database_service
         if user is None:

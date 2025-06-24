@@ -39,15 +39,18 @@ def test_delete_user(mock_get_connection):
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
-    mock_conn.cursor.return_value = mock_cursor
+    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor 
+
+    mock_cursor.rowcount = 1
 
     delete_user(mock_conn, "testuser")
 
     mock_cursor.execute.assert_called_with(
-        "DELETE FROM users WHERE username=(%s)", ("testuser",)
+        "DELETE FROM users WHERE username = %s", ("testuser",)
     )
     mock_conn.commit.assert_called_once()
-    mock_cursor.close.assert_called()
+    # No need to call cursor.close because 'with' context manager auto-closes
+
 
 @patch("app.services.database_service.get_connection")
 def test_get_user_found(mock_get_connection):

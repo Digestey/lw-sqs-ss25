@@ -1,18 +1,14 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-        console.error("No token found");
-        window.location.assign("/login");
-        return;
-    }
-
     try {
         const response = await fetch("/api/highscore/10", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            credentials: "include" 
         });
+
+        if (response.status === 401) {
+            console.error("Unauthorized: redirecting to login.");
+            window.location.assign("/login");
+            return;
+        }
 
         const data = await response.json();
         console.log("Received scores:", data);
@@ -29,5 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     } catch (err) {
         console.error("Error loading highscores:", err);
+        alert("Failed to load highscores.");
     }
 });

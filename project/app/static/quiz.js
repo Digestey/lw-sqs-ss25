@@ -52,23 +52,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     submitButton.addEventListener("click", async function () {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            alert("You must be logged in to submit a score.");
-            return;
-        }
-
         try {
             const response = await fetch("/api/highscore", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Content-Type": "application/json"
                 },
+                credentials: "include",  // <-- send cookies (important!)
                 body: JSON.stringify({ score: score })
             });
 
-            if (!response.ok) throw new Error("Failed to submit highscore");
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert("You must be logged in to submit a score.");
+                } else {
+                    alert("Failed to submit highscore.");
+                }
+                return;
+            }
 
             alert("Highscore submitted!");
             score = 0;
@@ -79,4 +80,5 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Failed to submit highscore.");
         }
     });
+
 });

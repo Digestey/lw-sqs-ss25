@@ -11,7 +11,7 @@ function password_check(password) {
 }
 
 document.addEventListener("cr_account", function () {
-    window.location.assign("/register");
+  window.location.assign("/register");
 })
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -39,12 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!response.ok) {
-        throw new Error(response.detail || "Login failed");
+        const errorBody = await response.json().catch(() => null);
+        throw new Error(errorBody?.detail || "Login failed");
       }
 
-      const data = await response.json();
-      localStorage.setItem("token", data.access_token);
-
+      // No need to store access_token, it's already in cookies
       alert("Login successful!");
       window.location.assign("/");
     } catch (error) {

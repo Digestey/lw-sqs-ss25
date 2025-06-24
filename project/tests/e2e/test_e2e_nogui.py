@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
+
 @pytest.mark.asyncio
 async def test_full_expected_workflow(client, mysql_container):
     # Register test user
@@ -16,13 +17,16 @@ async def test_full_expected_workflow(client, mysql_container):
         "password": "strongpass123"
     })
     assert login_response.status_code == 200
-    token = login_response.json()["access_token"]
 
-    # Create new highscore
+    # Instead of reading from JSON, read from cookies:
+    access_token = login_response.cookies.get("access_token")
+    assert access_token is not None, "No access_token cookie set"
+
+    # Use the access_token cookie in the Authorization header (if your API requires it)
     hs_response = client.post(
         "/api/highscore",
         json={"score": 1337},
-        headers={"Authorization": f"Bearer {token}"}
+        cookies={"access_token": access_token}
     )
     assert hs_response.status_code == 200
     result = hs_response.json()
@@ -32,7 +36,8 @@ async def test_full_expected_workflow(client, mysql_container):
     # Request highscores, use auth token
     get_response = client.get(
         "/api/highscores",
-        headers={"Authorization": f"Bearer {token}"}
+        cookies={"access_token": access_token}
     )
     assert get_response.status_code == 200
-    assert any(score["username"] == "e2euser" and score["score"] == 1337 for score in get_response.json())
+    assert any(score["username"] == "e2euser" and score["score"]
+               == 1337 for score in get_response.json())
