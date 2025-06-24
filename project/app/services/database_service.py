@@ -23,6 +23,7 @@ logger = logger.get_logger(name="db_conn")
 def get_pool(port=3306):
     global CONN_POOL
     if CONN_POOL is None:
+        logger.info(msg="Connection pool created.")
         CONN_POOL = pooling.MySQLConnectionPool(
             pool_name="pokedb_pool",
             pool_size=10,
@@ -34,48 +35,50 @@ def get_pool(port=3306):
         )
     return CONN_POOL
 
-def connect_to_db(host, user, password, database, port=3306):
-    """Legacy function to connect to a custom database
+
+def is_database_healthy(
+    host, user, password, database, port=3306, timeout=3, retries=5, delay=2
+) -> bool:
+    """
+    Attempts to connect to the database to verify health, with retries.
 
     Args:
-        host (str): hostname of the database
-        user (str): database username
-        password (str): database password
-        database (str): database name
-        port (int, optional): Database Port. Defaults to 3306.
-
-    Raises:
-        e: Error if the connection fails
+        host (str): Database host.
+        user (str): Username.
+        password (str): Password.
+        database (str): Database name.
+        port (int, optional): Port. Defaults to 3306.
+        timeout (int, optional): Timeout in seconds. Defaults to 3.
+        retries (int, optional): Retry attempts. Defaults to 5.
+        delay (int, optional): Delay between retries in seconds. Defaults to 2.
 
     Returns:
-        connection: Database connection
+        bool: True if connection is successful within retries, else False.
     """
-    retries = 5
-    delay = 5
-
     for attempt in range(retries):
         try:
-            print(f"Attempting to connect to MySQL (Attempt {attempt + 1}/{retries})...")
-            connector = mysql.connector.connect(
+            logger.info(f"[Health Check] Attempt (host {host}) {attempt + 1}/{retries}...")
+            conn = mysql.connector.connect(
                 host=host,
+                port=port,
                 user=user,
                 password=password,
                 database=database,
-                port=port,
+                connection_timeout=timeout,
                 use_pure=True
             )
-
-            if connector.is_connected():
-                print("Successfully connected to MySQL")
-                return connector
+            if conn.is_connected():
+                conn.close()
+                logger.info("[Health Check] Success")
+                return True
         except Error as e:
-            print(f"Error: {e}")
+            logger.warning(f"[Health Check] Connection failed: {e}")
             if attempt < retries - 1:
-                print(f"Retrying in {delay} seconds...")
+                logger.warning(f"[Health Check] Retrying in {delay} seconds...")
                 time.sleep(delay)
-            else:
-                print("Max retries reached. Unable to connect to MySQL.")
-                raise e
+
+    logger.warning("[Health Check] Max retries reached. Database is unhealthy.")
+    return False
 
 
 def get_connection(port=None):
@@ -86,7 +89,7 @@ def get_connection(port=None):
         (defaults to None, if port is None, 3306 will be the default used port)
     
     """
-    try:
+    try:       
         port = int(port) if port else int(os.getenv("MYSQL_PORT", "3306"))
         conn = get_pool(port).get_connection()
         return conn
@@ -110,10 +113,12 @@ def add_user(cnn, username, hashed_password):
     """
     cursor = cnn.cursor(dictionary=True)
     try:
+        logger.info(msg="Adding user "+username)
         cursor.execute(
             "INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, hashed_password))
         cnn.commit()
     except mysql.connector.IntegrityError as exc:
+        logger.error("Error while inserting into table: %s", exc)
         raise ValueError("Username already exists.") from exc
     finally:
         cursor.close()
@@ -125,6 +130,7 @@ def delete_user(cnn, username):
     Args:
         username (str): Username to be deleted
     """
+    logger.info(msg="Deleting user "+username)
     cursor = cnn.cursor(dictionary=True)
     cursor.execute("DELETE FROM users WHERE username=(%s)", (username,))
     cnn.commit()
@@ -140,6 +146,7 @@ def get_user(cnn, username):
         user: returns user entry from database
     """
     cursor = cnn.cursor(dictionary=True)
+    logger.info(msg="Fetching user "+username)
     try:
         cursor.execute(
             "SELECT id, username, password_hash, created_at FROM users WHERE username = %s", (
@@ -149,6 +156,7 @@ def get_user(cnn, username):
         cursor.close()
         return user
     except mysql.connector.Error as e:
+        logger.error("Error while fetching: %s", e)
         raise HTTPException(status_code=500, detail="Database error.") from e
     finally:
         cursor.close()
@@ -172,6 +180,7 @@ def add_highscore(cnn, username, score):
     """
 
     cursor = cnn.cursor()
+    logger.info(msg="Adding highscore "+username+" with score: "+str(score))
     try:
         # Find user_id from username
         cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
@@ -197,6 +206,7 @@ def add_highscore(cnn, username, score):
         cnn.commit()
         return result
     except Exception as e:
+        logger.error("Error while adding highscore: %s", e)
         cnn.rollback()
         raise e
 
@@ -215,6 +225,7 @@ def get_highscores(cnn):
     """
 
     cursor = cnn.cursor(dictionary=True)
+    logger.info(msg="Fetching all highscores...")
     try:
         cursor.execute(
             "SELECT u.username, h.score, h.achieved_at FROM highscores h JOIN users u ON h.user_id = u.id ORDER BY h.score DESC",
@@ -222,6 +233,8 @@ def get_highscores(cnn):
         highscores = cursor.fetchall()
         return highscores
     except Exception as e:
+        logger.error("Error while fetching: %s", e)
+
         cnn.rollback()
         raise e
     finally:

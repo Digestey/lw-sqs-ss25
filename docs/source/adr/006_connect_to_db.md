@@ -1,4 +1,4 @@
-# 1. Way of handling connections to the database
+# ADR 006 - Way of handling connections to the database
 
 **Date**: 15-04-2025
 

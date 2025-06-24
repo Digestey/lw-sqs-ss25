@@ -174,14 +174,9 @@ Motivation
    and facilitates future scaling.
 
 Contained Building Blocks
-   - Frontend: Provides the user interface via Jinja2 templates and JavaScript.
-   - Backend: Implements FastAPI endpoints and business logic.
+   - DexQuiz Application: Provides the user interface an backend routes
+   - PokeAPI: Provides Pokemon Data the user is to be quizzed about.
 
-Important Interfaces
-   - HTTP REST interface between frontend and backend
-   - Internal service functions between backend and auth/database modules
-   - SQL-based data access between backend and MySQL
-   - Token-based authentication via OAuth2 Bearer scheme
 
 .. _`__name_black_box_1`:
 
@@ -205,8 +200,10 @@ Handles REST endpoints, business logic, routing, error handling, and coordinatio
 
 *Interface(s)*
 
-- Exposes HTTP API routes (e.g. `/api/register`, `/api/token`, `/api/highscores`)
-- Calls functions from `auth_service` and `database_service`
+   - HTTP REST interface between frontend and backend
+   - Internal service functions between backend and auth/database modules
+   - SQL-based data access between backend and MySQL
+   - Token-based authentication via OAuth2 Bearer scheme
 
 *Quality/Performance Characteristics*
 
@@ -236,12 +233,6 @@ Renders user-facing pages using Jinja2 templates and JavaScript.
 
 - `app/templates/`
 - `app/static/`
-
-White Box Backend
-~~~~~~~~~~~~~~~~~
-
-*<white box template>*
-
 
 .. _`_white_box_emphasis_building_block_m_emphasis`:
 
@@ -522,7 +513,7 @@ Deployment View
 
 This section describes how the system is deployed during development and testing.
 
-.. image:: images/deployment_diagram.png
+.. image:: images/deployment_view.png
    :alt: DexQuiz Docker Deployment
    :width: 800px
    :align: center
@@ -563,28 +554,74 @@ Health & Resilience
 Cross-cutting Concepts
 ======================
 
-.. _`__emphasis_concept_1_emphasis`:
+.. image:: images/detailed_class_diagram.png
+   :alt: DexQuiz Docker Deployment
+   :width: 800px
+   :align: center
 
-*<Concept 1>*
--------------
+.. _`__emphasis_security_emphasis`:
 
-*<explanation>*
+Security
+--------
 
-.. _`__emphasis_concept_2_emphasis`:
+- JWT-based authentication with bearer tokens (`Authorization: Bearer <token>`) is used for protecting sensitive API endpoints.
+- Passwords are hashed using bcrypt before being stored in the database.
+- Rate limiting and CAPTCHA are not implemented (potential future enhancement).
+- HTTPS is not enabled by default — all traffic is currently plain HTTP.
 
-*<Concept 2>*
--------------
+.. _`__emphasis_persistence_emphasis`:
 
-*<explanation>*
+Persistence
+-----------
 
-…
+- MySQL is used as the persistent storage system.
+- Data is structured across two primary tables: `users` and `highscores`.
+- Connection pooling is implemented using `mysql.connector.pooling.MySQLConnectionPool` for performance.
 
-.. _`__emphasis_concept_n_emphasis`:
+.. _`__emphasis_error_handling_emphasis`:
 
-*<Concept n>*
--------------
+Error Handling & Logging
+------------------------
 
-*<explanation>*
+- Custom logger instances are used to track error messages and debug info (`app/util/logger.py`).
+- Most database and logic errors are wrapped in `try/except` blocks with meaningful `HTTPException`s.
+- Logging follows a tiered approach: debug/info/warning/error.
+
+.. _`__emphasis_session_handling_emphasis`:
+
+Session Handling
+----------------
+
+- A very basic in-memory session store is used (Python dictionary) based on client IP for the quiz logic.
+- This is **not scalable** and would need to be replaced with a session store like Redis for production.
+
+.. _`__emphasis_external_services_emphasis`:
+
+External Services
+-----------------
+
+- Uses the [PokeBase](https://github.com/PokeAPI/pokebase) library to fetch data from the PokéAPI.
+- Caching of Pokémon data is handled via `POKEMON_CACHE` environment variable, pointing to a local cache directory.
+- The service layer transforms raw API responses into clean domain models (`QuizInfo`) for frontend consumption.
+
+.. _`__emphasis_frontend_architecture_emphasis`:
+
+Frontend Architecture
+---------------------
+
+- Templated using Jinja2, served via FastAPI.
+- JavaScript handles user interactions such as form validation and async `fetch()` calls for login/register.
+- Static files (JS/CSS) are located in the `/static` folder and served via FastAPI's `StaticFiles` middleware.
+
+.. _`__emphasis_dev_ops_testing_emphasis`:
+
+DevOps & Testing
+----------------
+
+- Docker Compose is used to run the app along with its MySQL backend.
+- Integration tests use `testcontainers` to spin up isolated MySQL instances.
+- Playwright is used for end-to-end UI tests (in a separate container).
+- CI workflows are configured in GitHub Actions, with separate pipelines for API tests and UI tests.
 
 .. _section-design-decisions:
 
@@ -603,18 +640,63 @@ Quality Requirements
 Quality Tree
 ------------
 
+The following quality tree outlines the most important non-functional requirements and their subcategories:
+
+::
+
+    Quality
+    ├── Performance
+    │   ├── Fast response times
+    │   └── Efficient DB access via pooling
+    ├── Usability
+    │   ├── Intuitive UI with clear navigation
+    │   └── Simple feedback for success/failure
+    ├── Security
+    │   ├── Encrypted password storage (bcrypt)
+    │   ├── Stateless JWT-based auth
+    │   └── SQL injection protection via parameterization
+    ├── Maintainability
+    │   ├── Modular services (auth, DB, quiz logic)
+    │   └── Readable codebase with logging and comments
+    └── Testability
+        ├── Separation of logic for mocking
+        └── Unit and integration test coverage (pytest, testcontainers)
+
 .. _`_quality_scenarios`:
 
 Quality Scenarios
 -----------------
 
+The table below describes key quality scenarios relevant to DexQuiz:
+
++--------+-------------------+---------------------------------------------------------------+
+| ID     | Quality Attribute | Description                                                   |
++========+===================+===============================================================+
+| QS1    | Performance        | User submits quiz guess → System responds in under 500ms.    |
++--------+-------------------+---------------------------------------------------------------+
+| QS2    | Security           | SQL injection attempt → Input sanitized, query parameterized.|
++--------+-------------------+---------------------------------------------------------------+
+| QS3    | Usability          | User registers and logs in easily without technical barriers.|
++--------+-------------------+---------------------------------------------------------------+
+| QS4    | Reliability        | Database temporarily down → Retry logic prevents crash.      |
++--------+-------------------+---------------------------------------------------------------+
+| QS5    | Maintainability    | Dev replaces Pokémon source → Minimal change required.       |
++--------+-------------------+---------------------------------------------------------------+
+| QS6    | Testability        | Highscore logic tested in isolation using mocks.             |
++--------+-------------------+---------------------------------------------------------------+
+
 .. _section-technical-risks:
 
 Risks and Technical Debts
-=========================
+==========================
 
-- Missing HTTPS means all http requests are unencrypted.
-- Lack of asyncronous db handling means the application may perform poorly and error-ridden under high load.
+- **Missing HTTPS**: Currently, HTTP is used for all traffic. Production deployments must use HTTPS.
+- **Synchronous DB Access**: Blocking I/O via `mysql-connector-python` may degrade under heavy load.
+- **In-memory session handling**: Sessions based on client IP can be unreliable in NAT scenarios.
+- **No persistent session store**: Not scalable. Recommend migration to Redis or similar solution.
+- **External API dependency**: Pokémon data depends on PokeAPI; there is no fallback strategy.
+- **Limited server-side input validation**: Frontend JS handles most checks; backend should enforce rules as well.
+
 
 .. _section-glossary:
 

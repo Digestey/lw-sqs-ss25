@@ -9,7 +9,15 @@ on:
 jobs:
   ui-tests:
     runs-on: ubuntu-latest
-
+    env:
+      USE_TEST_POKEMON: "1"
+      MYSQL_ROOT_PASSWORD: pokeballs
+      MYSQL_DATABASE: pokedb
+      MYSQL_USER: trainer
+      MYSQL_PASSWORD: pokeballs
+      MYSQL_URL: pokedb
+      HOST_IP: 0.0.0.0
+      POKEMON_CACHE: "cache/"
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -18,7 +26,7 @@ jobs:
       run: |
         cd project/app
         docker compose version
-        docker compose up -d --build
+        docker compose -f docker-compose.test.yaml up -d --build
 
     - name: Waiting for application
       run: |
@@ -35,3 +43,8 @@ jobs:
       run: |
         docker build -t playwright-tests ./project/playwright/
         docker run --rm --network host playwright-tests
+
+    - name: print docker logs
+      run: |
+        docker logs dexquiz -n 50
+        docker logs pokedb -n 50

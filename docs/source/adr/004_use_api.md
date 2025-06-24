@@ -1,4 +1,4 @@
-# 1. API to be used in order to get information about Pokémon
+# ADR 004 - API to be used in order to get information about Pokémon
 
 Date: 05-04-2025
 

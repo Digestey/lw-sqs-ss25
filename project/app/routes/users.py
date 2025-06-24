@@ -45,19 +45,24 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         str: Identification token (JWT).
     """
     db_conn = None
+    logger.info("Login attempt for user: %s", form_data.username)
     try:
         db_conn = get_connection()
         db_user = get_user(db_conn, form_data.username)
         if db_user is None:
+            logger.warning("Login failed: User %s not found", form_data.username)
             raise HTTPException(
                 status_code=401, detail="Invalid username or password")
         user = authenticate_user(db_user, form_data.password)
         if not user:
+            logger.warning("Login failed: Invalid password for user %s", form_data.username)
             raise HTTPException(status_code=401, detail="Invalid username or password")
         token = create_access_token(data={"sub": user.username})
     except HTTPException as e:
+        logger.error("HTTPException during login for user %s: %s", form_data.username, e.detail)
         raise e
     except Exception as e:
+        logger.error("Unexpected error during login for user %s: %s", form_data.username, e)
         # print("Exception: PRINT THE DAMN EXCEPTION HERE" + str(e))
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
     finally:
@@ -76,11 +81,14 @@ async def register(request: RegisterRequest):
         HTTPException: _description_
     """
     db_conn = None
+    logger.info("Register attempt for new user: %s", request.username)
     try:
         db_conn = get_connection()
         add_user(db_conn, request.username, register_user(
             request.username, request.password))
+        logger.info("User registered successfully: %s", request.username)
     except Exception as e:
+        logger.error("Error during registration for user %s: %s", request.username, e)
         raise HTTPException(status_code=400, detail=str(e)) from e
     finally:
         if db_conn:

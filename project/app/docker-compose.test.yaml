@@ -39,6 +39,7 @@ services:
             MYSQL_URL: ${MYSQL_URL}
             HOST_IP: ${HOST_IP}
             PYTHONPATH: /app
+            USE_TEST_POKEMON: "1"
     
 #    test:
 #        build:

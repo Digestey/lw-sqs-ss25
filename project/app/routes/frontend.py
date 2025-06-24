@@ -31,6 +31,7 @@ async def home(request: Request):
     Returns:
         TemplateResponse: Returns the HTML Template to be displayed in the clients browser.
     """
+    logger.info(msg="Accessing home page.")
     return templates.TemplateResponse("index.html", {"request": request})
 
 
@@ -43,7 +44,8 @@ async def login_form(request: Request):
 
     Returns:
         TemplateResponse: HTML to be displayed in the browser
-    """
+    """ 
+    logger.info(msg="Accessing login page.")
     return templates.TemplateResponse("login.html", {"request": request})
 
 @router.get("/register", response_class=HTMLResponse)
@@ -57,6 +59,7 @@ async def register_form(request: Request):
     Returns:
         TemplateResponse: The HTML Template to be displayed
     """
+    logger.info(msg="Accessing registration page.")
     return templates.TemplateResponse("register.html", {"request": request})
 
 
@@ -71,6 +74,7 @@ async def highscore_page(request: Request):
     Returns:
         HTMLResponse: Highscores Page to be displayed in the browser.
     """
+    logger.info(msg="Accessing highscores page.")
     return templates.TemplateResponse("highscores.html", {
         "request": request
     })
@@ -85,12 +89,14 @@ async def get_quiz(request: Request):
     Returns:
         HTMLResponse: Quiz page to be displayed in the browser.
     """
+    logger.info(msg="Accessing quiz page.")
     session_id = request.client.host
     if session_id not in sessions:
         sessions[session_id] = fetch_pokemon(logger)
 
     pokemon_info = sessions[session_id]
-
+    logger.info(msg="Pokemon information captured")
+    
     return templates.TemplateResponse(
         "quiz.html",
         {

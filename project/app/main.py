@@ -10,6 +10,7 @@ import pokebase as pb
 from dotenv import load_dotenv
 from app.routes import frontend, highscores, users
 from app.util.logger import get_logger
+from app.services.database_service import is_database_healthy
 
 # Initialization of the application
 
@@ -23,6 +24,8 @@ cache_dir = os.getenv("POKEMON_CACHE", default="./cache")
 host_ip = os.getenv("HOST_IP", "127.0.0.1")
 
 pb.cache.set_cache()
+
+logger.info("Welcome to the DexQuiz Application")
 
 # print(f"{dir(pb.cache.API_CACHE)}")
 
@@ -47,5 +50,15 @@ app.include_router(users.router)
 
 
 if __name__ == "__main__":
+    if is_database_healthy(
+        host=os.getenv("MYSQL_URL"),
+        user=os.getenv("MYSQL_USER", "trainer"),
+        password=os.getenv("MYSQL_PASSWORD", "pokeballs"),
+        database=os.getenv("MYSQL_DATABASE", "pokedb")):
+        logger.info("Database is healthy.")
+    else:
+        logger.warning("Database is NOT reachable.")
+    if os.getenv("USE_TEST_POKEMON") == "1":
+        logger.info("USING TEST DATA.")
     import uvicorn
     uvicorn.run(app, host=host_ip, port=8000)

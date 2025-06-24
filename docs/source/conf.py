@@ -25,20 +25,23 @@ extensions = [
 ]
 
 source_suffix = {
-    '.rst': 'restructuredtext',
-    '.md': 'markdown',
+    ".rst": "restructuredtext",
+    ".md": "markdown",
 }
+
 
 html_theme = "furo"
 
 html_sidebars = {
-    # For all pages, default sidebar
-    '**': ['globaltoc.html', 'relations.html', 'searchbox.html'],
-
-    # For arc42 pages, use minimal sidebar (only local TOC or none)
-    'arc42/**': ['searchbox.html'],
+    "**": [
+        "sidebar/scroll-start.html",
+        "sidebar/brand.html",
+        "sidebar/search.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        "sidebar/scroll-end.html",
+    ]
 }
-
 autodoc_default_options = {
     "members": True,
     "undoc-members": True,
@@ -47,8 +50,7 @@ autodoc_default_options = {
 
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, '..', '..', '..', 'project')))
-sys.path.insert(0, os.path.abspath('../doc/adr'))
-sys.path.insert(0, os.path.abspath('../doc/arc42'))
+
 
 print("Sphinx sys.path:", sys.path)  # debug print to verify path
 
@@ -56,15 +58,9 @@ print("Sphinx sys.path:", sys.path)  # debug print to verify path
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 templates_path = ['_templates']
-exclude_patterns = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-]
-
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
 html_static_path = ['_static']
