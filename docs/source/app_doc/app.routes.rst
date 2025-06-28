@@ -20,6 +20,14 @@ app.routes.highscores module
    :show-inheritance:
    :undoc-members:
 
+app.routes.quiz module
+----------------------------
+
+.. automodule:: app.routes.quiz
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 app.routes.users module
 -----------------------
 

@@ -1,3 +1,4 @@
+import os
 import pytest
 from unittest.mock import patch, MagicMock
 from types import SimpleNamespace
@@ -14,8 +15,10 @@ def test_get_random_pokemon_id_within_range():
 
 def test_get_english_dex_entry_returns_entry():
     mock_species = SimpleNamespace(flavor_text_entries=[
-        SimpleNamespace(language=SimpleNamespace(name="en"), flavor_text="A wild Pokémon."),
-        SimpleNamespace(language=SimpleNamespace(name="jp"), flavor_text="ワイルドポケモン")
+        SimpleNamespace(language=SimpleNamespace(name="en"),
+                        flavor_text="A wild Pokémon."),
+        SimpleNamespace(language=SimpleNamespace(
+            name="jp"), flavor_text="ワイルドポケモン")
     ])
     result = pokemon_service.get_english_dex_entry(mock_species)
     assert result == "A wild Pokémon."
@@ -23,7 +26,8 @@ def test_get_english_dex_entry_returns_entry():
 
 def test_get_english_dex_entry_empty():
     mock_species = SimpleNamespace(flavor_text_entries=[
-        SimpleNamespace(language=SimpleNamespace(name="jp"), flavor_text="ワイルドポケモン")
+        SimpleNamespace(language=SimpleNamespace(
+            name="jp"), flavor_text="ワイルドポケモン")
     ])
     result = pokemon_service.get_english_dex_entry(mock_species)
     assert result == "No English entry found."
@@ -47,39 +51,9 @@ def test_extract_types():
     assert result == ["Grass", "Poison"]
 
 
-
-
 @patch("app.services.pokemon_service.pb.pokemon")
 @patch("app.services.pokemon_service.get_random_pokemon_id", return_value=1)
 def test_fetch_pokemon(mock_get_random_id, mock_pb_pokemon):
-    # Mocking pokemon object
-    mock_pokemon = MagicMock()
-    mock_pokemon.name = "bulbasaur"
-    mock_pokemon.id = 1
-    mock_pokemon.height = 7
-    mock_pokemon.weight = 69
-
-    # Mock stats
-    mock_stat = MagicMock()
-    mock_stat.stat.name = "hp"
-    mock_stat.base_stat = 45
-    mock_pokemon.stats = [mock_stat]
-
-    # Mock types
-    mock_type = MagicMock()
-    mock_type.type.name = "grass"
-    mock_pokemon.types = [mock_type]
-
-    # Mock species and dex entry
-    mock_species = MagicMock()
-    flavor_entry = MagicMock()
-    flavor_entry.language.name = "en"
-    flavor_entry.flavor_text = "A strange seed was planted on its back at birth."
-    mock_species.flavor_text_entries = [flavor_entry]
-    mock_pokemon.species = mock_species
-
-    mock_pb_pokemon.return_value = mock_pokemon
-
     # Run function
     logger = MagicMock(spec=Logger)
     result = pokemon_service.fetch_pokemon(logger)
@@ -87,6 +61,62 @@ def test_fetch_pokemon(mock_get_random_id, mock_pb_pokemon):
     # Assertions
     assert isinstance(result, QuizInfo)
     assert result.name == "bulbasaur"
-    assert result.types == ["Grass"]
-    assert result.stats == {"Hp": 45}
+    assert result.types == ["Grass", "Poison"]
+    assert result.stats == {'Hp': 45, 'Attack': 49, 'Defense': 81,
+                            'Special-attack': 60, 'Special-defense': 60, 'Speed': 80}
+
     assert "seed" in result.entry.lower()
+
+
+# Mock the pokebase.pokemon call inside fetch_pokemon
+@patch("pokebase.pokemon")
+def test_fetch_pokemon_with_use_test_pokemon_env(mock_pb_pokemon):
+    # Lets mock everything that the pokebase does (thanks chatgpt)
+    logger = MagicMock(spec=Logger)
+    mock_pokemon_instance = MagicMock()
+    mock_pokemon_instance.name = "charmander"
+    mock_pokemon_instance.id = 4
+    mock_pokemon_instance.height = 6
+    mock_pokemon_instance.weight = 85
+    mock_pokemon_instance.stats = [
+        MagicMock(stat=MagicMock(name="hp"), base_stat=39),
+        MagicMock(stat=MagicMock(name="attack"), base_stat=52),
+    ]
+    mock_type = MagicMock()
+    mock_type.type.name = "Fire"
+    mock_pokemon_instance.types = [mock_type]
+    mock_pokemon_instance.species = MagicMock()
+
+    language_mock = MagicMock()
+    language_mock.name = "en"
+
+    entry_mock = MagicMock()
+    entry_mock.flavor_text = "A fiery lizard Pokémon."
+    entry_mock.language = language_mock
+
+    mock_pokemon_instance.species.flavor_text_entries = [entry_mock]
+    mock_pb_pokemon.return_value = mock_pokemon_instance
+    os.environ["USE_TEST_POKEMON"] = "1"
+
+    # Call fetch_pokemon, check if its the test value
+    result = pokemon_service.fetch_pokemon(logger)
+    assert isinstance(result, QuizInfo)
+    assert result.name == "bulbasaur"
+    assert result.pokemon_id == 1
+    assert "THIS IS A TEST ENTRY" in result.entry
+    assert os.environ["USE_TEST_POKEMON"] == "1"
+
+    # Now set USE_TEST_POKEMON to "0" and call fetch_pokemon again
+    os.environ["USE_TEST_POKEMON"] = "0"
+    result = pokemon_service.fetch_pokemon(logger)
+
+    # Now it should be our mock.
+    assert isinstance(result, QuizInfo)
+    assert result.name == "charmander"
+    assert result.pokemon_id == 4
+    assert "fiery lizard" in result.entry.lower()
+
+    # set it back for further testing
+
+    os.environ["USE_TEST_POKEMON"] = "1"
+    assert os.environ["USE_TEST_POKEMON"] == "1"

@@ -3,7 +3,7 @@ Module database_service
 
 Contains the database connection functions.
 """
-from http.client import HTTPException
+from fastapi import HTTPException
 import time
 import os
 import mysql.connector
@@ -111,6 +111,11 @@ def add_user(cnn, username, hashed_password):
     Raises:
         ValueError: Raised, when <username> already exists
     """
+    if not username.strip():
+        raise ValueError("Username cannot be empty or whitespace.")
+    if not hashed_password:
+        raise ValueError("Password cannot be empty.")
+    
     cursor = cnn.cursor(dictionary=True)
     try:
         logger.info(msg="Adding user "+username)
@@ -124,17 +129,30 @@ def add_user(cnn, username, hashed_password):
         cursor.close()
 
 
-def delete_user(cnn, username):
-    """Deletes a user
+def delete_user(cnn, username: str) -> bool:
+    """
+    Deletes a user from the database.
 
     Args:
-        username (str): Username to be deleted
+        cnn: Database connection object.
+        username (str): Username to be deleted.
+
+    Returns:
+        bool: True if a user was deleted, False if no such user found.
     """
-    logger.info(msg="Deleting user "+username)
-    cursor = cnn.cursor(dictionary=True)
-    cursor.execute("DELETE FROM users WHERE username=(%s)", (username,))
-    cnn.commit()
-    cursor.close()
+    logger.info(f"Deleting user {username!r}")
+
+    try:
+        with cnn.cursor(dictionary=True) as cursor:
+            cursor.execute("DELETE FROM users WHERE username = %s", (username,))
+            affected_rows = cursor.rowcount
+        cnn.commit()
+        return affected_rows > 0
+    except Exception as e:
+        logger.error(f"Failed to delete user {username!r}: {e}")
+        cnn.rollback()
+        raise
+
 
 def get_user(cnn, username):
     """Fetches a user from the database by username
@@ -149,11 +167,10 @@ def get_user(cnn, username):
     logger.info(msg="Fetching user "+username)
     try:
         cursor.execute(
-            "SELECT id, username, password_hash, created_at FROM users WHERE username = %s", (
+            "SELECT username, password_hash, id, created_at FROM users WHERE username = %s", (
                 username,)
         )
         user = cursor.fetchone()
-        cursor.close()
         return user
     except mysql.connector.Error as e:
         logger.error("Error while fetching: %s", e)
@@ -250,16 +267,19 @@ def get_user_highscores(cnn, username):
     Returns:
         scores: A list of all highscores archieved by the user.
     """
-    cursor = cnn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT h.score, u.username, h.achieved_at FROM highscores h
-        JOIN users u ON h.user_id = u.id
-        WHERE u.username = %s
-        ORDER BY h.score DESC
-    """, (username,))
-    scores = cursor.fetchall()
-    cursor.close()
-    return scores
+    try:
+        with cnn.cursor(dictionary=True) as cursor:
+            cursor.execute("""
+                SELECT h.score, u.username, h.achieved_at FROM highscores h
+                JOIN users u ON h.user_id = u.id
+                WHERE u.username = %s
+                ORDER BY h.score DESC
+            """, (username,))
+            return cursor.fetchall()
+    except Exception as e:
+        logger.error("Error fetching user highscores: %s", e)
+        cnn.rollback()
+        raise
 
 
 def get_top_highscores(cnn, limit=10):
@@ -272,13 +292,16 @@ def get_top_highscores(cnn, limit=10):
         scores: List of highscores
     """
 
-    cursor = cnn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT u.username, h.score, h.achieved_at FROM highscores h
-        JOIN users u ON h.user_id = u.id
-        ORDER BY h.score DESC
-        LIMIT %s
-    """, (limit,))
-    scores = cursor.fetchall()
-    cursor.close()
-    return scores
+    try:
+        with cnn.cursor(dictionary=True) as cursor:
+            cursor.execute("""
+                SELECT u.username, h.score, h.achieved_at FROM highscores h
+                JOIN users u ON h.user_id = u.id
+                ORDER BY h.score DESC
+                LIMIT %s
+            """, (limit,))
+            return cursor.fetchall()
+    except Exception as e:
+        logger.error("Error fetching top highscores: %s", e)
+        cnn.rollback()
+        raise

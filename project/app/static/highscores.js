@@ -1,18 +1,14 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-        console.error("No token found");
-        window.location.assign("/login");
-        return;
-    }
-
     try {
         const response = await fetch("/api/highscore/10", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            credentials: "include" 
         });
+
+        if (response.status === 401) {
+            console.error("Unauthorized: redirecting to login.");
+            window.location.assign("/login");
+            return;
+        }
 
         const data = await response.json();
         console.log("Received scores:", data);
@@ -22,12 +18,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const highscoresList = document.getElementById("highscores-list");
+        highscoresList.innerHTML = "";  // clear old content
+
         data.forEach(score => {
-            const li = document.createElement("li");
-            li.textContent = `${score.username}: ${score.score}`;
-            highscoresList.appendChild(li);
+            const tr = document.createElement("tr");
+
+            const usernameTd = document.createElement("td");
+            usernameTd.textContent = score.username;
+
+            const scoreTd = document.createElement("td");
+            scoreTd.textContent = score.score;
+
+            tr.appendChild(usernameTd);
+            tr.appendChild(scoreTd);
+
+            highscoresList.appendChild(tr);
         });
     } catch (err) {
         console.error("Error loading highscores:", err);
+        alert("Failed to load highscores.");
     }
 });

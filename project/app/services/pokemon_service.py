@@ -42,7 +42,7 @@ def extract_types(types_data):
 
 
 def log_pokemon_details(logger: Logger, pokemon):
-    logger.info(msg=f"Name: {pokemon.name}", level=0)
+    logger.info(msg=f"Name: {pokemon.name}")
     logger.debug(f"Id: {pokemon.id}")
     logger.debug(f"Height: {pokemon.height}")
     logger.debug(f"Weight: {pokemon.weight}")
@@ -54,13 +54,20 @@ def log_pokemon_details(logger: Logger, pokemon):
 def fetch_pokemon(logger: Logger) -> QuizInfo:
     """Fetches a random Pokémon and returns a QuizInfo object."""
     if os.getenv("USE_TEST_POKEMON") == "1":
+        stats_dict = {
+            "Hp": 45,
+            "Attack": 49,
+            "Defense": 81,
+            "Special-attack": 60,
+            "Special-defense": 60,
+            "Speed": 80
+        }
         return QuizInfo(
             name="bulbasaur",
             pokemon_id=1,
             height=7,
             weight=69,
-            stats={"HP": 45, "Attack": 49, "Defense": 81,
-                   "Special Attack": 60, "Special Defense": 60, "Speed": 80},
+            stats=stats_dict,  # dict, JSON serializable
             types=["Grass", "Poison"],
             entry="THIS IS A TEST ENTRY: A strange seed was planted on its back at birth."
         )
