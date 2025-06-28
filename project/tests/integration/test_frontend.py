@@ -1,5 +1,7 @@
+from unittest.mock import patch
 from fastapi.testclient import TestClient
-from app.main import app
+from app.main import app  # Adjust to your actual FastAPI app entrypoint
+from app.models.quiz_info import QuizInfo
 
 client = TestClient(app)
 
@@ -17,3 +19,45 @@ def test_register_frontend():
     response = client.get("/register")
     assert response.status_code == 200
     assert "register" in response.text
+    
+def test_get_quiz_generates_new_session_and_sets_state(client):
+    # This is the test data returned by fetch_pokemon when USE_TEST_POKEMON=1
+    fake_pokemon = QuizInfo(
+        name="bulbasaur",
+        pokemon_id=1,
+        height=7,
+        weight=69,
+        stats={
+            "hp": 45,
+            "attack": 49,
+            "defense": 81,
+            "special_attack": 60,
+            "special_defense": 60,
+            "speed": 80
+        },
+        types=["Grass", "Poison"],
+        entry="THIS IS A TEST ENTRY: A strange seed was planted on its back at birth."
+    )
+
+    with patch("app.routes.quiz.get_state", return_value=None), \
+         patch("app.routes.quiz.set_state") as mock_set_state, \
+         patch("app.routes.quiz.fetch_pokemon", return_value=fake_pokemon):
+
+        response = client.get("/quiz")
+        assert response.status_code == 200
+        text = response.text.lower()
+
+        # Check if the Pokémon types are rendered (assuming lowercase filenames or strings)
+        assert "type_icons/grass.png" in text or "grass" in text
+        assert "type_icons/poison.png" in text or "poison" in text
+
+        # Check height and weight
+        assert "height: 7" in text or "7" in text
+        assert "weight: 69" in text or "69" in text
+
+        # Check the dex entry snippet
+        assert "a strange seed was planted on its back" in text
+
+        # Check that all stat values appear somewhere in the response text
+        for stat_name, stat_value in fake_pokemon.stats.items():
+            assert str(stat_value) in text

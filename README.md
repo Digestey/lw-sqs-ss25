@@ -74,11 +74,11 @@ docker run --rm --network host playwright-tests
 
 ### 🏗️ Architecture Decisions
 
-See [`doc/adr`](doc/adr) for ADRs (Architecture Decision Records).
+See [`docs/source/adr`](docs/source/adr/) for ADRs (Architecture Decision Records).
 
 ### 🧱 System Design (arc42)
 
-See [`doc/arc42`](doc/arc42) for arc42-based architectural documentation.
+See [`docs/source/arc42`](docs/source/arc42) for arc42-based architectural documentation.
 
 ---
 

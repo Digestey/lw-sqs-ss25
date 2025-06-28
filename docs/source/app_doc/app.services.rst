@@ -28,6 +28,14 @@ app.services.pokemon\_service module
    :show-inheritance:
    :undoc-members:
 
+app.services.redis\_service module
+-------------------------------------
+
+.. automodule:: app.services.redis_service
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Module contents
 ---------------
 

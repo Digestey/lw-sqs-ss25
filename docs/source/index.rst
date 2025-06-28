@@ -4,6 +4,14 @@
 Welcome to DEXQUIZ's Documentation
 ===================================
 
+This documentation provides a comprehensive overview of the DexQuiz project, including its architecture, API, and design decisions. For a quick introduction, installation instructions, and usage guidelines, please refer to the project's README file.
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Quick Start:
+
+   ../README.md
+
 .. toctree::
    :maxdepth: 1
    :caption: Detailed Documentation:

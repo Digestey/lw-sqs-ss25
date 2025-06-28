@@ -1,6 +1,9 @@
 Architecture Decision Records
 =============================
 
+This documentation collects the key Architecture Decision Records (ADRs) made throughout the development of this project. Each ADR captures a significant architectural choice, describing the context, the options considered, and the rationale behind the decision. This approach helps maintain a clear history of design decisions and facilitates future maintenance and enhancements.
+
+
 .. toctree::
    :maxdepth: 1
    
@@ -16,3 +19,4 @@ Architecture Decision Records
    009_frontend_backend_seperation.md
    010_testcontainers.md
    011_sql_param.md
+   012_use_redis.md

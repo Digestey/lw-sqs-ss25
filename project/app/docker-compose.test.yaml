@@ -19,6 +19,17 @@ services:
             retries: 5
             start_period: 30s
 
+    redis:
+        image: redis:8.2-m01-bookworm
+        ports:
+            - "6379:6379"
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
+
+
     app:
         container_name: dexquiz
         build:
@@ -40,21 +51,6 @@ services:
             HOST_IP: ${HOST_IP}
             PYTHONPATH: /app
             USE_TEST_POKEMON: "1"
-    
-#    test:
-#        build:
-#          context: .
-#          dockerfile: dockerfile
-#        depends_on:
-#          - app
-#          - pokedb
-#        environment:
-#          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#          MYSQL_DATABASE: ${MYSQL_DATABASE}
-#          MYSQL_USER: ${MYSQL_USER}
-#          MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-#          PYTHONPATH: /app
-#        command: ["pytest", "-v", "--maxfail=1", "tests/"]
 
 volumes:
     mysql_data:  # define only the named volume here

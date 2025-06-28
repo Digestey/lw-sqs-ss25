@@ -1,11 +1,12 @@
 """
 Module frontend: Defines all routes that are part of this applications frontend.
 """
-
+import uuid
 import os
-from fastapi import APIRouter, Request, Form
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from app.services.redis_service import get_state, set_state
 
 from app.services.pokemon_service import fetch_pokemon
 from app.util.logger import get_logger
@@ -82,60 +83,27 @@ async def highscore_page(request: Request):
 
 @router.get("/quiz", response_class=HTMLResponse)
 async def get_quiz(request: Request):
-    """Quiz frontend route. Fetches first pokemon
-    Args:
-        request (Request): 
+    logger.info("Accessing quiz page.")
 
-    Returns:
-        HTMLResponse: Quiz page to be displayed in the browser.
-    """
-    logger.info(msg="Accessing quiz page.")
-    session_id = request.client.host
-    if session_id not in sessions:
-        sessions[session_id] = fetch_pokemon(logger)
+    session_id = request.cookies.get("quiz_session_id")
 
-    pokemon_info = sessions[session_id]
-    logger.info(msg="Pokemon information captured")
-    
+    if session_id is None:
+        logger.warning("Missing quiz_session_id cookie in /quiz. Redirecting to /api/start_quiz")
+        return RedirectResponse(url="/api/start_quiz")
+
+    state = get_state(session_id)
+    if not state:
+        pokemon = fetch_pokemon(logger)
+        set_state(session_id, pokemon.__dict__)
+        state = pokemon.__dict__
+
+    logger.info(f"Pokemon information captured: {state}")
     return templates.TemplateResponse(
         "quiz.html",
         {
             "request": request,
             "message": "",
             "reload": False,
-            "pokemon": pokemon_info
+            "pokemon": state
         }
     )
-
-
-@router.post("/quiz", response_class=JSONResponse)
-async def post_quiz(request: Request, guess: str = Form(...)):
-    """Fetches a new Quiz question, and validates existing ones.
-
-    Args:
-        request (Request): request (form data from the ui form)
-        guess (str, optional): String. Defaults to Form(...).
-
-    Returns:
-        JSONResponse: Evaluated response if the guess was correct (and the message to be displayed)
-    """
-    session_id = request.client.host
-    if session_id not in sessions:
-        sessions[session_id] = fetch_pokemon(logger)
-
-    pokemon_info = sessions[session_id]
-    correct_answer = pokemon_info.name.lower()
-    guess = guess.strip().lower()
-
-    if guess == correct_answer:
-        del sessions[session_id]
-        return JSONResponse(content={
-            "correct": True,
-            "message": "Ding Ding Ding! We have a winner!"
-        })
-
-    return JSONResponse(content={
-        "correct": False,
-        "message": "That is incorrect. Another hint has been added to the entry.",
-        "hint": ""  # remainder of the original plan
-    })

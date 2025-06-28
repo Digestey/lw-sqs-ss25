@@ -1,12 +1,17 @@
 import pytest
-import bcrypt
+import socket
 from fastapi.testclient import TestClient
 from testcontainers.mysql import MySqlContainer
+from testcontainers.redis import RedisContainer
 from app.services.database_service import *
 from app.services.auth_service import *
 import os
 
 SQL_FILE_PATH = os.path.abspath("init.sql")
+
+@pytest.fixture
+def password_hash():
+    return "hashed_password_mock"
 
 def run_sql_file(conn, filepath):
     """Initializes schema in test DB."""
@@ -41,6 +46,26 @@ def mysql_container():
     yield container
     container.stop()
 
+def get_random_open_port() -> int:
+    """Ask OS for an unused port and return it."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))
+        return s.getsockname()[1]
+
+@pytest.fixture(scope="session", autouse=True)
+def redis_container():
+    fixed_port = get_random_open_port()
+
+    container = RedisContainer("redis:8.2-m01-bookworm") \
+        .with_bind_ports(6379, fixed_port)
+
+    with container as redis:
+        os.environ["REDIS_HOST"] = redis.get_container_host_ip()
+        os.environ["REDIS_PORT"] = str(fixed_port)
+
+        print(f"[TEST] Redis running on {os.environ['REDIS_HOST']}:{os.environ['REDIS_PORT']}")
+        yield
+
 @pytest.fixture
 def client(mysql_container):
      # Set env again for safety
@@ -50,6 +75,10 @@ def client(mysql_container):
     os.environ["MYSQL_DATABASE"] = "pokedb"
     os.environ["MYSQL_PORT"] = mysql_container.get_exposed_port(3306)
     os.environ["SECRET_KEY"] = "testsecret"
+    os.environ["USE_TEST_POKEMON"] = "1"
+    os.environ["USE_TESTING_POKEMON"] = "1"
 
     from app.main import app  # Import AFTER env vars are in place
-    return TestClient(app)
+    test_client = TestClient(app)
+    test_client.cookies.clear()  # Clean slate for each test
+    return test_client

@@ -111,7 +111,8 @@ def refresh_token(response: Response, request: Request):
                             secure=True, samesite="lax", max_age=7 * 24 * 60 * 60)
         return {"message":f"Token refreshed for {username}"}
     finally:
-        db_conn.close()
+        if db_conn:
+            db_conn.close()
 
 
 @router.post("/api/register", status_code=status.HTTP_201_CREATED)

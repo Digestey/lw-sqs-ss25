@@ -72,44 +72,58 @@ def test_get_highscores(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_user_highscores(mock_get_connection):
+    # Arrange
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
-    mock_get_connection.return_value = mock_conn
-    mock_conn.cursor.return_value = mock_cursor
 
+    # Setup context manager return for `with conn.cursor(...) as cursor`
+    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+
+    # Mock dictionary-style return
     mock_cursor.fetchall.return_value = [
         {"username": "user1", "score": 100, "achieved_at": "2025-06-01"},
         {"username": "user1", "score": 80, "achieved_at": "2025-05-30"},
     ]
 
+    # Act
     result = get_user_highscores(mock_conn, "user1")
+
+    # Assert
     assert len(result) == 2
     assert all(score["username"] == "user1" for score in result)
+    mock_conn.cursor.assert_called_once_with(dictionary=True)
     mock_cursor.execute.assert_called_once()
-    mock_cursor.close.assert_called()
-
 
 
 @patch("app.services.database_service.get_connection")
 def test_get_top_highscores(mock_get_connection):
+    # Arrange
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
-    mock_get_connection.return_value = mock_conn
-    mock_conn.cursor.return_value = mock_cursor
+
+    # Setup context manager for cursor
+    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
 
     mock_cursor.fetchall.return_value = [
         {"username": "user1", "score": 300, "achieved_at": "2025-06-01"},
         {"username": "user2", "score": 250, "achieved_at": "2025-06-01"},
     ]
 
+    # Act
     result = get_top_highscores(mock_conn, limit=2)
+
+    # Assert
     assert len(result) == 2
     assert result[0]["score"] == 300
+    assert result[1]["username"] == "user2"
+
+    mock_conn.cursor.assert_called_once_with(dictionary=True)
     mock_cursor.execute.assert_called_once_with(
         """
-        SELECT u.username, h.score, h.achieved_at FROM highscores h
-        JOIN users u ON h.user_id = u.id
-        ORDER BY h.score DESC
-        LIMIT %s
-    """, (2,))
-    mock_cursor.close.assert_called()
+                SELECT u.username, h.score, h.achieved_at FROM highscores h
+                JOIN users u ON h.user_id = u.id
+                ORDER BY h.score DESC
+                LIMIT %s
+            """, (2,)
+    )
+    

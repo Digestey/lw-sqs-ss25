@@ -1,4 +1,4 @@
-# ADR 010 - Database for testing
+# ADR 012 - Use SQL parameterization
 
 Date: 21.05.2025
 

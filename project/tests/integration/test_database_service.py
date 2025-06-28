@@ -53,17 +53,6 @@ async def test_add_get_delete_user(mysql_container):
 @pytest.mark.asyncio
 async def test_invalid_user(mysql_container):
     conn = get_connection(mysql_container.get_exposed_port(3306))
-    
-    user = get_user(conn, "invalid_user")
-    assert user is None
-    
-    delete_user(conn, "invalid_user")
-    
-    conn.close()
-    
-@pytest.mark.asyncio
-async def test_invalid_user(mysql_container):
-    conn = get_connection(mysql_container.get_exposed_port(3306))
     user = get_user(conn, "invalid_user")
     assert user is None
     delete_user(conn, "invalid_user")
@@ -182,5 +171,27 @@ async def test_get_highscores_empty(mysql_container):
     highscores = get_highscores(conn)
     assert isinstance(highscores, list)
     assert len(highscores) == 2
+
+    conn.close()
+    
+@pytest.mark.asyncio
+async def test_add_user_empty_username(mysql_container):
+    conn = get_connection(mysql_container.get_exposed_port(3306))
+    hashed_pw = bcrypt.hashpw("secret".encode(), bcrypt.gensalt()).decode()
+
+    with pytest.raises(ValueError, match="Username cannot be empty or whitespace"):
+        add_user(conn, "", hashed_pw)
+
+    with pytest.raises(ValueError, match="Username cannot be empty or whitespace"):
+        add_user(conn, "   ", hashed_pw)
+
+    conn.close()
+
+@pytest.mark.asyncio
+async def test_add_user_empty_password(mysql_container):
+    conn = get_connection(mysql_container.get_exposed_port(3306))
+
+    with pytest.raises(ValueError, match="Password cannot be empty"):
+        add_user(conn, "valid_username", "")
 
     conn.close()

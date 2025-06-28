@@ -18,10 +18,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const highscoresList = document.getElementById("highscores-list");
+        highscoresList.innerHTML = "";  // clear old content
+
         data.forEach(score => {
-            const li = document.createElement("li");
-            li.textContent = `${score.username}: ${score.score}`;
-            highscoresList.appendChild(li);
+            const tr = document.createElement("tr");
+
+            const usernameTd = document.createElement("td");
+            usernameTd.textContent = score.username;
+
+            const scoreTd = document.createElement("td");
+            scoreTd.textContent = score.score;
+
+            tr.appendChild(usernameTd);
+            tr.appendChild(scoreTd);
+
+            highscoresList.appendChild(tr);
         });
     } catch (err) {
         console.error("Error loading highscores:", err);
