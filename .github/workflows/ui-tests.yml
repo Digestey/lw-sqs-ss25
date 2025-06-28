@@ -52,5 +52,5 @@ jobs:
     - name: Print logs if tests fail
       if: failure()
       run: |
-        docker compose -f ./project/app/docker-compose.test.yaml logs dexquiz
+        docker compose -f ./project/app/docker-compose.test.yaml logs app
         docker compose -f ./project/app/docker-compose.test.yaml logs pokedb
