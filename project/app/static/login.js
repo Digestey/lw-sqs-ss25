@@ -25,11 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (formData.get("password").length < 1 || formData.get("username") < 1) {
       throw new Error("Those fields are empty, m'lardy")
     }
+    const username = formData.get("username");
+    const password = formData.get("password");
 
-    if (!(username_check(formData.get("username")) && password_check(formData.get("password")))) {
-      alert("Login failed: Username and Password requirements are not met. Username must be longer than 5 characters and password must be longer than 8 characters. Neither can exceed 100 characters.")
+    if (
+      username.length < MIN_USERNAME_LENGTH ||
+      username.length > MAX_STRING_LENGTH ||
+      password.length < MIN_PW_LENGTH ||
+      password.length > MAX_STRING_LENGTH
+    ) {
+      alert("Login failed: Username must be at least 5 characters and password at least 8. Neither can exceed 100 characters.");
       return;
     }
+
 
 
     try {

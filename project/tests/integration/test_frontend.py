@@ -47,7 +47,7 @@ def test_get_quiz_generates_new_session_and_sets_state(client):
         assert response.status_code == 200
         text = response.text.lower()
 
-        # Check if the Pokémon types are rendered (assuming lowercase filenames or strings)
+        # Check if the Pokémon types are rendered
         assert "type_icons/grass.png" in text or "grass" in text
         assert "type_icons/poison.png" in text or "poison" in text
 

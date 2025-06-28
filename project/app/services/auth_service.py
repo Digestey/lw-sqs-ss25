@@ -2,7 +2,7 @@
 Module auth_service: Authentication Service
 
 Handles everything authentication- and token-related.
-However does NOT connect to the database.
+However does NOT connect to the database directly. only via imports from the database service.
 """
 from datetime import datetime, timedelta
 import os
@@ -29,7 +29,18 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
 
 def register_user(username, password):
-    """Registers a new user."""
+    """Registers a new user by validating credentials and hashing the password.
+
+    Args:
+        username (str): The desired username.
+        password (str): The user's plain-text password.
+
+    Raises:
+        HTTPException: If the credentials do not meet the required standards.
+
+    Returns:
+        bytes: The hashed password using bcrypt.
+    """
     if not check_credentials(username, password):
         raise HTTPException(status_code=400, detail="Registration failed")
     hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -37,7 +48,18 @@ def register_user(username, password):
 
 
 def authenticate_user(db_user, plain_pw):
-    """Verifies user credentials and returns the UserInDb model if valid."""
+    """Authenticates a user by checking the provided password against the stored hash.
+
+    Args:
+        db_user (dict): A dictionary containing user data from the database.
+        plain_pw (str): The plain-text password for veryfication.
+
+    Raises:
+        HTTPException: In case the credentials are invalid or missing.
+
+    Returns:
+        UserInDb: The authenticated user data wrapped in a UserInDb model.
+    """
     username = db_user["username"]
     password_hash = db_user["password_hash"]
 
@@ -61,7 +83,16 @@ def authenticate_user(db_user, plain_pw):
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    """Creates a JWT access token."""
+    """Creates a JWT access token with an optional expiration.
+
+    Args:
+        data (dict): The payload to encode into the token.
+        expires_delta (timedelta | None, optional): The duration before the token expires. 
+            Defaults to ACCESS_TOKEN_EXPIRE_MINUTES if not provided.
+
+    Returns:
+        Token: A Token object containing the access token and its type.
+    """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now() + expires_delta
@@ -75,6 +106,15 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 
 def create_refresh_token(data: dict, expires_delta: timedelta | None = None):
+    """Creates a JWT refresh token with an optional expiration (defaults to 7 days).
+
+    Args:
+        data (dict): The payload to encode into the token.
+        expires_delta (timedelta | None, optional): Custom expiration time. Defaults to 7 days.
+
+    Returns:
+        Token: A Token object containing the refresh token and its type.
+    """
     to_encode = data.copy()
     expire = datetime.now() + (expires_delta or timedelta(days=7))
     to_encode.update({"exp": expire})
@@ -85,6 +125,18 @@ def create_refresh_token(data: dict, expires_delta: timedelta | None = None):
 
 
 def refresh_token_pair(refresh_token: str, db_conn) -> tuple[str, str, str]:
+    """Validates a refresh token and issues a new access and refresh token pair.
+
+    Args:
+        refresh_token (str): The JWT refresh token to verify.
+        db_conn: The active database connection or session.
+
+    Raises:
+        HTTPException: If the token is invalid or the user is not found.
+
+    Returns:
+        tuple[str, str, str]: A tuple containing (access_token, refresh_token, username).
+    """
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
@@ -105,7 +157,18 @@ def refresh_token_pair(refresh_token: str, db_conn) -> tuple[str, str, str]:
 
 
 def get_user_from_token(token: str, db_conn) -> UserInDb:
-    """Retrieves the user information from the JWT token."""
+    """Parses a JWT access token to extract the user and return user data.
+
+    Args:
+        token (str): The JWT access token.
+        db_conn: The active database connection or session.
+
+    Raises:
+        HTTPException: If the token is invalid or the user does not exist.
+
+    Returns:
+        UserInDb: The user information loaded into the UserInDb model.
+    """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")

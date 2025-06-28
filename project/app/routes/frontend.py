@@ -1,7 +1,7 @@
 """
 Module frontend: Defines all routes that are part of this applications frontend.
+All routes in here return a server-side rendered HTML page.
 """
-import uuid
 import os
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -83,6 +83,16 @@ async def highscore_page(request: Request):
 
 @router.get("/quiz", response_class=HTMLResponse)
 async def get_quiz(request: Request):
+    
+    """Quiz page. Uses templating cimbined with a fetch from the redis container (where
+    the quiz data is stored at) to return a server-side rendered thing
+
+    Args:
+        request (Request): reqeust body
+
+    Returns:
+        HTMLResponse: Quiz Page (rendered).
+    """
     logger.info("Accessing quiz page.")
 
     session_id = request.cookies.get("quiz_session_id")
