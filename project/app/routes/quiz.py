@@ -62,6 +62,43 @@ async def next_quiz(request: Request):
 
     return {"message": "New quiz loaded."}
 
+def get_or_create_session_id(request: Request) -> str:
+    return request.cookies.get("quiz_session_id") or str(uuid.uuid4())
+
+def get_or_init_state(session_id: str) -> dict:
+    state = get_state(session_id)
+    if not state:
+        pokemon = fetch_pokemon(logger)
+        state = pokemon.__dict__
+        state["score"] = 0
+        set_state(session_id, state)
+    return state
+
+def create_correct_response(score: int) -> JSONResponse:
+    return JSONResponse(content={
+        "correct": True,
+        "message": "Ding Ding Ding! We have a winner!",
+        "score": score
+    })
+
+def create_incorrect_response(score: int) -> JSONResponse:
+    return JSONResponse(content={
+        "correct": False,
+        "message": "That is incorrect. Another hint has been added to the entry.",
+        "hint": "",
+        "score": score
+    })
+
+def set_session_cookie(response: JSONResponse, session_id: str):
+    response.set_cookie(
+        key="quiz_session_id",
+        value=session_id,
+        max_age=1800,
+        httponly=True,
+        samesite="lax",
+        path="/"
+    )
+
 @router.post("/api/quiz", response_class=JSONResponse)
 async def post_quiz(request: Request, guess: str = Form(...)):
     """Processes the user's guess and updates the quiz session.
@@ -78,50 +115,23 @@ async def post_quiz(request: Request, guess: str = Form(...)):
         JSONResponse: A response indicating whether the guess was correct,
         the updated score, and optional hints.
     """
-    session_id = request.cookies.get("quiz_session_id")
-    if session_id is None:
-        session_id = str(uuid.uuid4())
+    session_id = get_or_create_session_id(request)
+    state = get_or_init_state(session_id)
 
-    state = get_state(session_id)
-    if not state:
-        pokemon = fetch_pokemon(logger)
-        state = pokemon.__dict__
-        state["score"] = 0
-        set_state(session_id, state)
-
-    correct_answer = state["name"].lower()
     guess = guess.strip().lower()
+    correct_answer = state["name"].lower()
     score = state.get("score", 0)
 
     if guess == correct_answer:
         score += 25
         state["score"] = score
-        set_state(session_id, state) 
-
-        response = JSONResponse(content={
-            "correct": True,
-            "message": "Ding Ding Ding! We have a winner!",
-            "score": score
-        })
-    else:
-        # You could add more hint logic here
-        state["score"] = score
         set_state(session_id, state)
-        response = JSONResponse(content={
-            "correct": False,
-            "message": "That is incorrect. Another hint has been added to the entry.",
-            "hint": "",
-            "score": score
-        })
+        response = create_correct_response(score)
+    else:
+        set_state(session_id, state)
+        response = create_incorrect_response(score)
 
     if "quiz_session_id" not in request.cookies:
-        response.set_cookie(
-            key="quiz_session_id",
-            value=session_id,
-            max_age=1800,
-            httponly=True,
-            samesite="lax",
-            path="/"
-        )
+        set_session_cookie(response, session_id)
 
     return response

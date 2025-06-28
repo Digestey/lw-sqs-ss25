@@ -88,6 +88,29 @@ def log_pokemon_details(logger: Logger, pokemon):
         logger.debug(f"{stat.stat.name.capitalize()}: {stat.base_stat}")
     logger.debug("Types: " + ", ".join(t.type.name for t in pokemon.types))
 
+def get_test_pokemon() -> QuizInfo:
+    """Returns a test pokemon during testing. Not for production use. only testing.
+
+    Returns:
+        QuizInfo: Object filled with fixed testing data.
+    """
+    stats_dict = {
+        "Hp": 45,
+        "Attack": 49,
+        "Defense": 81,
+        "Special-attack": 60,
+        "Special-defense": 60,
+        "Speed": 80
+    }
+    return QuizInfo(
+        name="bulbasaur",
+        pokemon_id=1,
+        height=7,
+        weight=69,
+        stats=stats_dict,
+        types=["Grass", "Poison"],
+        entry="THIS IS A TEST ENTRY: A strange seed was planted on its back at birth."
+    )
 
 def fetch_pokemon(logger: Logger) -> QuizInfo:
     """Fetch a random Pokémon and return a QuizInfo object for use in quizzes.
@@ -105,24 +128,7 @@ def fetch_pokemon(logger: Logger) -> QuizInfo:
         HTTPException: If the external PokéAPI is unreachable or returns invalid data.
     """
     if os.getenv("USE_TEST_POKEMON") == "1":
-        stats_dict = {
-            "Hp": 45,
-            "Attack": 49,
-            "Defense": 81,
-            "Special-attack": 60,
-            "Special-defense": 60,
-            "Speed": 80
-        }
-        return QuizInfo(
-            name="bulbasaur",
-            pokemon_id=1,
-            height=7,
-            weight=69,
-            stats=stats_dict,
-            types=["Grass", "Poison"],
-            entry="THIS IS A TEST ENTRY: A strange seed was planted on its back at birth."
-        )
-
+        return get_test_pokemon()
     try:
         pokemon_id = get_random_pokemon_id()
         pokemon = pb.pokemon(pokemon_id)
