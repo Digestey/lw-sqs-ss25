@@ -18,6 +18,8 @@ jobs:
       MYSQL_URL: pokedb
       HOST_IP: 0.0.0.0
       POKEMON_CACHE: "cache/"
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
