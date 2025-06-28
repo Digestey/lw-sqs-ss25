@@ -8,7 +8,8 @@ Can you recognize Pokémon by their stats and Pokédex entries?
 
 ## 🧩 Description
 
-DexQuiz is a full-stack quiz app built with FastAPI and MySQL. It presents users with hints about a Pokémon (such as base stats and Pokédex descriptions), and challenges them to guess the correct name.
+DexQuiz is a full-stack quiz app built with FastAPI and MySQL. It presents users with hints about a Pokémon (such as base stats and Pokédex descriptions), and challenges them to guess the correct name. It includes a highscore table, viewable
+and postable only when you are logged in.
 
 ---
 
@@ -70,7 +71,7 @@ docker run --rm --network host playwright-tests
 
 ## 📚 Documentation
 
-**!!! Under construction !!!**
+Check out the full documentation for this project in [ReadTheDocs](https://lw-sqs-ss25.readthedocs.io/en/latest/)
 
 ### 🏗️ Architecture Decisions
 
