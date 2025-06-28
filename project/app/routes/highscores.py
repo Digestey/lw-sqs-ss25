@@ -117,6 +117,35 @@ async def get_top_highscores_api(
         if db_conn:
             db_conn.close()
 
+def get_session_id_from_request(request: Request) -> str:
+    session_id = request.cookies.get("quiz_session_id")
+    if session_id is None:
+        logger.warn("No session id.")
+        raise HTTPException(status_code=400, detail="Session ID missing")
+    return session_id
+
+
+def get_score_from_redis(session_id: str) -> int:
+    redis = get_redis_client()
+    redis_key = f"quiz:{session_id}"
+    json_data = redis.get(redis_key)
+    if json_data is None:
+        logger.warn("No quiz data found.")
+        raise HTTPException(status_code=400, detail="No quiz data found")
+
+    data = json.loads(json_data)
+    score = data.get("score")
+    if score is None:
+        logger.warn("No score found in quiz data.")
+        raise HTTPException(status_code=400, detail="No score found")
+
+    return int(score)
+
+
+def reset_score_in_redis(session_id: str) -> None:
+    redis = get_redis_client()
+    redis_key = f"quiz:{session_id}"
+    redis.set(redis_key, 0)
 
 @router.post("/api/highscore")
 async def post_highscore(
@@ -140,26 +169,8 @@ async def post_highscore(
         HTTPException: 404 if the highscore could not be created.
         HTTPException: 500 on internal server or database error.
     """
-    redis = get_redis_client()
-    session_id = request.cookies.get("quiz_session_id")
-
-    if session_id is None:
-        logger.warn("No session id.")
-        raise HTTPException(status_code=400, detail="Session ID missing")
-
-    redis_key = f"quiz:{session_id}"
-    json_data = redis.get(redis_key)
-    if json_data is None:
-        logger.warn("No quiz data found.")
-        raise HTTPException(status_code=400, detail="No quiz data found")
-
-    data = json.loads(json_data)
-    score = data.get("score")
-    if score is None:
-        logger.warn("No score found in quiz data.")
-        raise HTTPException(status_code=400, detail="No score found")
-
-    score = int(score)
+    session_id = get_session_id_from_request(request)
+    score = get_score_from_redis(session_id)
 
     db_conn = None
     try:
@@ -167,15 +178,12 @@ async def post_highscore(
         logger.info(f"Storing highscore for {user.username}: {score}")
         highscore_data = add_highscore(db_conn, user.username, score)
 
-        # Reset score in Redis
-        redis.set(redis_key, 0)
-
+        reset_score_in_redis(session_id)
         return highscore_data
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:
-        raise HTTPException(
-            status_code=500, detail="Internal server error") from e
+        raise HTTPException(status_code=500, detail="Internal server error") from e
     finally:
         if db_conn:
             db_conn.close()

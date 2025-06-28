@@ -2,13 +2,6 @@ const MIN_USERNAME_LENGTH = 5;
 const MIN_PW_LENGTH = 8;
 const MAX_STRING_LENGTH = 100;
 
-function username_check(username) {
-  return !(username.length < MIN_USERNAME_LENGTH || username.length > MAX_STRING_LENGTH);
-}
-
-function password_check(password) {
-  return !(password.length < MIN_PW_LENGTH || password.length > MAX_STRING_LENGTH);
-}
 
 document.addEventListener("cr_account", function () {
   window.location.assign("/register");
