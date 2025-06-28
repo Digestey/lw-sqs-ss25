@@ -49,6 +49,8 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
             MYSQL_URL: ${MYSQL_URL}
             HOST_IP: ${HOST_IP}
+            REDIS_PORT: ${REDIS_PORT}
+            REDIS_HOST: ${REDIS_HOST}
             PYTHONPATH: /app
             USE_TEST_POKEMON: "1"
 

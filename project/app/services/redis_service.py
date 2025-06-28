@@ -7,7 +7,7 @@ from app.util.logger import get_logger
 logger = get_logger("Redis")
 
 def create_redis_client():
-    host = os.getenv("REDIS_HOST", "localhost")
+    host = os.getenv("REDIS_HOST", "redis")
     port = int(os.getenv("REDIS_PORT", 6379))
     logger.info(f"Connecting to Redis at {host}:{port}")
     return redis.Redis(
