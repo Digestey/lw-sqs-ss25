@@ -1,9 +1,20 @@
 """
 pokemon_service.py
 
-Provides functionality to fetch and format Pokémon data using PokeBase.
-"""
+This module provides functionality to fetch, format, and log Pokémon data for quiz-related use
+within the application. It leverages the PokéBase API to retrieve Pokémon stats, types, and
+Pokédex entries. It also includes a fallback mechanism for testing scenarios.
 
+Main Features:
+- Fetches a random Pokémon with complete info for quiz generation.
+- Extracts and formats stats, types, and English Pokédex entries.
+- Logs useful debug information via a custom logger.
+- Supports test mode via the USE_TEST_POKEMON environment variable.
+
+Environment Variables:
+- USE_TEST_POKEMON: If set to "1", a hardcoded test Pokémon (Bulbasaur) will be returned.
+- POKEMON_CACHE: Path for PokéBase API response caching (used by pokebase).
+"""
 import os
 import random
 import requests

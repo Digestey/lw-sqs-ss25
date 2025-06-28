@@ -54,14 +54,14 @@ Run tests using `pytest`:
 project/tests/pytest
 ```
 
-If you’re using [testcontainers](https://pypi.org/project/testcontainers/), ensure Docker is running beforehand.
+This projects tests use [testcontainers](https://pypi.org/project/testcontainers/), ensure Docker is running beforehand.
 
 
 ### Playwright UI-Tests
 
 The playwright tests are contained within the project/playwright folder. To run them follow these steps:
 
-Start the application using the docker-compose file **for testing** or set the **USE_TEST_POKEMON** flag to 1 in the environment variables.
+Start the application using the docker-compose file **for testing** or set the **USE_TEST_POKEMON** flag to 1 in the environment variables. Otherwise the quiz questions will be pulled directly from the PokeAPI and mess up the tests
 
 ```bash
 docker compose -f project/app/docker-compose.test.yaml up --build

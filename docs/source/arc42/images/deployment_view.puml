@@ -7,10 +7,14 @@ node "Host Machine" {
             component "FastAPI Web App\n(Backend + Frontend)"
             [Environment]
             note right of [Environment]
-                - Python 3.12
+                - Python 3.12+
                 - dotenv
-                - Gunicorn/Uvicorn
+                - Uvicorn
             end note
+        }
+
+        node "Redis Storage" {
+            database "Redis 8.2.0"
         }
 
         node "MySQL Database [pokedb]" {
@@ -31,5 +35,6 @@ node "Host Machine" {
 
 [User] --> "FastAPI Web App\n(Backend + Frontend)" : HTTP (port 8000)
 "FastAPI Web App\n(Backend + Frontend)" --> "MySQL 9.2.0" : SQL over port 3306
+"FastAPI Web App\n(Backend + Frontend)" --> "Redis 8.2.0" : Temporary Quiz storage
 [UI Tests] --> "FastAPI Web App\n(Backend + Frontend)" : Headless HTTP tests
 @enduml

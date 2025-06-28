@@ -2,7 +2,7 @@
 allowmixing
 skinparam componentStyle rectangle
 skinparam linetype ortho
-title DexQuiz - Detailed class diagram
+title DexQuiz - Somewhat detailed class diagram. Note: This project is python-based so there are actually no classes, just python files.
 
 package "Models" {
     class UserInDb {
@@ -41,26 +41,39 @@ package "Routes" {
         +register_form(request)
         +highscore_page(request)
         +get_quiz(request)
-        +post_quiz(request, guess)
     }
 
-    class "highscores.py" as HighscoreAPI {
-        +get_all_highscores(token)
-        +get_top_highscores_api(top, token)
-        +post_highscore(request, token)
+    
+class HighscoreAPI {
+    +get_all_highscores(user)
+    +get_top_highscores_api(top, user)
+    +post_highscore(request, user)
+}
+    class "quiz.py" as Quiz {
+        +post_quiz(request, guess)
+        +start_quiz(request)
+        +next_quiz(request)
+        +get_or_create_session_id(request)
+        +get_or_init_state(session_id)
+        +create_correct_response(score)
     }
 
     class "user.py" as UserAPI {
-        +login(form_data)
-        +register(request)
-    }
+    +login(response, form_data)
+    +refresh_token(response, request)
+    +register(request)
+    +logout(response)
+    +get_username(current_user)
+    -verify_credentials(username, password)
+    -set_login_cookies(response, username)
+}
 }
 
 package "Services" {
     class "auth_service.py" as AuthService {
         +authenticate_user(user, password)
         +create_access_token(data)
-        +get_user_from_token(token, db_conn)
+        +get_user_from_request(request)
         +register_user(username, password)
         +check_credentials(username, password)
     }
@@ -84,6 +97,15 @@ package "Services" {
         +extract_types(pokemon)
         +log_pokemon_details(pokemon)
     }
+
+    class "redis_service.py" as RedisService {
+        +get_quiz_state(client_id)
+        +set_quiz_state(client_id, quiz_info)
+        +clear_quiz_state(client_id)
+        +get_score(session_id)
+        +increment_score(session_id)
+        +reset_score(session_id)
+    }
 }
 
 package "Util" {
@@ -95,9 +117,11 @@ package "Util" {
 package "External" {
     component "Jinja2 Templates"
     component "PokeBase API"
+    component "Redis"
 }
 
 Frontend --> PokemonService
+Frontend --> RedisService
 Frontend --> Logger
 Frontend --> "Jinja2 Templates"
 Frontend --> QuizInfo
@@ -110,6 +134,11 @@ HighscoreAPI --> AuthService
 HighscoreAPI --> DatabaseService
 HighscoreAPI --> Logger
 HighscoreAPI --> HighscoreResponse
+HighscoreAPI --> RedisService
+
+Quiz --> AuthService
+Quiz --> RedisService
+Quiz --> Logger
 
 AuthService --> UserInDb
 AuthService --> Token
@@ -120,4 +149,5 @@ DatabaseService --> Logger
 PokemonService --> Logger
 PokemonService --> "PokeBase API"
 
+RedisService --> "Redis"
 @enduml

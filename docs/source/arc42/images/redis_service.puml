@@ -1,0 +1,65 @@
+@startuml
+package "Redis Service" {
+  class RedisService {
+    +create_redis_client() : Redis
+    +get_redis_client() : Redis
+    +is_redis_healthy(retries=5, delay=1) : bool
+
+    +get_state(client_id: str) : dict | None
+    +set_state(client_id: str, pokemon: dict) : void
+    +clear_state(client_id: str) : void
+
+    +get_score(session_id: str) : int
+    +increment_score(session_id: str, value=25) : void
+    +reset_score(session_id: str) : void
+
+    -_key(client_id: str) : str
+    -_score_key(session_id: str) : str
+  }
+
+  class ext.redis {
+    +Redis
+    +exceptions.ConnectionError
+  }
+
+  class ext.os {
+    +getenv(varname)
+  }
+
+  class ext.json {
+    +loads(str)
+    +dumps(dict)
+  }
+
+  class ext.time {
+    +sleep(seconds)
+  }
+
+  class Logger {
+    +info(msg)
+    +warning(msg)
+  }
+
+  RedisService --> redis : uses
+  RedisService --> os : reads REDIS_HOST, REDIS_PORT
+  RedisService --> json : (de)serializes quiz state
+  RedisService --> time : sleeps between retries
+  RedisService --> Logger : logs info/warnings
+
+  note right of RedisService::get_state
+    Loads client quiz state JSON from Redis
+  end note
+
+  note right of RedisService::set_state
+    Stores quiz state with 30 min TTL
+  end note
+
+  note right of RedisService::increment_score
+    Increments and refreshes session score TTL
+  end note
+
+  note right of RedisService::is_redis_healthy
+    Pings Redis multiple times for health check
+  end note
+}
+@enduml
