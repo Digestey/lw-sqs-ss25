@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 messageBox.textContent = "";
                 nextQuestionButton.style.display = "none";
 
-                window.location.href = "/quiz";
+                window.location.assign("/quiz");
             } else {
                 const data = await response.json();
                 alert(data.error || "Failed to load next question.");

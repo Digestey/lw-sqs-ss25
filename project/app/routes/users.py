@@ -32,64 +32,57 @@ class RegisterRequest(BaseModel):
     username: str
     password: str
 
+def verify_credentials(username: str, password: str):
+    conn = get_connection()
+    try:
+        db_user = get_user(conn, username)
+        if db_user is None:
+            logger.warning("Login failed: User %s not found", username)
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        user = authenticate_user(db_user, password)
+        if not user:
+            logger.warning("Login failed: Invalid password")
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+        return user
+    finally:
+        conn.close()
+
+def set_login_cookies(response: Response, username: str):
+    access_token = create_access_token(data={"sub": username})
+    refresh_token = create_refresh_token(data={"sub": username})
+    
+    response.set_cookie(
+        key="access_token",
+        value=access_token.access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=1800
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token.access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=604_800  # 7 days
+    )
 
 @router.post("/api/token")
 async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
-    """This is the API route where the user should log in. It's response contains
-    access and refresh Token, stored on the client in the form of cookies.
-
-    Args:
-        form_data (OAuth2PasswordRequestForm, optional): form data. Defaults to Depends().
-
-    Raises:
-        HTTPException: If anything goes wrong, access is denied by default.
-    """
-    db_conn = None
+    """Login route that returns access and refresh tokens as HTTP-only cookies."""
     logger.info("Login attempt for user: %s", form_data.username)
     try:
-        db_conn = get_connection()
-        db_user = get_user(db_conn, form_data.username)
-        if db_user is None:
-            logger.warning("Login failed: User %s not found",
-                           form_data.username)
-            raise HTTPException(
-                status_code=401, detail="Invalid username or password")
-        user = authenticate_user(db_user, form_data.password)
-        if not user:
-            logger.warning(
-                "Login failed: Invalid password for user %s", form_data.username)
-            raise HTTPException(
-                status_code=401, detail="Invalid username or password")
-        access_token = create_access_token(data={"sub": user.username})
-        refresh_token = create_refresh_token(data={"sub": user.username})
-        response.set_cookie(
-            key="access_token",
-            value=access_token.access_token,
-            httponly=True,
-            secure=True,
-            samesite="lax",
-            max_age=1800
-        )
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token.access_token,
-            httponly=True,
-            secure=True,
-            samesite="lax",
-            max_age=604_800  # This *should* equate to 7 days
-        )
+        user = verify_credentials(form_data.username, form_data.password)
+        set_login_cookies(response, user.username)
     except HTTPException as e:
-        logger.error("HTTPException during login for user %s: %s",
-                     form_data.username, e.detail)
-        raise e
+        logger.error("HTTPException during login for user %s: %s", form_data.username, e.detail)
+        raise
     except Exception as e:
-        logger.error("Unexpected error during login for user %s: %s",
-                     form_data.username, e)
-        raise HTTPException(
-            status_code=500, detail=f"Unexpected error: {str(e)}") from e
-    finally:
-        if db_conn:
-            db_conn.close()
+        logger.error("Unexpected error during login for user %s: %s", form_data.username, e)
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
+
 
 
 @router.post("/api/token/refresh")
