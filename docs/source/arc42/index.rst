@@ -126,7 +126,7 @@ Technical Context
 The following diagram shows the different services and connections between external and internal services from
 a mostly technical point of view.
 
-.. image:: images/context_diagram.png
+.. image:: images/technical_context.png
    :alt: DexQuiz architecture diagram
    :width: 700px
    :align: center
@@ -170,7 +170,7 @@ Building Block View
 Whitebox Overall System
 -----------------------
 
-.. image:: images/block_level_0.png
+.. image:: images/block_level_0.PNG
    :alt: DexQuiz architecture diagram
    :width: 1200px
    :align: center
@@ -193,7 +193,7 @@ Contained Building Blocks
 Level 2 (Container View)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: images/block_level_1.png
+.. image:: images/block_level_1.PNG
    :alt: DexQuiz architecture diagram
    :width: 700px
    :align: center
@@ -247,7 +247,7 @@ Renders user-facing pages using Jinja2 templates and JavaScript.
 Whitebox Component View
 -----------------------
 
-.. image:: images/block_level_2.png
+.. image:: images/Block_level_2.png
    :alt: Level 1 DexQuiz Architecture Diagram
    :width: 1200px
    :align: center
@@ -374,7 +374,7 @@ Level 3 - Services
 Authentication Service (auth_service)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: images/auth_service.png
+.. image:: images/auth_service.PNG
    :alt: Authentication Service Class diagram
    :width: 1200px
    :align: center
@@ -428,7 +428,7 @@ Authentication Service (auth_service)
 Database Service (database_service)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: images/database_service.png
+.. image:: images/database_service.PNG
    :alt: Database Service Class diagram
    :width: 1200px
    :align: center
@@ -477,7 +477,7 @@ Database Service (database_service)
 Pokemon Service (pokemon_service)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: images/pokemon_service.png
+.. image:: images/pokemon_service.PNG
    :alt: Pokemon Service Class diagram
    :width: 1200px
    :align: center
@@ -580,7 +580,7 @@ Login-Registration
 The following sequence diagram shows the workflow through the DexQuiz Application when
 registering a new user and logging in with user credentials.
 
-.. image:: images/login_register_sequence.png
+.. image:: images/login_register_sequence.PNG
    :alt: login_register_sequence_diagram
    :width: 1200px
    :align: center
@@ -598,7 +598,7 @@ Quiz-Highscore Sequence
 The following sequence diagram shows the quiz workflow with a logged in user choosing
 to store their achieved score to the highscore board.
 
-.. image:: images/quiz_highscore_sequence.png
+.. image:: images/quiz_highscore_sequence.PNG
    :alt: login_register_sequence_diagram
    :width: 1200px
    :align: center
