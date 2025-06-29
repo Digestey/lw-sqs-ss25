@@ -217,6 +217,9 @@ def add_highscore(cnn, username, score):
     logger.info(msg="Adding highscore "+username+" with score: "+str(score))
     try:
         # Find user_id from username
+        if score <= 0:
+            logger.error(msg="The score someone tried to submit is zero.")
+            raise HTTPException(status_code=400, detail="Score must not be zero. You lazy pig.")
         cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
         result = cursor.fetchone()
         if result is None:

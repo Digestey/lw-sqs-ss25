@@ -24,7 +24,7 @@
 <p id="quiz-message"></p>
 
 <p id="score-display" style="display: none;">
-    Your current Score: <span id="score-value">0</span>
+    Your current Score: <span id="score-value">{{ pokemon.score or 0 }}</span>
 </p>
 <button id="submit-score-button" style="display: none;">Submit score</button>
 

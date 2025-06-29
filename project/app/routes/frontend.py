@@ -114,6 +114,6 @@ async def get_quiz(request: Request):
             "request": request,
             "message": "",
             "reload": False,
-            "pokemon": state
+            "pokemon": state,
         }
     )

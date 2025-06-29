@@ -15,6 +15,11 @@ document.addEventListener("DOMContentLoaded", function () {
     scoreDisplay.style.display = "block";
     submitScoreButton.style.display = "inline-block";
 
+    let serverScore = parseInt(scoreValue.textContent);
+    if (!isNaN(serverScore)) {
+        localStorage.setItem("score", serverScore);
+    }
+
     // Load score from localStorage if you want, else rely on backend state
     let score = parseInt(localStorage.getItem("score")) || 0;
     scoreValue.textContent = score;
