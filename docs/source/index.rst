@@ -45,6 +45,12 @@ This documentation provides a comprehensive overview of the DexQuiz project, inc
 
 .. toctree::
    :maxdepth: 1
+   :caption: Test Strategy
+
+   test_strategy
+
+.. toctree::
+   :maxdepth: 1
    :caption: API Documentation
 
    api

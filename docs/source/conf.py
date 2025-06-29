@@ -9,8 +9,6 @@ import sys
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import subprocess
-
 project = 'DexQuiz'
 copyright = '2025, Lukas Waller'
 author = 'Lukas Waller'
@@ -19,7 +17,7 @@ extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",  # for Google or NumPy style docstrings
-    "sphinx.ext.viewcode",  # (optional) adds links to source code
+    "sphinx.ext.viewcode", 
     "sphinxcontrib.redoc",  # for OpenAPI display
     "sphinxcontrib.openapi"
 ]
@@ -50,6 +48,7 @@ autodoc_default_options = {
 
 
 sys.path.insert(0, os.path.abspath(os.path.join(__file__, '..', '..', '..', 'project')))
+sys.path.insert(0, os.path.abspath(os.path.join(__file__, 'arc42', 'images')))
 
 
 print("Sphinx sys.path:", sys.path)  # debug print to verify path

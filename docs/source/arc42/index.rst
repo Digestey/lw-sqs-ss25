@@ -379,6 +379,50 @@ Authentication Service (auth_service)
    :width: 1200px
    :align: center
 
+**Purpose/Responsibility**
+
+   The authentication service provides the authentication functionality by creating and evaluating tokens the user
+   is then identified by. These tokens are stored on the clients device in the form of cookies. The password is then
+   hashed and stored in the MySQL database using the Database Service
+
+**Contained Building Blocks**
+
+   - `register_user`: Registers a new user by validating credentials and hashing the password.
+   - `authenticate_user`: Authenticates a user by checking the provided password against the stored hash.
+   - `create_access_token`: Creates a new access token.
+   - `create_refresh_token`: Creates a JWT refresh token with an optional expiration (defaults to 7 days) (experimental).
+   - `refresh_token_pair`: Validates a refresh token and issues a new access and refresh token pair.
+   - `get_user_from_token`: Parses a JWT access token to extract the user and return user data. Used to display the
+   username in the frontend.
+   - `check_credentials`: Checks whether the credentials provided are according to the password requirements.
+
+**Important Interfaces**
+
+   - **MySQLConnectionPool (mysql.connector.pooling)**: Used to maintain a reusable DB connection pool.
+   - **Connector/Cursor Interface**: For executing raw SQL queries.
+   - **Environment Variables (.env)**: Controls DB config.
+   - **Logger**: Used for error tracking.
+
+**Quality/Performance Characteristics**
+
+   - Uses connection pooling for improved performance.
+   - Structured error handling with rollback and detailed logging.
+   - Retry logic in legacy connection improves reliability.
+
+**Directory/File Location**
+
+   - `app/services/database_service.py`
+
+**Fulfilled Requirements**
+
+   - User registration, deletion, authentication support.
+   - Highscore submission and leaderboard retrieval.
+
+**Open Issues/Risks**
+
+   - Some exception handling is broad (e.g., bare `except Exception`).
+   - Potential for cursor leakage if `cursor.close()` is missed on error.
+
 .. _`_white_box_building_block_x_2`:
 
 Database Service (database_service)
@@ -541,9 +585,8 @@ registering a new user and logging in with user credentials.
    :width: 1200px
    :align: center
 
--  The information whether a client is logged in or not is done via putting the token into the local storage.
-   I know its not ideal, but i feel like its suitable for this project. Ideally it should be stored in cookies.
-   WELL Now it is stored in the cookies because I felt like doing that.
+-  The information whether a client is logged in or not is done via putting the token into the clients cookies.
+   The registration process does not automatically log the user in, it merely creats the entry in the database.
 -  During the registration process, it is checked whether the username is longer than 5 characters
 -  During the registration process, it is checked whether the password is longer than 8 characters
 
@@ -582,30 +625,37 @@ Execution Environment
 
 The DexQuiz system runs in Docker containers via `docker-compose`. The following services are defined:
 
-- **dexquiz (FastAPI app)**: Handles all frontend and backend logic.
+- **app (DexQuiz, FastAPI app)**: Handles all frontend and backend logic.
 - **pokedb (MySQL)**: Stores users and highscores.
+- **redis**: Used as a temporary storage for Quiz data.
 - **Named volume `mysql_data`**: Persists database state across runs.
 
 Deployment Nodes and Containers
 -------------------------------
 
 * Docker host: Local machine
-* Two containers:
+* Three containers:
   - `dexquiz` exposes port 8000
-  - `pokedb` maps MySQL port 3306 to host port 32001
+  - `pokedb` exposes port 3306
+  - `app-redis-1` exposes por 6379
 * `.env` file controls secrets and DB config.
 
 Communication Paths
 --------------------
 
-- FastAPI (app) ↔ MySQL (pokedb) via TCP 3306 inside the Docker network.
+- FastAPI (app) <-> MySQL (pokedb) via TCP 3306 inside the Docker network.
+- FastAPI (app) <-> redis (app-redis-1) via TCP 6379 inside the docker network 
 - Frontend JS (in app) → API (`/api/...`) via HTTP 8000
 
 Health & Resilience
 -------------------
 
 - `pokedb` has a healthcheck to ensure it’s accepting connections before dependent containers start.
+- `app-redis-1` has a similar health check
 - `depends_on` ensures correct startup sequence, though no retry logic is built in for database failures at runtime.
+- `dexquiz` will only start, if the two storage containers are considered healthy. Additionally, before serving the
+webserver with uvicorn, it attempts to connect to the different containers and warns if it failed. If that is the case,
+the application will still be reachable but prone to errors. If that happens unexpectedly, check your envs.
 
 
 .. _section-concepts:
@@ -690,7 +740,7 @@ DevOps & Testing
 Architecture Decisions
 ======================
 
-See ADRs in ADR section of this documentation.
+See ADRs in **ADR** section of this documentation.
 
 .. _section-quality-scenarios:
 
@@ -750,6 +800,7 @@ The table below describes key quality scenarios relevant to DexQuiz:
 Note: due to the nature of the API that tends to take a couple of seconds (or more), the time until a question
 is ready may differ greatly, especially for the first request.
 
+For a more detailed **Test Strategy**, see the Test Strategy section in this documentation.
 
 .. _section-technical-risks:
 
