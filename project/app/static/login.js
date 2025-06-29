@@ -2,12 +2,21 @@ const MIN_USERNAME_LENGTH = 5;
 const MIN_PW_LENGTH = 8;
 const MAX_STRING_LENGTH = 100;
 
-function username_check(username) {
-  return !(username.length < MIN_USERNAME_LENGTH || username.length > MAX_STRING_LENGTH);
-}
+function validateCredentials(username, password) {
+  if (!username || !password) {
+    throw new Error("Those fields are empty, m'lardy");
+  }
 
-function password_check(password) {
-  return !(password.length < MIN_PW_LENGTH || password.length > MAX_STRING_LENGTH);
+  const tooShort = username.length < MIN_USERNAME_LENGTH || password.length < MIN_PW_LENGTH;
+  const tooLong = username.length > MAX_STRING_LENGTH || password.length > MAX_STRING_LENGTH;
+
+  if (tooShort || tooLong) {
+    alert(
+      "Login failed: Username must be at least 5 characters and password at least 8. Neither can exceed 100 characters."
+    );
+    return false;
+  }
+  return true;
 }
 
 document.addEventListener("cr_account", function () {
@@ -17,35 +26,32 @@ document.addEventListener("cr_account", function () {
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("login-form");
 
+  async function handleLogin(formData) {
+    const response = await fetch("/api/token", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => null);
+      throw new Error(errorBody?.detail || "Login failed");
+    }
+
+    alert("Login successful!");
+    window.location.assign("/");
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const formData = new FormData(form);
+    const username = formData.get("username") || "";
+    const password = formData.get("password") || "";
 
-    if (formData.get("password").length < 1 || formData.get("username") < 1) {
-      throw new Error("Those fields are empty, m'lardy")
-    }
-
-    if (!(username_check(formData.get("username")) && password_check(formData.get("password")))) {
-      alert("Login failed: Username and Password requirements are not met. Username must be longer than 5 characters and password must be longer than 8 characters. Neither can exceed 100 characters.")
-      return;
-    }
-
+    if (!validateCredentials(username, password)) return;
 
     try {
-      const response = await fetch("/api/token", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => null);
-        throw new Error(errorBody?.detail || "Login failed");
-      }
-
-      // No need to store access_token, it's already in cookies
-      alert("Login successful!");
-      window.location.assign("/");
+      await handleLogin(formData);
     } catch (error) {
       alert(error.message);
     }

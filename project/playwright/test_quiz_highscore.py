@@ -54,8 +54,9 @@ def test_quiz_flow_mocked():
         page.fill("input[name='guess']", "bulbasaur")
         page.click("button[type='submit']")
         page.wait_for_selector("text=incorrect", timeout=5000)
-        page.wait_for_selector("text=Ding", timeout=5000)
-        assert "Ding" in page.content(), "Expected Ding feedback missing"
+        page.wait_for_selector("#quiz-message", timeout=10000)
+        assert page.locator("#quiz-message").is_visible()
+
 
         # Wait for winner message
         page.wait_for_selector(

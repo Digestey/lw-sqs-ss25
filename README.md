@@ -8,7 +8,8 @@ Can you recognize Pokémon by their stats and Pokédex entries?
 
 ## 🧩 Description
 
-DexQuiz is a full-stack quiz app built with FastAPI and MySQL. It presents users with hints about a Pokémon (such as base stats and Pokédex descriptions), and challenges them to guess the correct name.
+DexQuiz is a full-stack quiz app built with FastAPI and MySQL. It presents users with hints about a Pokémon (such as base stats and Pokédex descriptions), and challenges them to guess the correct name. It includes a highscore table, viewable
+and postable only when you are logged in.
 
 ---
 
@@ -53,14 +54,14 @@ Run tests using `pytest`:
 project/tests/pytest
 ```
 
-If you’re using [testcontainers](https://pypi.org/project/testcontainers/), ensure Docker is running beforehand.
+This projects tests use [testcontainers](https://pypi.org/project/testcontainers/), ensure Docker is running beforehand.
 
 
 ### Playwright UI-Tests
 
 The playwright tests are contained within the project/playwright folder. To run them follow these steps:
 
-Start the application using the docker-compose file **for testing** or set the **USE_TEST_POKEMON** flag to 1 in the environment variables.
+Start the application using the docker-compose file **for testing** or set the **USE_TEST_POKEMON** flag to 1 in the environment variables. Otherwise the quiz questions will be pulled directly from the PokeAPI and mess up the tests
 
 ```bash
 docker compose -f project/app/docker-compose.test.yaml up --build
@@ -70,7 +71,7 @@ docker run --rm --network host playwright-tests
 
 ## 📚 Documentation
 
-**!!! Under construction !!!**
+Check out the full documentation for this project in [ReadTheDocs](https://lw-sqs-ss25.readthedocs.io/en/latest/)
 
 ### 🏗️ Architecture Decisions
 

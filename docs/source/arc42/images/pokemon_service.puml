@@ -1,0 +1,77 @@
+@startuml
+package "Pokemon Service" {
+  class PokemonService {
+    +fetch_pokemon(logger) : QuizInfo
+    +get_test_pokemon() : QuizInfo
+    +get_random_pokemon_id(min_id=1, max_id=1025) : int
+    +get_english_dex_entry(species) : str
+    +extract_stats(stats_data) : dict
+    +extract_types(types_data) : List[str]
+    +log_pokemon_details(logger, pokemon) : void
+  }
+
+  class ext.pokebase {
+    +pokemon(id)
+    +cache.set_cache(path)
+  }
+
+  class ext.requests {
+    +RequestException
+  }
+
+  class ext.dotenv {
+    +load_dotenv()
+  }
+
+  class ext.os {
+    +getenv(varname)
+  }
+
+  class Logger {
+    +info(msg)
+    +debug(msg)
+    +error(msg)
+  }
+
+  class QuizInfo {
+    -name: str
+    -pokemon_id: int
+    -height: int
+    -weight: int
+    -stats: dict
+    -types: List[str]
+    -entry: str
+  }
+
+  PokemonService --> pokebase : fetches data from
+  PokemonService --> requests : handles exceptions
+  PokemonService --> dotenv : loads environment
+  PokemonService --> os : reads USE_TEST_POKEMON
+  PokemonService --> Logger : logs events
+  PokemonService --> QuizInfo : returns
+
+  note right of PokemonService::fetch_pokemon
+    Main entry point, fetches a random Pokémon or test data
+  end note
+
+  note right of PokemonService::get_test_pokemon
+    Returns a hardcoded Bulbasaur for testing
+  end note
+
+  note right of PokemonService::get_english_dex_entry
+    Picks a random English-language Pokédex entry
+  end note
+
+  note right of PokemonService::extract_stats
+    Builds dict of base stats from API result
+  end note
+
+  note right of PokemonService::extract_types
+    Extracts and capitalizes Pokémon types
+  end note
+
+  note right of PokemonService::log_pokemon_details
+    Logs name, height, weight, stats, and types
+  end note
+}
+@enduml

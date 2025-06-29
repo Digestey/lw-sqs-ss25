@@ -4,7 +4,9 @@ package "Auth Service" {
     +register_user(username, password)
     +authenticate_user(db_user, plain_pw)
     +create_access_token(data, expires_delta)
-    +get_user_from_token(token)
+    +create_refresh_token(data, expires_delta)
+    +refresh_token_pair(refresh_token, db_conn)
+    +get_user_from_token(token, db_conn)
     +check_credentials(username, password)
   }
 
@@ -23,20 +25,44 @@ package "Auth Service" {
     -token_type: str
   }
 
+  class UserInDb {
+    -id: int
+    -username: str
+    -password_hash: str
+    -created_at: datetime
+  }
+
   AuthService --> JWT : uses
   AuthService --> Bcrypt : uses
   AuthService --> Token : returns
+  AuthService --> UserInDb : returns
 
   note right of AuthService::register_user
-    Calls check_credentials and bcrypt.hashpw
+    Validates credentials and hashes password using bcrypt
   end note
 
   note right of AuthService::authenticate_user
-    Compares hashed passwords using bcrypt.checkpw
+    Compares stored hash and plain password with bcrypt
+  end note
+
+  note right of AuthService::create_access_token
+    Encodes user data with expiry into JWT
+  end note
+
+  note right of AuthService::create_refresh_token
+    Encodes refresh data with 7-day expiry into JWT
+  end note
+
+  note right of AuthService::refresh_token_pair
+    Validates refresh token and issues new access + refresh tokens
   end note
 
   note right of AuthService::get_user_from_token
-    Decodes JWT and extracts "sub"
+    Decodes JWT, extracts username, queries database for user
+  end note
+
+  note right of AuthService::check_credentials
+    Ensures username and password match required lengths
   end note
 }
 @enduml

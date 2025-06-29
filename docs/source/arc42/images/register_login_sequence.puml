@@ -4,6 +4,7 @@ participant "DexQuiz Frontend" as FE
 participant "DexQuiz" as API
 participant "auth_service" as Auth
 participant "database_service" as DB
+participant "redis_service" as Redis
 participant "MySQL Database" as SQL
 
 == Registration Flow ==
@@ -20,7 +21,6 @@ DB --> API : success
 API --> FE : 201 Created
 
 == Login Flow ==
-
 User -> FE : Submit login form
 FE -> API : POST /api/token\nForm(username, password)
 API -> DB : get_user(username)
@@ -31,5 +31,5 @@ API -> Auth : authenticate_user(user_row, password)
 Auth --> API : UserInDb / raise 403
 API -> Auth : create_access_token({sub: username})
 Auth --> API : JWT access_token
-API --> FE : 200 OK\n{access_token, token_type}
+API --> FE : 200 OK\nSet-Cookie: access_token=...
 @enduml

@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS highscores (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+ALTER TABLE highscores ADD CONSTRAINT chk_score_nonnegative CHECK (score >= 0);
+ALTER TABLE highscores MODIFY COLUMN score BIGINT NOT NULL;
+
 -- Insert a dummy user (to test the highscore functionality)
 INSERT IGNORE INTO users (id, username, password_hash)
 VALUES (1, 'Tester', 'canttouchthis');

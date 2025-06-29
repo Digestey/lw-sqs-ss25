@@ -10,7 +10,20 @@ This documentation provides a comprehensive overview of the DexQuiz project, inc
    :maxdepth: 1
    :caption: Quick Start:
 
-   ../README.md
+   ../../README.md
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Motivation
+
+   motivation
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Environment Variables
+
+   environment_variables
+
 
 .. toctree::
    :maxdepth: 1
@@ -32,9 +45,17 @@ This documentation provides a comprehensive overview of the DexQuiz project, inc
 
 .. toctree::
    :maxdepth: 1
+   :caption: Test Strategy
+
+   test_strategy
+
+.. toctree::
+   :maxdepth: 1
    :caption: API Documentation
 
    api
+
+
 
 
 Indices and tables

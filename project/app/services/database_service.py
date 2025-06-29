@@ -21,6 +21,23 @@ CONN_POOL = None
 logger = logger.get_logger(name="db_conn")
 
 def get_pool(port=3306):
+    """Create and return a global MySQL connection pool.
+
+    If the pool has not been initialized yet, it is created with the given configuration.
+    The configuration values are pulled from environment variables, with defaults provided.
+
+    Args:
+        port (int, optional): The port number for the MySQL server. Defaults to 3306.
+
+    Returns:
+        MySQLConnectionPool: A pooled connection object to the MySQL database.
+
+    Environment Variables:
+        MYSQL_URL (str): The hostname or IP of the MySQL server. Defaults to "127.0.0.1".
+        MYSQL_USER (str): The username to authenticate with. Defaults to "trainer".
+        MYSQL_PASSWORD (str): The password for the user. Defaults to "pokeballs".
+        MYSQL_DATABASE (str): The database to connect to. Defaults to "testdb".
+    """
     global CONN_POOL
     if CONN_POOL is None:
         logger.info(msg="Connection pool created.")

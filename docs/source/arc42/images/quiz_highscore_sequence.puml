@@ -1,0 +1,43 @@
+@startuml
+actor User
+participant "DexQuiz Frontend" as FE
+participant "DexQuiz API" as API
+participant "auth_service" as Auth
+participant "database_service" as DB
+participant "redis_service" as Redis
+participant "MySQL Database" as SQL
+
+== Quiz Flow ==
+User -> FE : GET /api/quiz
+FE -> PokeAPI : fetch random pokemon (using pokebase wrapper)
+PokeAPI --> FE : Pokémon data
+FE -> Redis : SET quiz session data (quiz:{session_id} = {pokemon, score=0, hints})
+Redis --> FE : OK
+FE --> User : Quiz info (Pokemon Information)
+
+User -> FE : Submit guess
+FE -> API : POST /api/quiz/guess\nJSON(guess)
+API -> Redis : fetch quiz session data from redis (quiz:{session_id})
+Redis --> API : quiz data (score, pokemon, hints)
+API --> API : Validate guess, update score
+API -> Redis : SET updated quiz data (quiz:{session_id})
+Redis --> API : OK
+API --> FE : Result (correct/incorrect, current score)
+
+
+
+== Submit Highscore Flow ==
+User -> FE : Submit final score
+FE -> API : POST /api/highscore (with cookie: quiz_session_id)
+API -> Auth : get_current_user_from_cookie(access_token cookie)
+Auth --> API : UserInDb / HTTP 401
+API -> Redis : Get quiz data by session_id from cookie
+Redis --> API : JSON quiz data (score)
+API -> DB : add_highscore(username, score)
+DB -> SQL : INSERT INTO highscores (username, score)
+SQL --> DB : OK
+DB --> API : Highscore record
+API -> Redis : Reset score for session_id
+Redis --> API : OK
+API --> FE : Confirmation with highscore data
+@enduml
