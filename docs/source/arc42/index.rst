@@ -364,7 +364,22 @@ MySQL Database
 
 *Directory/File Location*
 
-   - External dependency defined via Docker/Testcontainers
+   - External dependency defined via Docker/Testcontainers (see docker-compose.yaml)
+
+redis
+~~~~~
+
+*Purpose/Responsibility*
+
+   Used as a temporary storage for Quiz questions and the score
+
+*Interfaces*
+
+   - Accessed via connectors from `redis_service.py`
+
+*Directory/File Location*
+
+   - External dependency defined via Docker/Testcontainers (see docker-compose.yaml)
 
 Level 3 - Services
 ------------------
@@ -758,14 +773,14 @@ The following quality tree outlines the most important non-functional requiremen
 
     Quality
     ├── Performance
-    │   ├── Fast response times
+    │   ├── Acceptable response times
     │   └── Efficient DB access via pooling
     ├── Usability
-    │   ├── Intuitive UI with clear navigation
+    │   ├── Simple UI with clear navigation
     │   └── Simple feedback for success/failure
     ├── Security
     │   ├── Encrypted password storage (bcrypt)
-    │   ├── Stateless JWT-based auth
+    │   ├── JWT-based auth
     │   └── SQL injection protection via parameterization
     ├── Maintainability
     │   ├── Modular services (auth, DB, quiz logic)
@@ -818,6 +833,8 @@ caching may need to be improved.
 
 Glossary
 ========
+
+Here terms will be added as needed.
 
 +-----------------------+-----------------------------------------------+
 | Term                  | Definition                                    |
