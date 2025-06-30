@@ -17,7 +17,7 @@ Environment Variables:
 """
 import os
 import re
-import random
+import secrets
 import requests
 from fastapi import HTTPException
 import pokebase as pb
@@ -39,7 +39,7 @@ def get_random_pokemon_id(min_id=1, max_id=1025):
     Returns:
         int: A randomly selected Pokémon ID.
     """
-    return random.randint(min_id, max_id)
+    return min_id + secrets.randbelow(max_id - min_id + 1)
 
 
 def get_english_dex_entry(species, name):
@@ -55,7 +55,7 @@ def get_english_dex_entry(species, name):
         entry.flavor_text for entry in species.flavor_text_entries
         if entry.language.name == "en"
     ]
-    entry = random.choice(english_entries) if english_entries else "No English entry found."
+    entry = secrets.choice(english_entries) if english_entries else "No English entry found."
     pattern = re.compile(rf"\b{re.escape(name)}\b", re.IGNORECASE)
     entry = pattern.sub("[Pokémon]", entry)
     return entry
