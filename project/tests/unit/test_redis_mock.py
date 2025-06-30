@@ -1,3 +1,4 @@
+"""Redis serivce unit tests (redis mocked)"""
 import pytest
 from unittest.mock import patch, MagicMock
 import json
@@ -8,6 +9,7 @@ import app.services.redis_service as redis_service
 
 @pytest.fixture
 def mock_redis_client():
+    """see if redis client mocking works"""
     with patch("app.services.redis_service.redis.Redis") as mock_redis_class:
         mock_client = MagicMock()
         mock_redis_class.return_value = mock_client
@@ -15,31 +17,38 @@ def mock_redis_client():
 
 
 def test_create_redis_client_calls_with_env_vars(monkeypatch):
+    """Client calls using envs"""
     monkeypatch.setenv("REDIS_HOST", "myhost")
     monkeypatch.setenv("REDIS_PORT", "1234")
     with patch("app.services.redis_service.redis.Redis") as mock_redis:
         redis_service.create_redis_client()
-        mock_redis.assert_called_once_with(host="myhost", port=1234, db=0, decode_responses=True)
+        mock_redis.assert_called_once_with(
+            host="myhost", port=1234, db=0, decode_responses=True)
 
 
 def test_get_redis_client_returns_new_client_instance():
+    """get redis client returns redis client, lets test that"""
     with patch("app.services.redis_service.create_redis_client") as mock_create:
         redis_service.get_redis_client()
         mock_create.assert_called_once()
 
 
 def test_is_redis_healthy_returns_true_when_ping_success(mock_redis_client):
+    """Health check works."""
     mock_redis_client.ping.return_value = True
     assert redis_service.is_redis_healthy() is True
     mock_redis_client.ping.assert_called_once()
 
 
 def test_is_redis_healthy_retries_and_returns_false(monkeypatch):
-    # Patch sleep to avoid actual delay during tests
+    """Check if health_check behaves correctly if redis isnt there."""
+    # We dont need no de-he-la-hays, we dont need no thought control
+    # hey, if you have to read this crap, why not have a laugh out of it? :)
     monkeypatch.setattr(time, "sleep", lambda _: None)
     with patch("app.services.redis_service.get_redis_client") as mock_get_client:
         mock_client = MagicMock()
-        mock_client.ping.side_effect = redis_service.redis.exceptions.ConnectionError("fail")
+        mock_client.ping.side_effect = redis_service.redis.exceptions.ConnectionError(
+            "fail")
         mock_get_client.return_value = mock_client
 
         result = redis_service.is_redis_healthy(retries=3, delay=0)
@@ -48,6 +57,7 @@ def test_is_redis_healthy_retries_and_returns_false(monkeypatch):
 
 
 def test_get_state_returns_deserialized_state(mock_redis_client):
+    """I think the test name speaks for itself"""
     sample_data = {"name": "bulbasaur", "pokemon_id": 1}
     mock_redis_client.get.return_value = json.dumps(sample_data)
 
@@ -57,12 +67,14 @@ def test_get_state_returns_deserialized_state(mock_redis_client):
 
 
 def test_get_state_returns_none_if_no_state(mock_redis_client):
+    """Return none if no state is there. duh."""
     mock_redis_client.get.return_value = None
     state = redis_service.get_state("client1")
     assert state is None
 
 
 def test_set_state_sets_json_with_expiry(mock_redis_client):
+    """Json expiry set correctly"""
     data = {"name": "charmander"}
     redis_service.set_state("client2", data)
     expected_key = "quiz:client2"
@@ -74,11 +86,13 @@ def test_set_state_sets_json_with_expiry(mock_redis_client):
 
 
 def test_clear_state_deletes_key(mock_redis_client):
+    """Clear_state deletes the key."""
     redis_service.clear_state("client3")
     mock_redis_client.delete.assert_called_once_with("quiz:client3")
 
 
 def test_get_score_returns_int_or_zero(mock_redis_client):
+    """Test if scores are stored correctly"""
     mock_redis_client.get.side_effect = ["100", None]
     score1 = redis_service.get_score("client4")
     score2 = redis_service.get_score("client5")
@@ -87,6 +101,7 @@ def test_get_score_returns_int_or_zero(mock_redis_client):
 
 
 def test_increment_score_increments_and_sets_expiry(mock_redis_client):
+    """Test score increment"""
     redis_service.increment_score("client6", value=50)
     expected_key = "quiz:client6:score"
     mock_redis_client.incrby.assert_called_once_with(expected_key, 50)
@@ -94,5 +109,6 @@ def test_increment_score_increments_and_sets_expiry(mock_redis_client):
 
 
 def test_reset_score_deletes_score_key(mock_redis_client):
+    """Test reset score"""
     redis_service.reset_score("client7")
     mock_redis_client.delete.assert_called_once_with("quiz:client7:score")

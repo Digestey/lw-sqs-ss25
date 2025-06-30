@@ -2,6 +2,7 @@
 Main entry point for the DexQuiz Application
 """
 import os
+import sys
 import logging
 from pathlib import Path
 from fastapi import FastAPI
@@ -52,7 +53,7 @@ app.include_router(quiz.router)
 
 if __name__ == "__main__":
     logger.info(
-    f"The address for redis: {os.getenv("REDIS_HOST", "NONE")}:{os.getenv("REDIS_PORT", "NONE")}")
+        f"The address for redis: {os.getenv("REDIS_HOST", "NONE")}:{os.getenv("REDIS_PORT", "NONE")}")
     # MySQL, are you there?
     if is_database_healthy(
             host=os.getenv("MYSQL_URL"),
@@ -61,13 +62,15 @@ if __name__ == "__main__":
             database=os.getenv("MYSQL_DATABASE", "pokedb")):
         logger.info("Database is healthy.")
     else:
-        logger.warning("Database is NOT reachable.")
+        logger.warning("Database is NOT reachable. Terminating application.")
+        sys.exit(1)
 
     # Redis, are you there?
     if is_redis_healthy():
         logger.info("Redis is healthy.")
     else:
-        logger.warning("Redis is NOT reachable.")
+        logger.warning("Redis is NOT reachable. Terminating application")
+        sys.exit(1)
 
     # Wait, its a test setup? Always has been
     if os.getenv("USE_TEST_POKEMON") == "1":

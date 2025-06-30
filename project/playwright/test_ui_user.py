@@ -1,6 +1,6 @@
+"""Login user Playwright tests"""
 import os
 import uuid
-import pytest
 from playwright.sync_api import Page, Dialog
 
 BASE_URL = os.getenv("BASE_URL", "http://0.0.0.0:8000")

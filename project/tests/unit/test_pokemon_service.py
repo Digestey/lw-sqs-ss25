@@ -1,5 +1,5 @@
+"""Pokemon Service Unit tests"""
 import os
-import pytest
 from unittest.mock import patch, MagicMock
 from types import SimpleNamespace
 from app.services import pokemon_service
@@ -8,32 +8,72 @@ from app.util.logger import Logger
 
 
 def test_get_random_pokemon_id_within_range():
+    """Test if get random pokemon works"""
     for _ in range(100):
         pid = pokemon_service.get_random_pokemon_id(1, 10)
         assert 1 <= pid <= 10
 
 
 def test_get_english_dex_entry_returns_entry():
+    """Test if it really does only extract english pokedex entries"""
     mock_species = SimpleNamespace(flavor_text_entries=[
         SimpleNamespace(language=SimpleNamespace(name="en"),
                         flavor_text="A wild Pokémon."),
         SimpleNamespace(language=SimpleNamespace(
             name="jp"), flavor_text="ワイルドポケモン")
     ])
-    result = pokemon_service.get_english_dex_entry(mock_species)
+    result = pokemon_service.get_english_dex_entry(mock_species, name="Regigigas")
     assert result == "A wild Pokémon."
 
 
 def test_get_english_dex_entry_empty():
+    """Check if it tells an error if no entry was found"""
     mock_species = SimpleNamespace(flavor_text_entries=[
         SimpleNamespace(language=SimpleNamespace(
             name="jp"), flavor_text="ワイルドポケモン")
     ])
-    result = pokemon_service.get_english_dex_entry(mock_species)
+    result = pokemon_service.get_english_dex_entry(mock_species, name="Gengar")
     assert result == "No English entry found."
 
 
+def test_get_english_dex_entry_replaces_pokemon_name():
+    """Ensure Pokémon name is replaced in the dex entry."""
+    mock_species = SimpleNamespace(flavor_text_entries=[
+        SimpleNamespace(language=SimpleNamespace(name="en"),
+                        flavor_text="Bulbasaur can be seen napping in bright sunlight.")
+    ])
+    result = pokemon_service.get_english_dex_entry(
+        mock_species, name="Bulbasaur")
+    assert "[Pokémon]" in result
+    assert "Bulbasaur" not in result
+
+
+def test_get_english_dex_entry_case_insensitive_and_word_boundary():
+    """Ensure name replacement is case-insensitive and avoids partial matches."""
+    mock_species = SimpleNamespace(flavor_text_entries=[
+        SimpleNamespace(language=SimpleNamespace(name="en"),
+                        flavor_text="bulbasaur is cute. Bulbasaur is strong.")
+    ])
+    result = pokemon_service.get_english_dex_entry(
+        mock_species, name="Bulbasaur")
+    assert result.count("[Pokémon]") == 2
+    assert "bulbasaur" not in result.lower()
+
+
+def test_get_english_dex_entry_avoids_partial_replacement():
+    """Ensure similar names inside other words are not mistakenly replaced."""
+    mock_species = SimpleNamespace(flavor_text_entries=[
+        SimpleNamespace(language=SimpleNamespace(name="en"),
+                        flavor_text="This Pokémon is a real bulbasaurnado!")
+    ])
+    result = pokemon_service.get_english_dex_entry(
+        mock_species, name="Bulbasaur")
+    # The word 'bulbasaurnado' should remain untouched
+    assert "bulbasaurnado" in result
+
+
 def test_extract_stats():
+    """Check if the stats are extracted correctly"""
     mock_stats = [
         SimpleNamespace(stat=SimpleNamespace(name="hp"), base_stat=45),
         SimpleNamespace(stat=SimpleNamespace(name="attack"), base_stat=60)
@@ -43,6 +83,7 @@ def test_extract_stats():
 
 
 def test_extract_types():
+    """Check if the types are extracted correctly"""
     mock_types = [
         SimpleNamespace(type=SimpleNamespace(name="grass")),
         SimpleNamespace(type=SimpleNamespace(name="poison"))
@@ -54,7 +95,7 @@ def test_extract_types():
 @patch("app.services.pokemon_service.pb.pokemon")
 @patch("app.services.pokemon_service.get_random_pokemon_id", return_value=1)
 def test_fetch_pokemon(mock_get_random_id, mock_pb_pokemon):
-    # Run function
+    """Testing fetch_pokemon by mocking the API"""
     logger = MagicMock(spec=Logger)
     result = pokemon_service.fetch_pokemon(logger)
 
@@ -71,6 +112,7 @@ def test_fetch_pokemon(mock_get_random_id, mock_pb_pokemon):
 # Mock the pokebase.pokemon call inside fetch_pokemon
 @patch("pokebase.pokemon")
 def test_fetch_pokemon_with_use_test_pokemon_env(mock_pb_pokemon):
+    """Testing fetch_pokemon by using the env"""
     # Lets mock everything that the pokebase does (thanks chatgpt)
     logger = MagicMock(spec=Logger)
     mock_pokemon_instance = MagicMock()
@@ -110,7 +152,7 @@ def test_fetch_pokemon_with_use_test_pokemon_env(mock_pb_pokemon):
     os.environ["USE_TEST_POKEMON"] = "0"
     result = pokemon_service.fetch_pokemon(logger)
 
-    # Now it should be our mock.
+    # Now it should be the mock.
     assert isinstance(result, QuizInfo)
     assert result.name == "charmander"
     assert result.pokemon_id == 4

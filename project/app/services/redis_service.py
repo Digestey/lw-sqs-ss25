@@ -9,6 +9,7 @@ from app.util.logger import get_logger
 
 logger = get_logger("Redis")
 
+
 def create_redis_client():
     """Returns a redis client to connect to a redis container.
 
@@ -25,6 +26,7 @@ def create_redis_client():
         decode_responses=True
     )
 
+
 def get_redis_client():
     """ Returns a redis client. a wrapper function to build lazy initalization
 
@@ -32,6 +34,7 @@ def get_redis_client():
         Redis: Redis client
     """
     return create_redis_client()
+
 
 def is_redis_healthy(retries=5, delay=1):
     """Redis health Check. Tries to connect to redis service and will produce a warinig
@@ -54,7 +57,8 @@ def is_redis_healthy(retries=5, delay=1):
             time.sleep(delay)
     return False
 
-def _key(client_id: str) -> str:   
+
+def _key(client_id: str) -> str:
     """Generate the Redis key for storing quiz state for a specific client.
 
     Args:
@@ -64,6 +68,7 @@ def _key(client_id: str) -> str:
         str: The Redis key used to store the quiz state.
     """
     return f"quiz:{client_id}"
+
 
 def get_state(client_id: str):
     """Retrieve the current quiz state for a given client from Redis.
@@ -78,6 +83,7 @@ def get_state(client_id: str):
     state = client.get(_key(client_id))
     return json.loads(state) if state else None
 
+
 def set_state(client_id: str, pokemon: dict):
     """Set or update the current quiz state for a given client in Redis.
 
@@ -88,6 +94,7 @@ def set_state(client_id: str, pokemon: dict):
     client = get_redis_client()
     client.setex(_key(client_id), 1800, json.dumps(pokemon))
 
+
 def clear_state(client_id: str):
     """Clear the quiz state for a given client from Redis.
 
@@ -96,6 +103,7 @@ def clear_state(client_id: str):
     """
     client = get_redis_client()
     client.delete(_key(client_id))
+
 
 def _score_key(session_id: str) -> str:
     """Generate the Redis key for storing quiz score for a specific session.
@@ -107,6 +115,7 @@ def _score_key(session_id: str) -> str:
         str: The Redis key used to store the quiz score.
     """
     return f"quiz:{session_id}:score"
+
 
 def get_score(session_id: str) -> int:
     """Retrieve the current score for a given session from Redis.
@@ -121,6 +130,7 @@ def get_score(session_id: str) -> int:
     score = client.get(_score_key(session_id))
     return int(score) if score else 0
 
+
 def increment_score(session_id: str, value: int = 25):
     """Increment the score for a given session in Redis.
 
@@ -132,7 +142,8 @@ def increment_score(session_id: str, value: int = 25):
     client.incrby(_score_key(session_id), value)
     client.expire(_score_key(session_id), 1800)
 
-def reset_score(session_id: str):    
+
+def reset_score(session_id: str):
     """Reset the quiz score for a given session in Redis.
 
     Args:

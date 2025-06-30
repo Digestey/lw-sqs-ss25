@@ -57,7 +57,8 @@ Requirements Overview
    * - 13
      - The highscore and user data will be stored using a database.
 
-
+The application is **explicitly** not designed to be run on a webserver and it is only supported
+to run this locally. (see Technical Debt section of this documentation)
 
 
 .. _`_quality_goals`:
@@ -364,7 +365,22 @@ MySQL Database
 
 *Directory/File Location*
 
-   - External dependency defined via Docker/Testcontainers
+   - External dependency defined via Docker/Testcontainers (see docker-compose.yaml)
+
+redis
+~~~~~
+
+*Purpose/Responsibility*
+
+   Used as a temporary storage for Quiz questions and the score
+
+*Interfaces*
+
+   - Accessed via connectors from `redis_service.py`
+
+*Directory/File Location*
+
+   - External dependency defined via Docker/Testcontainers (see docker-compose.yaml)
 
 Level 3 - Services
 ------------------
@@ -758,14 +774,14 @@ The following quality tree outlines the most important non-functional requiremen
 
     Quality
     ├── Performance
-    │   ├── Fast response times
+    │   ├── Acceptable response times
     │   └── Efficient DB access via pooling
     ├── Usability
-    │   ├── Intuitive UI with clear navigation
+    │   ├── Simple UI with clear navigation
     │   └── Simple feedback for success/failure
     ├── Security
     │   ├── Encrypted password storage (bcrypt)
-    │   ├── Stateless JWT-based auth
+    │   ├── JWT-based auth
     │   └── SQL injection protection via parameterization
     ├── Maintainability
     │   ├── Modular services (auth, DB, quiz logic)
@@ -808,6 +824,7 @@ Risks and Technical Debts
 ==========================
 
 - **Missing HTTPS**: Currently, HTTP is used for all traffic. Production deployments must use HTTPS.
+This also makes authentification somewhat insecure.
 - **Synchronous DB Access**: Blocking I/O via `mysql-connector-python` may degrade under heavy load.
 - **Basic API Caching**: Caching the resources from the PokeAPI would make sense, DexQuiz already
 uses the in-built caching from the pokebase wrapper, but if images are added at a later point, that
@@ -818,6 +835,8 @@ caching may need to be improved.
 
 Glossary
 ========
+
+Here terms will be added as needed.
 
 +-----------------------+-----------------------------------------------+
 | Term                  | Definition                                    |

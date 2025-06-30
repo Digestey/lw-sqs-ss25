@@ -1,3 +1,4 @@
+"""Defining a good workflow"""
 import pytest
 import json
 import re
@@ -5,6 +6,7 @@ from app.services.redis_service import get_redis_client
 
 @pytest.mark.asyncio
 async def test_full_expected_workflow(client, mysql_container):
+    """This is a full-fledged workflow like any normal user would do it"""
     # Register test user
     register_response = client.post("/api/register", json={
         "username": "e2euser",

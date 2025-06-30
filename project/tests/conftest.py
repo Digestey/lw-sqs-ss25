@@ -9,9 +9,12 @@ import os
 
 SQL_FILE_PATH = os.path.abspath("init.sql")
 
+
 @pytest.fixture
 def password_hash():
+    """Lets mock a hashed password"""
     return "hashed_password_mock"
+
 
 def run_sql_file(conn, filepath):
     """Initializes schema in test DB."""
@@ -30,7 +33,9 @@ def run_sql_file(conn, filepath):
 
 @pytest.fixture(scope="session")
 def mysql_container():
-    container = MySqlContainer("mysql:9.2.0", username="testuser", password="testpass", dbname="pokedb")
+    """Connecting to test container"""
+    container = MySqlContainer(
+        "mysql:9.2.0", username="testuser", password="testpass", dbname="pokedb")
     container.start()
     port = container.get_exposed_port(3306)
 
@@ -46,14 +51,17 @@ def mysql_container():
     yield container
     container.stop()
 
+
 def get_random_open_port() -> int:
     """Ask OS for an unused port and return it."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(('', 0))
         return s.getsockname()[1]
 
+
 @pytest.fixture(scope="session", autouse=True)
 def redis_container():
+    """Connects to redis testcontainer"""
     fixed_port = get_random_open_port()
 
     container = RedisContainer("redis:8.2-m01-bookworm") \
@@ -63,12 +71,15 @@ def redis_container():
         os.environ["REDIS_HOST"] = redis.get_container_host_ip()
         os.environ["REDIS_PORT"] = str(fixed_port)
 
-        print(f"[TEST] Redis running on {os.environ['REDIS_HOST']}:{os.environ['REDIS_PORT']}")
+        print(
+            f"[TEST] Redis running on {os.environ['REDIS_HOST']}:{os.environ['REDIS_PORT']}")
         yield
+
 
 @pytest.fixture
 def client(mysql_container):
-     # Set env again for safety
+    """Lets start the test client."""
+    # Set env again for safety
     os.environ["MYSQL_URL"] = "127.0.0.1"
     os.environ["MYSQL_USER"] = "testuser"
     os.environ["MYSQL_PASSWORD"] = "testpass"

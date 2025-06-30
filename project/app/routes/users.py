@@ -32,32 +32,36 @@ class RegisterRequest(BaseModel):
     username: str
     password: str
 
+
 def verify_credentials(username: str, password: str):
     conn = get_connection()
     try:
         db_user = get_user(conn, username)
         if db_user is None:
             logger.warning("Login failed: User %s not found", username)
-            raise HTTPException(status_code=401, detail="Invalid username or password")
+            raise HTTPException(
+                status_code=401, detail="Invalid username or password")
 
         user = authenticate_user(db_user, password)
         if not user:
             logger.warning("Login failed: Invalid password")
-            raise HTTPException(status_code=401, detail="Invalid username or password")
+            raise HTTPException(
+                status_code=401, detail="Invalid username or password")
         return user
     finally:
         conn.close()
 
+
 def set_login_cookies(response: Response, username: str):
     access_token = create_access_token(data={"sub": username})
     refresh_token = create_refresh_token(data={"sub": username})
-    
+
     response.set_cookie(
         key="access_token",
         value=access_token.access_token,
         httponly=True,
         secure=True,
-        samesite="lax",
+        samesite="strict",
         max_age=1800
     )
     response.set_cookie(
@@ -65,9 +69,10 @@ def set_login_cookies(response: Response, username: str):
         value=refresh_token.access_token,
         httponly=True,
         secure=True,
-        samesite="lax",
+        samesite="strict",
         max_age=604_800  # 7 days
     )
+
 
 @router.post("/api/token")
 async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
@@ -77,12 +82,14 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
         user = verify_credentials(form_data.username, form_data.password)
         set_login_cookies(response, user.username)
     except HTTPException as e:
-        logger.error("HTTPException during login for user %s: %s", form_data.username, e.detail)
+        logger.error("HTTPException during login for user %s: %s",
+                     form_data.username, e.detail)
         raise
     except Exception as e:
-        logger.error("Unexpected error during login for user %s: %s", form_data.username, e)
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
-
+        logger.error("Unexpected error during login for user %s: %s",
+                     form_data.username, e)
+        raise HTTPException(
+            status_code=500, detail=f"Unexpected error: {str(e)}") from e
 
 
 @router.post("/api/token/refresh")
@@ -99,10 +106,10 @@ def refresh_token(response: Response, request: Request):
             old_token, db_conn)
 
         response.set_cookie("access_token", access_token, httponly=True,
-                            secure=True, samesite="lax", max_age=1800)
+                            secure=True, samesite="strict", max_age=1800)
         response.set_cookie("refresh_token", new_refresh_token, httponly=True,
-                            secure=True, samesite="lax", max_age=7 * 24 * 60 * 60)
-        return {"message":f"Token refreshed for {username}"}
+                            secure=True, samesite="strict", max_age=7 * 24 * 60 * 60)
+        return {"message": f"Token refreshed for {username}"}
     finally:
         if db_conn:
             db_conn.close()
@@ -132,11 +139,13 @@ async def register(request: RegisterRequest):
         if db_conn:
             db_conn.close()
 
+
 @router.post("/api/logout")
 def logout(response: Response):
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return {"detail": "Logged out successfully"}
+
 
 @router.get("/api/username")
 async def get_username(current_user: dict = Depends(get_current_user_from_cookie)):

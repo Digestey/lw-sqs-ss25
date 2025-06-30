@@ -1,6 +1,6 @@
+"""Database service user part unit tests"""
 from unittest.mock import patch, MagicMock
 import pytest
-import bcrypt
 import mysql.connector
 
 from app.services.database_service import add_user, delete_user, get_user
@@ -8,6 +8,7 @@ from app.services.database_service import add_user, delete_user, get_user
 
 @patch("app.services.database_service.get_connection")
 def test_add_user_success(mock_get_connection):
+    """Add user test"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
@@ -22,6 +23,7 @@ def test_add_user_success(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_add_user_integrity_error(mock_get_connection):
+    """Cant accept the same username twice"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_cursor.execute.side_effect = mysql.connector.IntegrityError()
@@ -36,10 +38,11 @@ def test_add_user_integrity_error(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_delete_user(mock_get_connection):
+    """Check if you can delete a user. Unused."""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor 
+    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
 
     mock_cursor.rowcount = 1
 
@@ -54,6 +57,7 @@ def test_delete_user(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_user_found(mock_get_connection):
+    """Test get_user"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_cursor.fetchone.return_value = {
@@ -70,6 +74,7 @@ def test_get_user_found(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_user_not_found(mock_get_connection):
+    """Test get user with unknown user"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_cursor.fetchone.return_value = None

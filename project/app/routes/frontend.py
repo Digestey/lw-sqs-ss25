@@ -45,15 +45,16 @@ async def login_form(request: Request):
 
     Returns:
         TemplateResponse: HTML to be displayed in the browser
-    """ 
+    """
     logger.info(msg="Accessing login page.")
     return templates.TemplateResponse("login.html", {"request": request})
+
 
 @router.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
     """Register Route. Provides the frontend to give users the opportunity to sell their
        soul to this website.
-    
+
     Args:
         request (Request): Request
 
@@ -83,7 +84,6 @@ async def highscore_page(request: Request):
 
 @router.get("/quiz", response_class=HTMLResponse)
 async def get_quiz(request: Request):
-    
     """Quiz page. Uses templating cimbined with a fetch from the redis container (where
     the quiz data is stored at) to return a server-side rendered thing
 
@@ -98,7 +98,8 @@ async def get_quiz(request: Request):
     session_id = request.cookies.get("quiz_session_id")
 
     if session_id is None:
-        logger.warning("Missing quiz_session_id cookie in /quiz. Redirecting to /api/start_quiz")
+        logger.warning(
+            "Missing quiz_session_id cookie in /quiz. Redirecting to /api/start_quiz")
         return RedirectResponse(url="/api/start_quiz")
 
     state = get_state(session_id)
@@ -114,6 +115,6 @@ async def get_quiz(request: Request):
             "request": request,
             "message": "",
             "reload": False,
-            "pokemon": state
+            "pokemon": state,
         }
     )

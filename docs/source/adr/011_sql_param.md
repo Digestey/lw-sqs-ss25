@@ -1,4 +1,4 @@
-# ADR 012 - Use SQL parameterization
+# ADR 011 - Use SQL parameterization
 
 Date: 21.05.2025
 
@@ -33,4 +33,3 @@ SQL query shall be added as one string.
 - **Cons**:
   - Manual query construction still carries some risk if parameterization is not applied consistently.
   - Lacks advanced abstraction and migration tools that come with ORMs like SQLAlchemy.
-

@@ -16,7 +16,8 @@ Environment Variables:
 - POKEMON_CACHE: Path for PokéBase API response caching (used by pokebase).
 """
 import os
-import random
+import re
+import secrets
 import requests
 from fastapi import HTTPException
 import pokebase as pb
@@ -38,10 +39,10 @@ def get_random_pokemon_id(min_id=1, max_id=1025):
     Returns:
         int: A randomly selected Pokémon ID.
     """
-    return random.randint(min_id, max_id)
+    return min_id + secrets.randbelow(max_id - min_id + 1)
 
 
-def get_english_dex_entry(species):
+def get_english_dex_entry(species, name):
     """Retrieve a random English-language Pokédex entry from a Pokémon species.
 
     Args:
@@ -54,7 +55,10 @@ def get_english_dex_entry(species):
         entry.flavor_text for entry in species.flavor_text_entries
         if entry.language.name == "en"
     ]
-    return random.choice(english_entries) if english_entries else "No English entry found."
+    entry = secrets.choice(english_entries) if english_entries else "No English entry found."
+    pattern = re.compile(rf"\b{re.escape(name)}\b", re.IGNORECASE)
+    entry = pattern.sub("[Pokémon]", entry)
+    return entry
 
 
 def extract_stats(stats_data):
@@ -99,6 +103,7 @@ def log_pokemon_details(logger: Logger, pokemon):
         logger.debug(f"{stat.stat.name.capitalize()}: {stat.base_stat}")
     logger.debug("Types: " + ", ".join(t.type.name for t in pokemon.types))
 
+
 def get_test_pokemon() -> QuizInfo:
     """Returns a test pokemon during testing. Not for production use. only testing.
 
@@ -122,6 +127,7 @@ def get_test_pokemon() -> QuizInfo:
         types=["Grass", "Poison"],
         entry="THIS IS A TEST ENTRY: A strange seed was planted on its back at birth."
     )
+
 
 def fetch_pokemon(logger: Logger) -> QuizInfo:
     """Fetch a random Pokémon and return a QuizInfo object for use in quizzes.
@@ -148,7 +154,7 @@ def fetch_pokemon(logger: Logger) -> QuizInfo:
 
         stats = extract_stats(pokemon.stats)
         types = extract_types(pokemon.types)
-        entry = get_english_dex_entry(pokemon.species)
+        entry = get_english_dex_entry(pokemon.species, pokemon.name)
 
         return QuizInfo(
             name=pokemon.name,
@@ -162,4 +168,5 @@ def fetch_pokemon(logger: Logger) -> QuizInfo:
 
     except (requests.exceptions.RequestException, AttributeError, KeyError) as e:
         logger.error(f"Failed to fetch Pokémon data: {e}")
-        raise HTTPException(status_code=503, detail="External Pokémon API is unavailable.") from e
+        raise HTTPException(
+            status_code=503, detail="External Pokémon API is unavailable.") from e

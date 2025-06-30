@@ -1,6 +1,6 @@
 # ADR 012 - Redis as game storage
 
-Date: 21.05.2025
+Date: 26.05.2025
 
 ## Status
 

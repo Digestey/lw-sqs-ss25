@@ -30,4 +30,3 @@ For DexQuiz, we require a stateless and scalable authentication mechanism that i
 - **Cons:**
   - JWTs must be securely signed and verified.
   - Token storage on the client must be secure (e.g., not accessible via JS to avoid XSS).
-  - Tok

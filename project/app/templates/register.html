@@ -3,20 +3,20 @@
 {% block title %}Register - DEXQUIZ{% endblock %}
 
 {% block content %}
-    <h1>Come join the DexQuiz 'community'!</h1>
+<h1>Come join the DexQuiz 'community'!</h1>
 
-    <p>Considering registering? Good.</p>
-    <p>Registration is required in order to access the scoreboard.</p>
-    
-    <form id="register-form">
-        <label>Username:</label>
-        <input type="text" name="username" required>
-        <label>Password:</label>
-        <input type="password" name="password" required>
-        <label>Repeat password:</label>
-        <input type="password" name="repeat_password" required>
-        <button type="submit">Register Now!</button>
-    </form>
+<p>Considering registering? Good.</p>
+<p>Registration is required in order to access the scoreboard.</p>
 
-    <script type="module" src="/static/register.js"></script>
+<form id="register-form">
+    <label>Username:</label>
+    <input type="text" name="username" required>
+    <label>Password:</label>
+    <input type="password" name="password" required>
+    <label>Repeat password:</label>
+    <input type="password" name="repeat_password" required>
+    <button type="submit">Register Now!</button>
+</form>
+
+<script type="module" src="/static/register.js"></script>
 {% endblock %}

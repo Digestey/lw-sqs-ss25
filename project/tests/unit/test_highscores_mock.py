@@ -1,3 +1,4 @@
+"""Database service highscore related unit tests."""
 from unittest.mock import patch, MagicMock
 import pytest
 
@@ -11,6 +12,7 @@ from app.services.database_service import (
 
 @patch("app.services.database_service.get_connection")
 def test_add_highscore_success(mock_get_connection):
+    """Check if you can add a highscore"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
@@ -27,7 +29,8 @@ def test_add_highscore_success(mock_get_connection):
     result = add_highscore(mock_conn, "testuser", 100)
 
     assert result["score"] == 100
-    mock_cursor.execute.assert_any_call("SELECT id FROM users WHERE username = %s", ("testuser",))
+    mock_cursor.execute.assert_any_call(
+        "SELECT id FROM users WHERE username = %s", ("testuser",))
     mock_cursor.execute.assert_any_call(
         "INSERT INTO highscores (user_id, score) VALUES (%s, %s)", (1, 100)
     )
@@ -37,6 +40,7 @@ def test_add_highscore_success(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_add_highscore_user_not_found(mock_get_connection):
+    """Check if you can not add a highscore if no user by the provided name was found."""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
@@ -53,6 +57,7 @@ def test_add_highscore_user_not_found(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_highscores(mock_get_connection):
+    """Check get highscores"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
@@ -72,6 +77,7 @@ def test_get_highscores(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_user_highscores(mock_get_connection):
+    """Check get user highscores"""
     # Arrange
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -97,6 +103,7 @@ def test_get_user_highscores(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_top_highscores(mock_get_connection):
+    """Test get top highscores"""
     # Arrange
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -126,4 +133,3 @@ def test_get_top_highscores(mock_get_connection):
                 LIMIT %s
             """, (2,)
     )
-    

@@ -72,6 +72,7 @@ docker run --rm --network host playwright-tests
 ## 📚 Documentation
 
 Check out the full documentation for this project in [ReadTheDocs](https://lw-sqs-ss25.readthedocs.io/en/latest/)
+In case the RTD-documentation is not available to you, you can always browse this repo:
 
 ### 🏗️ Architecture Decisions
 

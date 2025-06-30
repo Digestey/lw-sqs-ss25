@@ -57,7 +57,7 @@ workspace {
                     technology "mysql-connector-python"
                 }
 
-                quiz = component "Quiz Service" {
+                quiz = component "Pokemon Service" {
                     description "Fetches Pokémon data, builds quiz logic, and manages temporary quiz state and scores."
                     technology "pokebase, Redis"
                 }

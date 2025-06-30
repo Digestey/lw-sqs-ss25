@@ -35,6 +35,7 @@ async def start_quiz(response: Response):
     )
     return response
 
+
 @router.post("/api/next_quiz", response_class=JSONResponse)
 async def next_quiz(request: Request):
     """Prepares the next quiz question and updates session state.
@@ -62,8 +63,10 @@ async def next_quiz(request: Request):
 
     return {"message": "New quiz loaded."}
 
+
 def get_or_create_session_id(request: Request) -> str:
     return request.cookies.get("quiz_session_id") or str(uuid.uuid4())
+
 
 def get_or_init_state(session_id: str) -> dict:
     state = get_state(session_id)
@@ -74,12 +77,14 @@ def get_or_init_state(session_id: str) -> dict:
         set_state(session_id, state)
     return state
 
+
 def create_correct_response(score: int) -> JSONResponse:
     return JSONResponse(content={
         "correct": True,
         "message": "Ding Ding Ding! We have a winner!",
         "score": score
     })
+
 
 def create_incorrect_response(score: int) -> JSONResponse:
     return JSONResponse(content={
@@ -88,6 +93,7 @@ def create_incorrect_response(score: int) -> JSONResponse:
         "hint": "",
         "score": score
     })
+
 
 def set_session_cookie(response: JSONResponse, session_id: str):
     response.set_cookie(
@@ -98,6 +104,7 @@ def set_session_cookie(response: JSONResponse, session_id: str):
         samesite="lax",
         path="/"
     )
+
 
 @router.post("/api/quiz", response_class=JSONResponse)
 async def post_quiz(request: Request, guess: str = Form(...)):

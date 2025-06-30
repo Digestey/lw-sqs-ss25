@@ -20,3 +20,4 @@ This documentation collects the key Architecture Decision Records (ADRs) made th
    010_testcontainers.md
    011_sql_param.md
    012_use_redis.md
+   013_use_cookies.md

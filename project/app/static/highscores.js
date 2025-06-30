@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const response = await fetch("/api/highscore/10", {
-            credentials: "include" 
+            credentials: "include"
         });
 
         if (response.status === 401) {

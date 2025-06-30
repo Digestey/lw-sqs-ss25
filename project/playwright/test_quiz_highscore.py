@@ -1,6 +1,6 @@
+"""Basic ui tests for quiz and stuff"""
 import os
 import uuid
-import pytest
 from playwright.sync_api import sync_playwright
 
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
@@ -56,7 +56,6 @@ def test_quiz_flow_mocked():
         page.wait_for_selector("text=incorrect", timeout=5000)
         page.wait_for_selector("#quiz-message", timeout=10000)
         assert page.locator("#quiz-message").is_visible()
-
 
         # Wait for winner message
         page.wait_for_selector(
