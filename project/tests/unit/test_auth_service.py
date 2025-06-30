@@ -46,7 +46,7 @@ def test_authenticate_user_valid():
     db_user = {
         "id": 1,
         "username": "user",
-        "password_hash": hashed, 
+        "password_hash": hashed,
         "created_at": datetime.now()
     }
     user = auth.authenticate_user(db_user, test_password)
@@ -79,6 +79,7 @@ def test_authenticate_user_missing_fields():
         auth.authenticate_user(db_user, "")
     assert "Invalid credentials" in str(excinfo.value)
 
+
 def test_create_access_token_and_get_user(monkeypatch):
     """Check if tokens are created correctly. Mock db access."""
     test_username = "testuser"
@@ -97,12 +98,13 @@ def test_create_access_token_and_get_user(monkeypatch):
     # DB mock
     monkeypatch.setattr(auth, "get_user", lambda cnn, username: dummy_user)
 
-    token_obj = auth.create_access_token({"sub": test_username}, timedelta(minutes=5))
+    token_obj = auth.create_access_token(
+        {"sub": test_username}, timedelta(minutes=5))
     assert isinstance(token_obj, Token)
 
-    decoded_user = auth.get_user_from_token(token_obj.access_token, db_conn=None)
+    decoded_user = auth.get_user_from_token(
+        token_obj.access_token, db_conn=None)
     assert decoded_user.username == test_username
-
 
 
 def test_get_user_from_token_invalid(monkeypatch):
@@ -112,7 +114,8 @@ def test_get_user_from_token_invalid(monkeypatch):
     invalid_token = jwt.encode({"sub": "user"}, "wrongkey", algorithm="HS256")
 
     # Mock get_user to avoid needing a real DB call
-    monkeypatch.setattr(db, "get_user", lambda cnn, username: {"username": username})
+    monkeypatch.setattr(db, "get_user", lambda cnn,
+                        username: {"username": username})
 
     with pytest.raises(Exception) as excinfo:
         auth.get_user_from_token(invalid_token, db_conn=None)

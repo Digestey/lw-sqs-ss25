@@ -20,6 +20,7 @@ load_dotenv()
 CONN_POOL = None
 logger = logger.get_logger(name="db_conn")
 
+
 def get_pool(port=3306):
     """Create and return a global MySQL connection pool.
 
@@ -74,7 +75,8 @@ def is_database_healthy(
     """
     for attempt in range(retries):
         try:
-            logger.info(f"[Health Check] Attempt (host {host}) {attempt + 1}/{retries}...")
+            logger.info(
+                f"[Health Check] Attempt (host {host}) {attempt + 1}/{retries}...")
             conn = mysql.connector.connect(
                 host=host,
                 port=port,
@@ -91,22 +93,24 @@ def is_database_healthy(
         except Error as e:
             logger.warning(f"[Health Check] Connection failed: {e}")
             if attempt < retries - 1:
-                logger.warning(f"[Health Check] Retrying in {delay} seconds...")
+                logger.warning(
+                    f"[Health Check] Retrying in {delay} seconds...")
                 time.sleep(delay)
 
-    logger.warning("[Health Check] Max retries reached. Database is unhealthy.")
+    logger.warning(
+        "[Health Check] Max retries reached. Database is unhealthy.")
     return False
 
 
 def get_connection(port=None):
     """Returns a connection to access the database in order to perform SQL queries.
-    
+
     args:
         port (int): port the db is at 
         (defaults to None, if port is None, 3306 will be the default used port)
-    
+
     """
-    try:       
+    try:
         port = int(port) if port else int(os.getenv("MYSQL_PORT", "3306"))
         conn = get_pool(port).get_connection()
         return conn
@@ -132,7 +136,7 @@ def add_user(cnn, username, hashed_password):
         raise ValueError("Username cannot be empty or whitespace.")
     if not hashed_password:
         raise ValueError("Password cannot be empty.")
-    
+
     cursor = cnn.cursor(dictionary=True)
     try:
         logger.info(msg="Adding user "+username)
@@ -161,7 +165,8 @@ def delete_user(cnn, username: str) -> bool:
 
     try:
         with cnn.cursor(dictionary=True) as cursor:
-            cursor.execute("DELETE FROM users WHERE username = %s", (username,))
+            cursor.execute(
+                "DELETE FROM users WHERE username = %s", (username,))
             affected_rows = cursor.rowcount
         cnn.commit()
         return affected_rows > 0
@@ -219,7 +224,8 @@ def add_highscore(cnn, username, score):
         # Find user_id from username
         if score <= 0:
             logger.error(msg="The score someone tried to submit is zero.")
-            raise HTTPException(status_code=400, detail="Score must not be zero. You lazy pig.")
+            raise HTTPException(
+                status_code=400, detail="Score must not be zero. You lazy pig.")
         cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
         result = cursor.fetchone()
         if result is None:

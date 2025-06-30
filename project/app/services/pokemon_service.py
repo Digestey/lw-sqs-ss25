@@ -99,6 +99,7 @@ def log_pokemon_details(logger: Logger, pokemon):
         logger.debug(f"{stat.stat.name.capitalize()}: {stat.base_stat}")
     logger.debug("Types: " + ", ".join(t.type.name for t in pokemon.types))
 
+
 def get_test_pokemon() -> QuizInfo:
     """Returns a test pokemon during testing. Not for production use. only testing.
 
@@ -122,6 +123,7 @@ def get_test_pokemon() -> QuizInfo:
         types=["Grass", "Poison"],
         entry="THIS IS A TEST ENTRY: A strange seed was planted on its back at birth."
     )
+
 
 def fetch_pokemon(logger: Logger) -> QuizInfo:
     """Fetch a random Pokémon and return a QuizInfo object for use in quizzes.
@@ -162,4 +164,5 @@ def fetch_pokemon(logger: Logger) -> QuizInfo:
 
     except (requests.exceptions.RequestException, AttributeError, KeyError) as e:
         logger.error(f"Failed to fetch Pokémon data: {e}")
-        raise HTTPException(status_code=503, detail="External Pokémon API is unavailable.") from e
+        raise HTTPException(
+            status_code=503, detail="External Pokémon API is unavailable.") from e

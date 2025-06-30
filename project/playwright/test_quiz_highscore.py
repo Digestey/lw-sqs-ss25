@@ -57,7 +57,6 @@ def test_quiz_flow_mocked():
         page.wait_for_selector("#quiz-message", timeout=10000)
         assert page.locator("#quiz-message").is_visible()
 
-
         # Wait for winner message
         page.wait_for_selector(
             "text=Ding Ding Ding! We have a winner!", timeout=10000)

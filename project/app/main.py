@@ -52,7 +52,7 @@ app.include_router(quiz.router)
 
 if __name__ == "__main__":
     logger.info(
-    f"The address for redis: {os.getenv("REDIS_HOST", "NONE")}:{os.getenv("REDIS_PORT", "NONE")}")
+        f"The address for redis: {os.getenv("REDIS_HOST", "NONE")}:{os.getenv("REDIS_PORT", "NONE")}")
     # MySQL, are you there?
     if is_database_healthy(
             host=os.getenv("MYSQL_URL"),

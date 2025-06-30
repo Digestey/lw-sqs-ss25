@@ -29,7 +29,8 @@ def test_add_highscore_success(mock_get_connection):
     result = add_highscore(mock_conn, "testuser", 100)
 
     assert result["score"] == 100
-    mock_cursor.execute.assert_any_call("SELECT id FROM users WHERE username = %s", ("testuser",))
+    mock_cursor.execute.assert_any_call(
+        "SELECT id FROM users WHERE username = %s", ("testuser",))
     mock_cursor.execute.assert_any_call(
         "INSERT INTO highscores (user_id, score) VALUES (%s, %s)", (1, 100)
     )
@@ -132,4 +133,3 @@ def test_get_top_highscores(mock_get_connection):
                 LIMIT %s
             """, (2,)
     )
-    

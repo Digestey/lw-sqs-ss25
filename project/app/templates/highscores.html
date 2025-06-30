@@ -3,22 +3,23 @@
 {% block title %}Highscores - DEXQUIZ{% endblock %}
 
 {% block content %}
-    <h1>Top 10 Highscores</h1>
-    <div id="login-message" style="display:none;">You must <a href="/login">log in</a> to view the highscores.</div>
-    <table id="highscores-table">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Score</th>
-            </tr>
-        </thead>
-        <tbody id="highscores-list">
-            <!-- JS will fill this -->
-        </tbody>
-    </table>
+<h1>Top 10 Highscores</h1>
+<div id="login-message" style="display:none;">You must <a href="/login">log
+        in</a> to view the highscores.</div>
+<table id="highscores-table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody id="highscores-list">
+        <!-- JS will fill this -->
+    </tbody>
+</table>
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script src="{{ url_for('static', path='highscores.js') }}"></script>
+{{ super() }}
+<script src="{{ url_for('static', path='highscores.js') }}"></script>
 {% endblock %}

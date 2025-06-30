@@ -78,7 +78,8 @@ async def get_all_highscores(user: UserInDb = Depends(get_current_user_from_cook
         highscores = get_highscores(db_conn)
         return highscores
     except ValueError as valueerr:
-        raise HTTPException(status_code=404, detail=str(valueerr)) from valueerr
+        raise HTTPException(
+            status_code=404, detail=str(valueerr)) from valueerr
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
     finally:
@@ -117,6 +118,7 @@ async def get_top_highscores_api(
         if db_conn:
             db_conn.close()
 
+
 def get_session_id_from_request(request: Request) -> str:
     session_id = request.cookies.get("quiz_session_id")
     if session_id is None:
@@ -146,6 +148,7 @@ def reset_score_in_redis(session_id: str) -> None:
     redis = get_redis_client()
     redis_key = f"quiz:{session_id}"
     redis.set(redis_key, 0)
+
 
 @router.post("/api/highscore")
 async def post_highscore(
@@ -183,7 +186,8 @@ async def post_highscore(
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve)) from ve
     except mysql.connector.Error as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+        raise HTTPException(
+            status_code=500, detail="Internal server error") from e
     finally:
         if db_conn:
             db_conn.close()

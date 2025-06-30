@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <link href="{{ url_for('static', path='/css/main.css') }}" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}DEXQUIZ{% endblock %}</title>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('images', path='favicon.ico') }}" sizes="64x64">
-    <style>
+    <head>
+        <link href="{{ url_for('static', path='/css/main.css') }}"
+            rel="stylesheet">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}DEXQUIZ{% endblock %}</title>
+        <link rel="icon" type="image/x-icon"
+            href="{{ url_for('images', path='favicon.ico') }}" sizes="64x64">
+        <style>
         body {
             background-image: url('images/background.png');
             background-repeat: no-repeat;
@@ -15,39 +17,41 @@
             background-size: cover;
         }
     </style>
-</head>
+    </head>
 
-<body>
-    <div class="topbar">
-        <a title="DexQuiz" href="/" class="dexquiz-home-nav">
-            <img src="{{ url_for('images', path='dexquiz.png') }}" alt="DexQuiz" width="1715" height="168">
-        </a>
-    </div>
-    <div class="topnav">
-        <div class="nav-left">
-            <a href="/">Home</a>
-            <a href="/quiz">Quiz</a>
-            <a href="/highscores">Highscores</a>
+    <body>
+        <div class="topbar">
+            <a title="DexQuiz" href="/" class="dexquiz-home-nav">
+                <img src="{{ url_for('images', path='dexquiz.png') }}"
+                    alt="DexQuiz" width="1715" height="168">
+            </a>
         </div>
-        <div class="nav-right">
-            <span id="user-info"></span>
-            <a href="/login" id="login-link">Login</a>
-            <a href="/register" id="register-link">Register</a>
-            <button id="logout-button" style="display: none;">Logout</button>
+        <div class="topnav">
+            <div class="nav-left">
+                <a href="/">Home</a>
+                <a href="/quiz">Quiz</a>
+                <a href="/highscores">Highscores</a>
+            </div>
+            <div class="nav-right">
+                <span id="user-info"></span>
+                <a href="/login" id="login-link">Login</a>
+                <a href="/register" id="register-link">Register</a>
+                <button id="logout-button"
+                    style="display: none;">Logout</button>
+            </div>
         </div>
-    </div>
-    
-    <div class="content">
-        {% block content %}{% endblock %}
-    </div>
 
-    {% block scripts %}
-    <script src="{{ url_for('static', path='/base.js') }}"></script>
-    {% endblock %}
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
 
-    <footer class="footer">
-        <div class="footer-content"></div>
-    </footer>
-</body>
+        {% block scripts %}
+        <script src="{{ url_for('static', path='/base.js') }}"></script>
+        {% endblock %}
+
+        <footer class="footer">
+            <div class="footer-content"></div>
+        </footer>
+    </body>
 
 </html>

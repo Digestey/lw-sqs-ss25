@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from mysql.connector import Error
-from app.services.database_service import is_database_healthy  
+from app.services.database_service import is_database_healthy
+
 
 @patch("app.services.database_service.mysql.connector.connect")
 def test_is_database_healthy_success(mock_connect):
@@ -22,7 +23,7 @@ def test_is_database_healthy_success(mock_connect):
 
 
 @patch("app.services.database_service.mysql.connector.connect")
-@patch("app.services.database_service.time.sleep")  
+@patch("app.services.database_service.time.sleep")
 def test_is_database_healthy_failure(mock_sleep, mock_connect):
     """Unhealthy database returns False"""
     mock_connect.side_effect = Error("Unable to connect")

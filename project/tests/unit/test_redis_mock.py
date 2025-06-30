@@ -22,7 +22,8 @@ def test_create_redis_client_calls_with_env_vars(monkeypatch):
     monkeypatch.setenv("REDIS_PORT", "1234")
     with patch("app.services.redis_service.redis.Redis") as mock_redis:
         redis_service.create_redis_client()
-        mock_redis.assert_called_once_with(host="myhost", port=1234, db=0, decode_responses=True)
+        mock_redis.assert_called_once_with(
+            host="myhost", port=1234, db=0, decode_responses=True)
 
 
 def test_get_redis_client_returns_new_client_instance():
@@ -46,7 +47,8 @@ def test_is_redis_healthy_retries_and_returns_false(monkeypatch):
     monkeypatch.setattr(time, "sleep", lambda _: None)
     with patch("app.services.redis_service.get_redis_client") as mock_get_client:
         mock_client = MagicMock()
-        mock_client.ping.side_effect = redis_service.redis.exceptions.ConnectionError("fail")
+        mock_client.ping.side_effect = redis_service.redis.exceptions.ConnectionError(
+            "fail")
         mock_get_client.return_value = mock_client
 
         result = redis_service.is_redis_healthy(retries=3, delay=0)
