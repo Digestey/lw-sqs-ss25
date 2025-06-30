@@ -44,7 +44,12 @@ package "Routes" {
     }
 
     
-class HighscoreAPI {
+class "highscores.py" as HighscoreAPI {
+    +get_session_id_from_request(request)
+    +get_score_from_redis(session_id)
+    +reset_score_in_redis(session_id)
+    +get_token_from_cookie(access_token, cookie)
+    +get_current_user_from_cookie(token)
     +get_all_highscores(user)
     +get_top_highscores_api(top, user)
     +post_highscore(request, user)
@@ -64,15 +69,15 @@ class HighscoreAPI {
     +register(request)
     +logout(response)
     +get_username(current_user)
-    -verify_credentials(username, password)
-    -set_login_cookies(response, username)
+    +verify_credentials(username, password)
+    +set_login_cookies(response, username)
 }
 }
 
 package "Services" {
     class "auth_service.py" as AuthService {
         +authenticate_user(user, password)
-        +create_access_token(data)
+        +create_access_token(data, expires_delta)
         +get_user_from_request(request)
         +register_user(username, password)
         +check_credentials(username, password)
@@ -80,10 +85,12 @@ package "Services" {
 
     class "database_service.py" as DatabaseService {
         +get_pool(port=3306)
+        +connect_to_db(host, user, pw, db, port)
         +get_connection(port=None)
         +add_user(cnn, username, hash)
         +get_user(cnn, username)
         +delete_user(cnn, username)
+        +get_user_highscores(cnn, username)
         +get_highscores(cnn)
         +get_top_highscores(cnn, top)
         +add_highscore(cnn, username, score)
@@ -99,12 +106,17 @@ package "Services" {
     }
 
     class "redis_service.py" as RedisService {
-        +get_quiz_state(client_id)
-        +set_quiz_state(client_id, quiz_info)
-        +clear_quiz_state(client_id)
+        +create_redis_client()
+        +get_redis_client()
+        +is_redis_healthy(retries=5, delay=1)
+        +get_state(client_id)
+        +set_state(client_id, pokemon)
+        +clear_state(client_id)
         +get_score(session_id)
-        +increment_score(session_id)
+        +increment_score(session_id, value=25)
         +reset_score(session_id)
+        -_key(client_id)
+        -_score_key(session_id)
     }
 }
 
