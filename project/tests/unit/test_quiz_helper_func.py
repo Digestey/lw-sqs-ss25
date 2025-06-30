@@ -87,7 +87,7 @@ def test_create_incorrect_response():
     response = create_incorrect_response(3)
     assert isinstance(response, JSONResponse)
     assert response.status_code == 200
-    assert response.body == b'{"correct":false,"message":"That is incorrect. Another hint has been added to the entry.","hint":"","score":3}'
+    assert response.body == b'{"correct":false,"message":"That is incorrect. Please try again.","hint":"","score":3}'
 
 ### --- Tests for set_session_cookie --- ###
 
