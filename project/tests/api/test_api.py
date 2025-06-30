@@ -44,7 +44,6 @@ def test_login_user(client):
     assert cookie_header is not None
     assert "access_token" in cookie_header  # or your cookie name
 
-    # Optional: check cookie exists in client for subsequent requests
     cookies = client.cookies.jar
     assert any(cookie.name == "access_token" for cookie in cookies)
 
@@ -232,8 +231,6 @@ def test_logout(client, mysql_container):
     assert response.status_code == 200
     assert response.json()["detail"] == "Logged out successfully"
 
-    # Technically FastAPI's TestClient doesn't auto-remove cookies like a browser would
-    # So you'd want to check that the server tried to unset them
     set_cookie_headers = response.headers.get("set-cookie")
     # logout should send Set-Cookie with deletion
     assert set_cookie_headers is not None
@@ -282,7 +279,6 @@ def test_quiz_reset_score(client):
         "submitted": False
     }
     redis.set(quiz_key, json.dumps(quiz_data))
-    # Simulate login if needed; otherwise call the endpoint directly
     response = client.post("/api/quiz/reset")
     
     assert response.status_code == 200
