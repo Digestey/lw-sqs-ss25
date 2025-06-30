@@ -11,6 +11,7 @@ SQL_FILE_PATH = os.path.abspath("init.sql")
 
 @pytest.fixture
 def password_hash():
+    """Lets mock a hashed password"""
     return "hashed_password_mock"
 
 def run_sql_file(conn, filepath):
@@ -30,6 +31,7 @@ def run_sql_file(conn, filepath):
 
 @pytest.fixture(scope="session")
 def mysql_container():
+    """Connecting to test container"""
     container = MySqlContainer("mysql:9.2.0", username="testuser", password="testpass", dbname="pokedb")
     container.start()
     port = container.get_exposed_port(3306)
@@ -54,6 +56,7 @@ def get_random_open_port() -> int:
 
 @pytest.fixture(scope="session", autouse=True)
 def redis_container():
+    """Connects to redis testcontainer"""
     fixed_port = get_random_open_port()
 
     container = RedisContainer("redis:8.2-m01-bookworm") \
@@ -68,6 +71,7 @@ def redis_container():
 
 @pytest.fixture
 def client(mysql_container):
+    """Lets start the test client."""
      # Set env again for safety
     os.environ["MYSQL_URL"] = "127.0.0.1"
     os.environ["MYSQL_USER"] = "testuser"

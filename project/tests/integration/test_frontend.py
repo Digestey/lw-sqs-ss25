@@ -1,3 +1,4 @@
+"""Froentend integration tests"""
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 from app.main import app  # Adjust to your actual FastAPI app entrypoint
@@ -6,22 +7,25 @@ from app.models.quiz_info import QuizInfo
 client = TestClient(app)
 
 def test_homepage():
+    """Check if template is returned when accessing"""
     response = client.get("/")
     assert response.status_code == 200
     assert "DexQuiz" in response.text
     
 def test_login_frontend():
+    """Check if login template is returned"""
     response = client.get("/login")
     assert response.status_code == 200
     assert "login" in response.text
     
 def test_register_frontend():
+    """check if register template is returned"""
     response = client.get("/register")
     assert response.status_code == 200
     assert "register" in response.text
     
 def test_get_quiz_generates_new_session_and_sets_state(client):
-    # This is the test data returned by fetch_pokemon when USE_TEST_POKEMON=1
+    """Test the quiz page. This took AGES. (and lots of chatgpt-ing)"""
     fake_pokemon = QuizInfo(
         name="bulbasaur",
         pokemon_id=1,

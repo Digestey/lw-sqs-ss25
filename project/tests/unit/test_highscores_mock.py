@@ -1,3 +1,4 @@
+"""Database service highscore related unit tests."""
 from unittest.mock import patch, MagicMock
 import pytest
 
@@ -11,6 +12,7 @@ from app.services.database_service import (
 
 @patch("app.services.database_service.get_connection")
 def test_add_highscore_success(mock_get_connection):
+    """Check if you can add a highscore"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
@@ -37,6 +39,7 @@ def test_add_highscore_success(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_add_highscore_user_not_found(mock_get_connection):
+    """Check if you can not add a highscore if no user by the provided name was found."""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
@@ -53,6 +56,7 @@ def test_add_highscore_user_not_found(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_highscores(mock_get_connection):
+    """Check get highscores"""
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
     mock_get_connection.return_value = mock_conn
@@ -72,6 +76,7 @@ def test_get_highscores(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_user_highscores(mock_get_connection):
+    """Check get user highscores"""
     # Arrange
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -97,6 +102,7 @@ def test_get_user_highscores(mock_get_connection):
 
 @patch("app.services.database_service.get_connection")
 def test_get_top_highscores(mock_get_connection):
+    """Test get top highscores"""
     # Arrange
     mock_conn = MagicMock()
     mock_cursor = MagicMock()

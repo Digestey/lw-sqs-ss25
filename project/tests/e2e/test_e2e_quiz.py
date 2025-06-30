@@ -1,3 +1,4 @@
+"""Quiz e2e tests"""
 import pytest
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
@@ -7,6 +8,7 @@ from app.services.redis_service import set_state, get_state, clear_state
 
 @pytest.fixture
 def test_pokemon():
+    """Test pokemon definiton"""
     return QuizInfo(
         name="pikachu",
         pokemon_id=25,
@@ -20,16 +22,19 @@ def test_pokemon():
 
 @pytest.fixture
 def test_session_header():
+    """Test session id header"""
     return {"X-Session-ID": "test-session-1"}
 
 
 @pytest.fixture
 def mock_sessions():
+    """Mock session"""
     with patch("app.routes.frontend.sessions", {}) as mock_store:
         yield mock_store
 
 
 def test_wrong_guess(client, test_session_header):
+    """Lets test a wrong guess"""
     # Arrange: same setup, but guessing wrong
     set_state("test-session-1", {
         "name": "Bulbasaur",
@@ -48,6 +53,7 @@ def test_wrong_guess(client, test_session_header):
 
 
 def test_correct_guess(client, test_session_header):
+    """Now test a correct guess."""
     # Arrange: simulate state with Bulbasaur as current Pokémon
     set_state("test-session-1", {
         "name": "Bulbasaur",
@@ -68,6 +74,7 @@ def test_correct_guess(client, test_session_header):
 
 
 def test_creates_new_session(client, test_session_header):
+    """start a new session by starting a new guess"""
     # Arrange: clear any old state
     clear_state("test-session-1")
 
@@ -84,5 +91,6 @@ def test_creates_new_session(client, test_session_header):
 
 
 def test_quiz_requires_form_data(client: TestClient, test_session_header):
+    """Form data required!"""
     response = client.post("/api/quiz", headers=test_session_header)
     assert response.status_code == 422

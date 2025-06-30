@@ -1,8 +1,9 @@
-import pytest
-from unittest.mock import patch, MagicMock
+"""Auth service unit tests"""
+from unittest.mock import patch
 from datetime import datetime, timedelta
 from jose import jwt
 import bcrypt
+import pytest
 
 import app.services.auth_service as auth
 import app.services.database_service as db
@@ -10,6 +11,7 @@ from app.models.token import Token
 
 
 def test_check_credentials_valid():
+    """Check if credentials are valid when ehey are supposed to be"""
     assert auth.check_credentials("validuser", "validpass123") is True
 
 
@@ -19,28 +21,32 @@ def test_check_credentials_valid():
     ("", ""),                 # both empty
 ])
 def test_check_credentials_invalid(username, password):
+    """Check if credentials are invalid """
     assert auth.check_credentials(username, password) is False
 
 
 def test_register_user_valid():
+    """Check if registration works"""
     result = auth.register_user("validuser", "validpass123")
     assert isinstance(result, bytes)
     assert bcrypt.checkpw("validpass123".encode(), result)
 
 
 def test_register_user_invalid():
+    """Check if registration detects invalid username/password"""
     with pytest.raises(Exception) as excinfo:
         auth.register_user("usr", "pwd")
     assert "Registration failed" in str(excinfo.value)
 
 
 def test_authenticate_user_valid():
+    """Check if authentication works without a hitch"""
     test_password = "validpass123"
     hashed = bcrypt.hashpw(test_password.encode(), bcrypt.gensalt())
     db_user = {
         "id": 1,
         "username": "user",
-        "password_hash": hashed,  # ⬅️ don't decode
+        "password_hash": hashed, 
         "created_at": datetime.now()
     }
     user = auth.authenticate_user(db_user, test_password)
@@ -49,6 +55,7 @@ def test_authenticate_user_valid():
 
 @patch("bcrypt.checkpw", return_value=False)
 def test_authenticate_user_invalid_password(mock_checkpw):
+    """Check if invalid credentials are blocked by authentication"""
     db_user = {
         "id": 1,
         "username": "user",
@@ -61,6 +68,7 @@ def test_authenticate_user_invalid_password(mock_checkpw):
 
 
 def test_authenticate_user_missing_fields():
+    """Check if missing credentials are blocked by authentication"""
     db_user = {
         "id": 1,
         "username": "",
@@ -71,10 +79,8 @@ def test_authenticate_user_missing_fields():
         auth.authenticate_user(db_user, "")
     assert "Invalid credentials" in str(excinfo.value)
 
-
-from datetime import datetime
-
 def test_create_access_token_and_get_user(monkeypatch):
+    """Check if tokens are created correctly. Mock db access."""
     test_username = "testuser"
     test_secret = "testsecret"
 
@@ -88,6 +94,7 @@ def test_create_access_token_and_get_user(monkeypatch):
         "created_at": datetime.now(),
     }
 
+    # DB mock
     monkeypatch.setattr(auth, "get_user", lambda cnn, username: dummy_user)
 
     token_obj = auth.create_access_token({"sub": test_username}, timedelta(minutes=5))
@@ -99,6 +106,7 @@ def test_create_access_token_and_get_user(monkeypatch):
 
 
 def test_get_user_from_token_invalid(monkeypatch):
+    """Check if invalid token is rejected."""
     monkeypatch.setattr(auth, "SECRET_KEY", "correctkey")
 
     invalid_token = jwt.encode({"sub": "user"}, "wrongkey", algorithm="HS256")
