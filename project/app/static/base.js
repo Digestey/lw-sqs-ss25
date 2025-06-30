@@ -7,19 +7,32 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
 
         try {
-            await fetch("/api/logout", {
+            // Call backend logout
+            const res = await fetch("/api/logout", {
                 method: "POST",
-                credentials: "include", 
+                credentials: "include",
             });
+
+            if (!res.ok) {
+                throw new Error("Logout failed");
+            }
+
+            // Reset score on backend
+            await fetch("/api/quiz/reset", {
+                method: "POST",
+                credentials: "include",
+            });
+
+            // Clear local storage
+            localStorage.removeItem("score");
+            localStorage.removeItem("token");
+
+            // Redirect to login page only after all is done
+            window.location.assign("/login");
         } catch (err) {
             console.error("Logout failed or server not reachable", err);
         }
 
-        // clear local storage (just in case something sussy is there)
-        localStorage.removeItem("token");
-
-        // Redirect to login page (because we can)
-        window.location.assign("/login");
     });
 
     // Call the backend API to get user info using cookie authentication

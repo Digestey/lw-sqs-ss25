@@ -30,6 +30,7 @@
     Your current Score: <span id="score-value">{{ pokemon.score or 0 }}</span>
 </p>
 <button id="submit-score-button" style="display: none;">Submit score</button>
+<button id="reset-score-button">Reset Score</button>
 
 <div class="pokedex-container">
 
@@ -108,12 +109,12 @@
     </div>
 </div>
 
-<script src="/static/quiz.js"></script>
-
 {% if message %}
 <p>{{ message }}</p>
 {% endif %}
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', path='/quiz.js') }}"></script>
 {% endblock %}

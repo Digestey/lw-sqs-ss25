@@ -142,3 +142,27 @@ async def post_quiz(request: Request, guess: str = Form(...)):
         set_session_cookie(response, session_id)
 
     return response
+
+@router.post("/api/quiz/reset", response_class=JSONResponse)
+async def reset_quiz_score(request: Request):
+    """
+    Resets the current quiz score in the session.
+
+    Args:
+        request (Request): The incoming request with session cookie.
+
+    Returns:
+        JSONResponse: A message confirming the score has been reset.
+    """
+    session_id = request.cookies.get("quiz_session_id")
+    if not session_id:
+        return JSONResponse(status_code=400, content={"error": "No quiz session found"})
+
+    state = get_state(session_id)
+    if not state:
+        return JSONResponse(status_code=404, content={"error": "Quiz session state not found"})
+
+    state["score"] = 0
+    set_state(session_id, state)
+
+    return JSONResponse(content={"message": "Quiz score has been reset.", "score": 0})

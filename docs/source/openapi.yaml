@@ -85,6 +85,15 @@ paths:
   "/quiz":
     get:
       summary: Get Quiz
+      description: |-
+        Quiz page. Uses templating cimbined with a fetch from the redis container (where
+        the quiz data is stored at) to return a server-side rendered thing
+
+        Args:
+            request (Request): reqeust body
+
+        Returns:
+            HTMLResponse: Quiz Page (rendered).
       operationId: get_quiz_quiz_get
       responses:
         '200':
@@ -97,14 +106,19 @@ paths:
     get:
       summary: Get All Highscores
       description: |-
-        _summary_
+        Returns all highscores in the database.
 
-        Raises:
-            HTTPException: _description_
-            HTTPException: _description_
+        Requires user to be authenticated via a JWT token in cookies.
+
+        Args:
+            user (UserInDb): The authenticated user.
 
         Returns:
-            _type_: _description_
+            List[HighscoreResponse]: A list of all highscores.
+
+        Raises:
+            HTTPException: 404 if highscores are not found.
+            HTTPException: 500 if a database error occurs.
       operationId: get_all_highscores_api_highscores_get
       parameters:
       - name: access_token
@@ -135,14 +149,18 @@ paths:
     get:
       summary: Get Top Highscores Api
       description: |-
-        Returns the top N highscores. Requires login.
+        "Returns the top N highscores. Requires authentication.
 
         Args:
-            top (int): Number of top scores to return.
-            user (UserInDb): The authenticated user (not used, but required for access).
+            top (int): The number of top scores to retrieve.
+            user (UserInDb): The authenticated user (access control only).
 
         Returns:
-            List[HighscoreResponse]: The top N highscore entries.
+            List[HighscoreResponse]: The top N highscores.
+
+        Raises:
+            HTTPException: 404 if no highscores are found.
+            HTTPException: 500 if a database error occurs.
       operationId: get_top_highscores_api_api_highscore__top__get
       parameters:
       - name: top
@@ -178,6 +196,23 @@ paths:
   "/api/highscore":
     post:
       summary: Post Highscore
+      description: |-
+        Submits the user's current score as a highscore.
+
+        Reads score data from Redis using the quiz session ID stored in cookies.
+        Validates and stores the highscore in the database. Resets the score in Redis afterward.
+
+        Args:
+            request (Request): The HTTP request containing cookies.
+            user (UserInDb): The authenticated user submitting the score.
+
+        Returns:
+            dict: The newly created highscore record.
+
+        Raises:
+            HTTPException: 400 if session ID, quiz data, or score is missing.
+            HTTPException: 404 if the highscore could not be created.
+            HTTPException: 500 on internal server or database error.
       operationId: post_highscore_api_highscore_post
       parameters:
       - name: access_token
@@ -203,15 +238,8 @@ paths:
   "/api/token":
     post:
       summary: Login
-      description: |-
-        This is the API route where the user should log in. It's response contains
-        access and refresh Token, stored on the client in the form of cookies.
-
-        Args:
-            form_data (OAuth2PasswordRequestForm, optional): form data. Defaults to Depends().
-
-        Raises:
-            HTTPException: If anything goes wrong, access is denied by default.
+      description: Login route that returns access and refresh tokens as HTTP-only
+        cookies.
       operationId: login_api_token_post
       requestBody:
         content:
@@ -308,6 +336,17 @@ paths:
   "/api/start_quiz":
     get:
       summary: Start Quiz
+      description: |-
+        Starts a new quiz session and redirects to the quiz page.
+
+        A unique session ID is generated and stored in an HTTP-only cookie.
+        The user is redirected to the `/quiz` frontend route.
+
+        Args:
+            response (Response): The response object used to set cookies and redirect.
+
+        Returns:
+            RedirectResponse: A 302 redirect response to the quiz page with the session cookie set.
       operationId: start_quiz_api_start_quiz_get
       responses:
         '200':
@@ -318,6 +357,17 @@ paths:
   "/api/next_quiz":
     post:
       summary: Next Quiz
+      description: |-
+        Prepares the next quiz question and updates session state.
+
+        Retrieves the user's current quiz session via cookie, preserves the current score,
+        fetches a new Pokémon, and stores it in the session state.
+
+        Args:
+            request (Request): The incoming request containing cookies for session tracking.
+
+        Returns:
+            JSONResponse: A success message if a session exists, or an error message if not.
       operationId: next_quiz_api_next_quiz_post
       responses:
         '200':
@@ -328,6 +378,20 @@ paths:
   "/api/quiz":
     post:
       summary: Post Quiz
+      description: |-
+        Processes the user's guess and updates the quiz session.
+
+        Checks the submitted answer against the correct Pokémon name.
+        Updates the score on a correct guess and prepares hints for incorrect guesses.
+        Initializes a new session if none exists.
+
+        Args:
+            request (Request): The incoming request containing the session cookie and form data.
+            guess (str): The user's guess, submitted via form input.
+
+        Returns:
+            JSONResponse: A response indicating whether the guess was correct,
+            the updated score, and optional hints.
       operationId: post_quiz_api_quiz_post
       requestBody:
         content:
@@ -347,6 +411,24 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/HTTPValidationError"
+  "/api/quiz/reset":
+    post:
+      summary: Reset Quiz Score
+      description: |-
+        Resets the current quiz score in the session.
+
+        Args:
+            request (Request): The incoming request with session cookie.
+
+        Returns:
+            JSONResponse: A message confirming the score has been reset.
+      operationId: reset_quiz_score_api_quiz_reset_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
 components:
   schemas:
     Body_login_api_token_post:

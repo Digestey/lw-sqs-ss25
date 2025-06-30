@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    if (!document.querySelector("form[action='/api/quiz']")) {
+    if (!window.location.pathname.startsWith("/quiz")) {
         localStorage.removeItem("score");
     }
     const form = document.querySelector("form");
@@ -10,6 +10,30 @@ document.addEventListener("DOMContentLoaded", function () {
     const submitGuessButton = document.getElementById("submit-guess-button");
     const nextQuestionButton = document.getElementById("next-question-button");
     const guessInput = form.querySelector('input[name="guess"]');
+    let score = parseInt(localStorage.getItem("score")) || 0;
+
+
+    document.getElementById("reset-score-button").addEventListener("click", async () => {
+        try {
+            if (score == 0) {
+                return;
+            }
+            const res = await fetch("/api/quiz/reset", {
+                method: "POST",
+            });
+            const data = await res.json();
+            if (res.ok) {
+                scoreValue.textContent = data.score;
+                messageBox.textContent = data.message;
+                scoreDisplay.style.display = "block";
+            } else {
+                messageBox.textContent = data.error || "Failed to reset score.";
+            }
+        } catch (err) {
+            console.error("Error resetting score:", err);
+            messageBox.textContent = "Unexpected error occurred.";
+        }
+    });
 
     // Show score and submit score button always
     scoreDisplay.style.display = "block";
@@ -21,17 +45,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Load score from localStorage if you want, else rely on backend state
-    let score = parseInt(localStorage.getItem("score")) || 0;
-    scoreValue.textContent = score;
 
-    const logoutButton = document.getElementById("logout-button");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", () => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("score");
-            window.location.assign("/");
-        });
-    }
+    scoreValue.textContent = score;
 
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
