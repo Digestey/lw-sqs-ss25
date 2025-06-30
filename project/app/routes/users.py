@@ -62,7 +62,8 @@ def set_login_cookies(response: Response, username: str):
         httponly=True,
         secure=True,
         samesite="strict",
-        max_age=1800
+        max_age=1800,
+        path="/"
     )
     response.set_cookie(
         key="refresh_token",
@@ -70,7 +71,8 @@ def set_login_cookies(response: Response, username: str):
         httponly=True,
         secure=True,
         samesite="strict",
-        max_age=604_800  # 7 days
+        max_age=604_800, # 7 days
+        path="/"
     )
 
 
@@ -106,9 +108,9 @@ def refresh_token(response: Response, request: Request):
             old_token, db_conn)
 
         response.set_cookie("access_token", access_token, httponly=True,
-                            secure=True, samesite="strict", max_age=1800)
+                            secure=True, samesite="strict", max_age=1800, path="/")
         response.set_cookie("refresh_token", new_refresh_token, httponly=True,
-                            secure=True, samesite="strict", max_age=7 * 24 * 60 * 60)
+                            secure=True, samesite="strict", max_age=7 * 24 * 60 * 60, path="/")
         return {"message": f"Token refreshed for {username}"}
     finally:
         if db_conn:

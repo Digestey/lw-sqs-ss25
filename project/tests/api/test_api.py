@@ -165,6 +165,7 @@ async def test_post_and_get_highscore(client, mysql_container):
 
 @pytest.mark.asyncio
 async def test_get_highscores_unauthorized(client):
+    
     # /api/highscores is protected
     response = client.get("/api/highscores")
     assert response.status_code == 401  # missing or invalid token
@@ -240,3 +241,52 @@ def test_logout(client, mysql_container):
     assert 'refresh_token=""' in set_cookie_headers
 
     conn.close()
+
+def test_quiz_reset_score(client):
+    """This is a full-fledged workflow like any normal user would do it"""
+    # Register test user
+    register_response = client.post("/api/register", json={
+        "username": "reset_user",
+        "password": "strongpass123"
+    })
+    assert register_response.status_code == 201
+
+    # Login
+    login_response = client.post("/api/token", data={
+        "username": "reset_user",
+        "password": "strongpass123"
+    })
+    assert login_response.status_code == 200
+
+    access_token = login_response.cookies.get("access_token")
+    assert access_token is not None, "No access_token cookie set"
+
+    # Step 1: Start quiz session — DO NOT follow redirects
+    start_response = client.get("/api/start_quiz", follow_redirects=False)
+    assert start_response.status_code == 302  # Redirect expected
+
+    # Manually parse quiz_session_id from Set-Cookie header
+    set_cookie = start_response.headers.get("set-cookie")
+    assert set_cookie is not None and "quiz_session_id=" in set_cookie
+
+    match = re.search(r"quiz_session_id=([^;]+)", set_cookie)
+    quiz_session_id = match.group(1)
+    assert quiz_session_id is not None
+
+    # Step 2: Seed Redis with score for this session
+    redis = get_redis_client()
+    quiz_key = f"quiz:{quiz_session_id}"
+    quiz_data = {
+        "name": "somepokemon",
+        "score": 1337,
+        "submitted": False
+    }
+    redis.set(quiz_key, json.dumps(quiz_data))
+    # Simulate login if needed; otherwise call the endpoint directly
+    response = client.post("/api/quiz/reset")
+    
+    assert response.status_code == 200
+    data = response.json()
+    
+    assert "message" in data
+    assert data["score"] == 0
