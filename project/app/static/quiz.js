@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             const data = await res.json();
             if (res.ok) {
+                score = data.score;  // Update local JS variable
+                localStorage.setItem("score", score);
                 scoreValue.textContent = data.score;
                 messageBox.textContent = data.message;
                 scoreDisplay.style.display = "block";
