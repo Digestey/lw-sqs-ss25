@@ -89,8 +89,8 @@ def create_correct_response(score: int) -> JSONResponse:
 def create_incorrect_response(score: int) -> JSONResponse:
     return JSONResponse(content={
         "correct": False,
-        "message": "That is incorrect. Another hint has been added to the entry.",
-        "hint": "",
+        "message": "That is incorrect. Please try again.",
+        "hint": "", # legacy
         "score": score
     })
 
@@ -101,7 +101,7 @@ def set_session_cookie(response: JSONResponse, session_id: str):
         value=session_id,
         max_age=1800,
         httponly=True,
-        samesite="lax",
+        samesite="strict",
         path="/"
     )
 
