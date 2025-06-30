@@ -22,7 +22,7 @@ def test_get_english_dex_entry_returns_entry():
         SimpleNamespace(language=SimpleNamespace(
             name="jp"), flavor_text="ワイルドポケモン")
     ])
-    result = pokemon_service.get_english_dex_entry(mock_species)
+    result = pokemon_service.get_english_dex_entry(mock_species, name="Regigigas")
     assert result == "A wild Pokémon."
 
 
@@ -32,8 +32,44 @@ def test_get_english_dex_entry_empty():
         SimpleNamespace(language=SimpleNamespace(
             name="jp"), flavor_text="ワイルドポケモン")
     ])
-    result = pokemon_service.get_english_dex_entry(mock_species)
+    result = pokemon_service.get_english_dex_entry(mock_species, name="Gengar")
     assert result == "No English entry found."
+
+
+def test_get_english_dex_entry_replaces_pokemon_name():
+    """Ensure Pokémon name is replaced in the dex entry."""
+    mock_species = SimpleNamespace(flavor_text_entries=[
+        SimpleNamespace(language=SimpleNamespace(name="en"),
+                        flavor_text="Bulbasaur can be seen napping in bright sunlight.")
+    ])
+    result = pokemon_service.get_english_dex_entry(
+        mock_species, name="Bulbasaur")
+    assert "[Pokémon]" in result
+    assert "Bulbasaur" not in result
+
+
+def test_get_english_dex_entry_case_insensitive_and_word_boundary():
+    """Ensure name replacement is case-insensitive and avoids partial matches."""
+    mock_species = SimpleNamespace(flavor_text_entries=[
+        SimpleNamespace(language=SimpleNamespace(name="en"),
+                        flavor_text="bulbasaur is cute. Bulbasaur is strong.")
+    ])
+    result = pokemon_service.get_english_dex_entry(
+        mock_species, name="Bulbasaur")
+    assert result.count("[Pokémon]") == 2
+    assert "bulbasaur" not in result.lower()
+
+
+def test_get_english_dex_entry_avoids_partial_replacement():
+    """Ensure similar names inside other words are not mistakenly replaced."""
+    mock_species = SimpleNamespace(flavor_text_entries=[
+        SimpleNamespace(language=SimpleNamespace(name="en"),
+                        flavor_text="This Pokémon is a real bulbasaurnado!")
+    ])
+    result = pokemon_service.get_english_dex_entry(
+        mock_species, name="Bulbasaur")
+    # The word 'bulbasaurnado' should remain untouched
+    assert "bulbasaurnado" in result
 
 
 def test_extract_stats():
